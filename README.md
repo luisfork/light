@@ -4,7 +4,7 @@
 
 Light is a static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, not deceptive advertised rates.
 
-🔗 **Live Site:** [GitHub Pages URL to be added after deployment]
+🔗 **Live Site:** https://luisfork.github.io/light/ (deployed automatically via GitHub Actions)
 
 ---
 
@@ -88,25 +88,26 @@ This reflects real Texas usage patterns where summer AC dominates annual consump
 light/
 ├── .github/
 │   └── workflows/
-│       └── update-plans.yml    # Daily data update automation
+│       ├── deploy.yml           # GitHub Pages deployment automation
+│       └── update-plans.yml     # Daily data update automation
 ├── data/
-│   ├── plans.json              # Electricity plans (updated daily)
-│   ├── tdu-rates.json          # TDU delivery charges
-│   └── local-taxes.json        # Texas local tax rates
+│   ├── plans.json               # Electricity plans (updated daily)
+│   ├── tdu-rates.json           # TDU delivery charges
+│   └── local-taxes.json         # Texas local tax rates
 ├── src/
-│   ├── index.html              # Main application
-│   ├── about.html              # Educational resources
+│   ├── index.html               # Main application
+│   ├── about.html               # Educational resources
 │   ├── css/
-│   │   └── styles.css          # Main stylesheet
+│   │   └── styles.css           # Main stylesheet
 │   └── js/
-│       ├── api.js              # Data loading
-│       ├── calculator.js       # Cost calculation engine
-│       └── ui.js               # User interface logic
+│       ├── api.js               # Data loading
+│       ├── calculator.js        # Cost calculation engine
+│       └── ui.js                # User interface logic
 ├── scripts/
-│   ├── fetch_plans.py          # Fetch plans from Power to Choose
-│   ├── fetch_tdu_rates.py      # TDU rate management
-│   └── generate_sample_data.py # Generate sample data
-├── pyproject.toml              # Python dependencies
+│   ├── fetch_plans.py           # Fetch plans from Power to Choose
+│   ├── fetch_tdu_rates.py       # TDU rate management
+│   └── generate_sample_data.py  # Generate sample data
+├── pyproject.toml               # Python dependencies
 ├── README.md
 └── LICENSE
 ```
@@ -161,17 +162,28 @@ python scripts/fetch_plans.py
 
 ## Deployment (GitHub Pages)
 
+### Automated Deployment
+
+This project uses GitHub Actions for automated deployment to GitHub Pages. The deployment workflow automatically:
+
+1. **Assembles the site** - Combines application code from `src/` with data from `data/` into a deployable artifact
+2. **Deploys to GitHub Pages** - Publishes the assembled site using GitHub's native Pages deployment action
+3. **Triggers automatically** on:
+   - Every push to `main` branch that affects `src/` or `data/`
+   - After the daily data update workflow completes
+   - Manual workflow dispatch (on-demand deployment)
+
 ### Initial Setup
 
 1. **Enable GitHub Pages**
    - Go to repository Settings → Pages
-   - Source: Deploy from a branch
-   - Branch: `main`
-   - Folder: `/src`
+   - Source: **GitHub Actions** (not "Deploy from a branch")
+   - The deployment workflow will handle everything automatically
 
 2. **Configure Custom Domain** (optional)
-   - Add a `CNAME` file to `/src`
-   - Set up DNS records
+   - Add a `CNAME` file to `src/` directory
+   - Configure DNS records for your custom domain
+   - GitHub Actions will include it in the deployment
 
 3. **Push to main branch**
    ```bash
@@ -182,15 +194,30 @@ python scripts/fetch_plans.py
 
 4. **Verify deployment**
    - Check Actions tab for deployment status
-   - Visit your GitHub Pages URL
+   - Look for the "Deploy to GitHub Pages" workflow
+   - Visit your GitHub Pages URL once deployment completes
 
 ### Automatic Updates
 
-GitHub Actions runs daily at 2 AM Central Time to:
-1. Fetch latest electricity plans
-2. Update `data/plans.json`
-3. Commit changes
-4. Trigger GitHub Pages rebuild
+The site is automatically updated through two workflows:
+
+1. **Data Update Workflow** (runs daily at 2 AM Central Time):
+   - Fetches latest electricity plans from Power to Choose
+   - Updates `data/plans.json`
+   - Commits changes to the repository
+
+2. **Deployment Workflow** (triggers after data updates):
+   - Assembles the complete site
+   - Deploys the updated site to GitHub Pages
+   - Ensures users always see the latest plan data
+
+### Manual Deployment
+
+To manually trigger a deployment:
+1. Go to the Actions tab
+2. Select "Deploy to GitHub Pages" workflow
+3. Click "Run workflow"
+4. Select the `main` branch and confirm
 
 ---
 
