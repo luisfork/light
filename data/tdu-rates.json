@@ -1,0 +1,62 @@
+{
+  "last_updated": "2026-01-08",
+  "effective_date": "2025-09-01",
+  "next_update": "2026-03-01",
+  "note": "TDU rates update on March 1 and September 1 each year. CenterPoint updated December 8, 2025.",
+  "tdus": [
+    {
+      "code": "CENTERPOINT",
+      "name": "CenterPoint Energy",
+      "service_area": "Houston and surrounding areas",
+      "monthly_base_charge": 4.90,
+      "per_kwh_rate": 6.00,
+      "effective_date": "2025-12-08",
+      "notes": "New 6.00¢ per kWh rate funds $2.9 billion Resiliency Plan"
+    },
+    {
+      "code": "ONCOR",
+      "name": "Oncor Electric Delivery",
+      "service_area": "Dallas-Fort Worth, Killeen, and surrounding areas",
+      "monthly_base_charge": 4.23,
+      "per_kwh_rate": 5.60,
+      "effective_date": "2025-09-01",
+      "notes": "Largest TDU serving 7.5 million customers"
+    },
+    {
+      "code": "AEP_CENTRAL",
+      "name": "AEP Texas Central",
+      "service_area": "Corpus Christi and Rio Grande Valley",
+      "monthly_base_charge": 3.21,
+      "per_kwh_rate": 6.04,
+      "effective_date": "2025-09-01",
+      "notes": ""
+    },
+    {
+      "code": "AEP_NORTH",
+      "name": "AEP Texas North",
+      "service_area": "Abilene and San Angelo",
+      "monthly_base_charge": 3.21,
+      "per_kwh_rate": 5.91,
+      "effective_date": "2025-09-01",
+      "notes": ""
+    },
+    {
+      "code": "TNMP",
+      "name": "Texas-New Mexico Power",
+      "service_area": "Scattered areas including Galveston",
+      "monthly_base_charge": 7.85,
+      "per_kwh_rate": 7.21,
+      "effective_date": "2025-09-01",
+      "notes": "One of the highest TDU rates in Texas"
+    },
+    {
+      "code": "LPL",
+      "name": "Lubbock Power & Light",
+      "service_area": "Lubbock",
+      "monthly_base_charge": 0.00,
+      "per_kwh_rate": 6.31,
+      "effective_date": "2025-09-01",
+      "notes": "Joined deregulation in January 2024"
+    }
+  ]
+}
