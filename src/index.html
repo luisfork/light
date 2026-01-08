@@ -6,232 +6,309 @@
     <meta name="description" content="Find the best and most affordable Texas electricity plan. Free, unbiased, and accurate cost comparison based on your actual usage.">
     <meta name="keywords" content="Texas electricity, electricity plans, power to choose, Texas energy, electricity rates">
     <title>Light - Find Your Best Texas Electricity Plan</title>
-
-    <!-- Inter Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="./css/styles.css">
-
-    <!-- Framer Motion CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.16/dist/framer-motion.js"></script>
 </head>
 <body>
-    <!-- Unitary Surface -->
-    <div class="surface">
-        <!-- Header: Minimal and Typographic -->
-        <header class="header">
-            <div class="container">
-                <div class="header-inner">
-                    <h1 class="wordmark">Light</h1>
-                    <nav class="nav">
-                        <a href="./about.html" class="nav-item">About</a>
-                    </nav>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="site-logo">
+                    <span class="logo-light">Light</span>
+                </h1>
+                <nav class="site-nav">
+                    <a href="./index.html" class="nav-link active">Home</a>
+                    <a href="./about.html" class="nav-link">About</a>
+                    <a href="#how-it-works" class="nav-link">How It Works</a>
+                </nav>
+            </div>
+            <div class="header-tagline">
+                <p>Find your best Texas electricity plan, free and unbiased</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h2 class="hero-title">Stop overpaying for electricity</h2>
+            <p class="hero-subtitle">
+                Most Texans overpay $800+ annually by choosing plans with deceptive bill credits.
+                Get true cost comparison based on your actual usage pattern.
+            </p>
+            <div class="hero-features">
+                <div class="feature-item">
+                    <span class="feature-icon">💰</span>
+                    <span>100% Free</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔍</span>
+                    <span>Unbiased</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <span>Accurate Costs</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🏠</span>
+                    <span>Made in Texas</span>
                 </div>
             </div>
-        </header>
+        </div>
+    </section>
 
-        <!-- Hero: Pure Typography -->
-        <section class="hero">
-            <div class="container">
-                <h2 class="hero-headline">True cost.<br>Not advertised rates.</h2>
-                <p class="hero-body">
-                    Calculate actual annual electricity costs based on your usage pattern.<br>
-                    No deceptive marketing. No hidden fees.
-                </p>
-            </div>
-        </section>
-
-        <!-- Hairline Divider -->
-        <div class="hairline"></div>
-
-        <!-- Calculator: Unitary Interface -->
-        <main class="calculator">
-            <div class="container">
-
-                <!-- ZIP Code Entry -->
-                <section class="calc-section" id="zip-section">
-                    <label class="input-label">Your ZIP Code</label>
+    <!-- Main Calculator Section -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Step 1: ZIP Code -->
+            <section class="input-section" id="zip-section">
+                <div class="section-header">
+                    <span class="step-number">Step 1</span>
+                    <h2>Enter Your ZIP Code</h2>
+                </div>
+                <div class="input-group">
+                    <label for="zip-code" class="input-label">ZIP Code</label>
                     <input
                         type="text"
                         id="zip-code"
-                        class="zip-field"
+                        class="input-field zip-input"
                         placeholder="75001"
                         maxlength="5"
                         pattern="[0-9]{5}"
                         required
-                        autocomplete="postal-code"
                     >
-                    <p class="field-caption" id="tdu-info"></p>
-                </section>
+                    <p class="input-hint">We'll detect your TDU service area</p>
+                </div>
+                <div id="tdu-info" class="tdu-info" style="display: none;"></div>
+            </section>
 
-                <!-- Hairline -->
-                <div class="hairline"></div>
+            <!-- Step 2: Usage Input -->
+            <section class="input-section disabled" id="usage-section">
+                <div class="section-header">
+                    <span class="step-number">Step 2</span>
+                    <h2>Tell Us About Your Usage</h2>
+                </div>
 
-                <!-- Usage Input Modes -->
-                <section class="calc-section" id="usage-section" style="opacity: 0.4; pointer-events: none;">
-                    <label class="input-label">Usage Pattern</label>
+                <!-- Usage Type Tabs -->
+                <div class="usage-tabs">
+                    <button class="usage-tab active" data-usage-type="quick">
+                        <span class="tab-title">Quick Estimate</span>
+                        <span class="tab-subtitle">Easiest - just pick your home size</span>
+                    </button>
+                    <button class="usage-tab" data-usage-type="average">
+                        <span class="tab-title">Average Usage</span>
+                        <span class="tab-subtitle">Enter average monthly kWh</span>
+                    </button>
+                    <button class="usage-tab" data-usage-type="monthly">
+                        <span class="tab-title">Monthly Usage</span>
+                        <span class="tab-subtitle">Most accurate - enter each month</span>
+                    </button>
+                </div>
 
-                    <!-- Segmented Control -->
-                    <div class="segmented-control" id="usage-mode-control">
-                        <button class="segment active" data-mode="quick">Quick</button>
-                        <button class="segment" data-mode="average">Average</button>
-                        <button class="segment" data-mode="detailed">Detailed</button>
-                        <div class="segment-indicator"></div>
-                    </div>
-
-                    <!-- Quick Mode -->
-                    <div class="usage-mode active" id="quick-mode" data-mode="quick">
-                        <select id="home-size" class="select-field">
-                            <option value="">Home size</option>
-                            <option value="studio">Apartment • 500 kWh</option>
-                            <option value="2br">2BR Apartment • 750 kWh</option>
-                            <option value="small">Small House • 1,000 kWh</option>
-                            <option value="medium">Medium House • 1,500 kWh</option>
-                            <option value="large">Large House • 2,000 kWh</option>
-                            <option value="xlarge">Large House • 2,500+ kWh</option>
+                <!-- Quick Estimate Panel -->
+                <div class="usage-panel active" id="quick-usage-panel">
+                    <div class="input-group">
+                        <label for="home-size" class="input-label">Home Size</label>
+                        <select id="home-size" class="input-field">
+                            <option value="">Select your home size...</option>
+                            <option value="studio">Studio/1BR Apartment (500 kWh/month)</option>
+                            <option value="2br">2BR Apartment (750 kWh/month)</option>
+                            <option value="small">Small to Medium House (1000 kWh/month)</option>
+                            <option value="medium">Medium House (1500 kWh/month)</option>
+                            <option value="large">Large House (2000 kWh/month)</option>
+                            <option value="xlarge">Very Large House (2500+ kWh/month)</option>
                         </select>
-                    </div>
-
-                    <!-- Average Mode -->
-                    <div class="usage-mode" id="average-mode" data-mode="average">
-                        <div class="number-input-group">
-                            <input
-                                type="number"
-                                id="avg-usage"
-                                class="number-field"
-                                placeholder="1000"
-                                min="100"
-                                max="10000"
-                                step="50"
-                            >
-                            <span class="unit">kWh/month</span>
-                        </div>
-                    </div>
-
-                    <!-- Detailed Mode: 12-Month Data Visualization -->
-                    <div class="usage-mode" id="detailed-mode" data-mode="detailed">
-                        <div class="monthly-data">
-                            <div class="month-row">
-                                <span class="month-label">Jan</span>
-                                <input type="number" id="month-1" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Feb</span>
-                                <input type="number" id="month-2" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Mar</span>
-                                <input type="number" id="month-3" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Apr</span>
-                                <input type="number" id="month-4" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">May</span>
-                                <input type="number" id="month-5" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Jun</span>
-                                <input type="number" id="month-6" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Jul</span>
-                                <input type="number" id="month-7" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Aug</span>
-                                <input type="number" id="month-8" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Sep</span>
-                                <input type="number" id="month-9" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Oct</span>
-                                <input type="number" id="month-10" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Nov</span>
-                                <input type="number" id="month-11" class="month-field" placeholder="—" min="0">
-                            </div>
-                            <div class="month-row">
-                                <span class="month-label">Dec</span>
-                                <input type="number" id="month-12" class="month-field" placeholder="—" min="0">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Calculate -->
-                    <button id="calculate-btn" class="calculate-btn">Calculate</button>
-                </section>
-
-                <!-- Hairline -->
-                <div class="hairline"></div>
-
-                <!-- Results: Editorial List -->
-                <section class="results" id="results-section" style="display: none;">
-                    <h3 class="results-title">Ranked by True Annual Cost</h3>
-                    <div id="results-list" class="results-list"></div>
-                </section>
-
-            </div>
-        </main>
-
-        <!-- Hairline -->
-        <div class="hairline"></div>
-
-        <!-- Methodology -->
-        <section class="methodology">
-            <div class="container">
-                <h3 class="section-title">Methodology</h3>
-                <div class="method-grid">
-                    <div class="method-item">
-                        <h4>Seasonal Patterns</h4>
-                        <p>Texas usage varies 40–80% between summer and shoulder months. We account for this.</p>
-                    </div>
-                    <div class="method-item">
-                        <h4>All Fees Included</h4>
-                        <p>Energy charges, TDU delivery, base fees, and local taxes. No hidden costs.</p>
-                    </div>
-                    <div class="method-item">
-                        <h4>Bill Credit Reality</h4>
-                        <p>We calculate how many months you'll qualify for credits based on actual usage.</p>
-                    </div>
-                    <div class="method-item">
-                        <h4>Annual Ranking</h4>
-                        <p>Sorted by true annual cost, not deceptive "advertised rates" at 1,000 kWh.</p>
+                        <p class="input-hint">We'll apply Texas seasonal patterns automatically</p>
                     </div>
                 </div>
+
+                <!-- Average Usage Panel -->
+                <div class="usage-panel" id="average-usage-panel">
+                    <div class="input-group">
+                        <label for="avg-usage" class="input-label">Average Monthly kWh</label>
+                        <input
+                            type="number"
+                            id="avg-usage"
+                            class="input-field"
+                            placeholder="1000"
+                            min="100"
+                            max="10000"
+                            step="50"
+                        >
+                        <p class="input-hint">Find this on your electricity bill. We'll apply seasonal patterns.</p>
+                    </div>
+                </div>
+
+                <!-- Monthly Usage Panel -->
+                <div class="usage-panel" id="monthly-usage-panel">
+                    <p class="panel-intro">Enter your usage for each month for the most accurate comparison.</p>
+                    <div class="monthly-grid">
+                        <div class="month-input-group">
+                            <label for="month-1">January</label>
+                            <input type="number" id="month-1" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-2">February</label>
+                            <input type="number" id="month-2" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-3">March</label>
+                            <input type="number" id="month-3" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-4">April</label>
+                            <input type="number" id="month-4" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-5">May</label>
+                            <input type="number" id="month-5" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-6">June</label>
+                            <input type="number" id="month-6" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-7">July</label>
+                            <input type="number" id="month-7" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-8">August</label>
+                            <input type="number" id="month-8" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-9">September</label>
+                            <input type="number" id="month-9" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-10">October</label>
+                            <input type="number" id="month-10" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-11">November</label>
+                            <input type="number" id="month-11" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                        <div class="month-input-group">
+                            <label for="month-12">December</label>
+                            <input type="number" id="month-12" class="input-field-small" placeholder="kWh" min="0">
+                        </div>
+                    </div>
+                    <p class="input-hint">Tip: Get detailed usage from Smart Meter Texas or past bills</p>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="button-group">
+                    <button id="calculate-btn" class="btn-primary btn-large">
+                        Find Best Plans
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="results-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Your Best Plans</h2>
+                    <p>Ranked by true annual cost based on your usage pattern</p>
+                </div>
+
+                <!-- Top 3 Best Plans -->
+                <div id="best-plans" class="best-plans-container"></div>
+
+                <!-- Warning: Plans to Avoid -->
+                <div id="gimmick-plans" class="gimmick-plans-container" style="display: none;"></div>
+
+                <!-- Full Comparison Table -->
+                <div class="comparison-section">
+                    <h3>All Plans Comparison</h3>
+                    <div id="comparison-table" class="table-container"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section" id="how-it-works">
+        <div class="container">
+            <h2>How We Calculate True Costs</h2>
+            <div class="how-it-works-grid">
+                <div class="how-card">
+                    <h3>1. Seasonal Usage</h3>
+                    <p>Texas electricity usage varies dramatically by season. Summer months use 40-80% more than shoulder months. We account for this.</p>
+                </div>
+                <div class="how-card">
+                    <h3>2. All Fees Included</h3>
+                    <p>We include energy charges, TDU delivery fees, base charges, and local taxes. No hidden costs.</p>
+                </div>
+                <div class="how-card">
+                    <h3>3. Bill Credits Reality</h3>
+                    <p>We calculate how many months you'll actually qualify for bill credits based on your usage pattern.</p>
+                </div>
+                <div class="how-card">
+                    <h3>4. Annual Comparison</h3>
+                    <p>We rank by total annual cost, not deceptive "advertised rates" that only apply at exactly 1000 kWh.</p>
+                </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Hairline -->
-        <div class="hairline"></div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="container">
-                <p class="footer-text">
-                    Free and unbiased. No commissions. Open source.<br>
-                    Data from Power to Choose (PUCT). Updated daily.
-                </p>
-                <p class="footer-legal">
-                    This tool provides educational estimates. Verify plan details on the EFL before enrolling.<br>
-                    Not affiliated with any electricity provider.
-                </p>
+    <!-- Trust Section -->
+    <section class="trust-section">
+        <div class="container">
+            <h2>100% Free and Unbiased</h2>
+            <div class="trust-grid">
+                <div class="trust-item">
+                    <h3>No Commissions</h3>
+                    <p>We do not receive commissions from any person, company, or entity. Ever.</p>
+                </div>
+                <div class="trust-item">
+                    <h3>Open Source</h3>
+                    <p>All our code and calculations are open source on GitHub. Check our work.</p>
+                </div>
+                <div class="trust-item">
+                    <h3>Community Project</h3>
+                    <p>This tool is a community project for public benefit. Made by Texans, for Texans.</p>
+                </div>
             </div>
-        </footer>
+            <div class="data-transparency">
+                <p id="data-freshness" class="data-freshness-text">Plans updated: Loading...</p>
+                <p class="data-source">Data source: Power to Choose (PUCT official platform)</p>
+            </div>
+        </div>
+    </section>
 
-    </div>
-    <!-- End Unitary Surface -->
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Light</h4>
+                    <p>Free, unbiased Texas electricity plan comparison</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="./about.html">About</a></li>
+                        <li><a href="https://www.powertochoose.org" target="_blank">Power to Choose</a></li>
+                        <li><a href="https://www.puc.texas.gov" target="_blank">PUCT</a></li>
+                        <li><a href="https://www.smartmetertexas.com" target="_blank">Smart Meter Texas</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Disclaimer</h4>
+                    <p class="footer-disclaimer">
+                        This tool provides educational cost estimates. Always verify plan details on the official EFL before enrolling.
+                        We are not affiliated with any electricity provider.
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Light. Open source project. MIT License.</p>
+            </div>
+        </div>
+    </footer>
 
     <!-- Scripts -->
     <script src="./js/calculator.js"></script>
     <script src="./js/api.js"></script>
     <script src="./js/ui.js"></script>
-    <script src="./js/animations.js"></script>
 </body>
 </html>
