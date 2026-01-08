@@ -1,0 +1,28 @@
+{
+  "last_updated": "2026-01-08",
+  "note": "Most residential electricity is exempt from local sales tax in Texas. Some cities are eligible to impose local tax. Consult Texas Comptroller for complete list.",
+  "state_sales_tax": 0.0,
+  "cities_with_local_tax": [
+    {
+      "city": "Dallas",
+      "rate": 0.0,
+      "note": "Check Texas Comptroller for current status"
+    },
+    {
+      "city": "Houston",
+      "rate": 0.0,
+      "note": "Check Texas Comptroller for current status"
+    },
+    {
+      "city": "Austin",
+      "rate": 0.0,
+      "note": "Check Texas Comptroller for current status"
+    },
+    {
+      "city": "San Antonio",
+      "rate": 0.0,
+      "note": "Municipal utility - not deregulated"
+    }
+  ],
+  "reference": "https://comptroller.texas.gov/taxes/sales/utility/cities.php"
+}

@@ -1,0 +1,77 @@
+name: Update Electricity Plans Data
+
+on:
+  # Run daily at 2 AM Central Time (8 AM UTC during DST, 7 AM UTC otherwise)
+  schedule:
+    - cron: '0 7 * * *'  # 7 AM UTC = ~2 AM Central
+
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system requests beautifulsoup4 lxml
+
+      - name: Fetch electricity plans
+        id: fetch_plans
+        run: |
+          python scripts/fetch_plans.py
+        continue-on-error: true
+
+      - name: Generate sample data if fetch failed
+        if: steps.fetch_plans.outcome == 'failure'
+        run: |
+          echo "Plan fetch failed, generating sample data..."
+          python scripts/generate_sample_data.py
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet data/plans.json; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/plans.json
+          git commit -m "Update electricity plans data - $(date +'%Y-%m-%d')"
+          git push
+
+      - name: Create summary
+        run: |
+          echo "## Data Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check_changes.outputs.changes }}" == "true" ]; then
+            echo "**Status:** ✅ Data updated successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ℹ️ No changes detected" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Count plans in the file
+          PLAN_COUNT=$(python -c "import json; data = json.load(open('data/plans.json')); print(data['total_plans'])")
+          echo "**Total Plans:** $PLAN_COUNT" >> $GITHUB_STEP_SUMMARY
