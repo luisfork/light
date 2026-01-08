@@ -49,12 +49,12 @@ jobs:
           # Create a temporary directory for the assembled site
           mkdir -p _site
           
-          # Copy all files from src/ to _site/
-          cp -r src/* _site/
+          # Copy all files from src/ to _site/ (including hidden files)
+          cp -r src/. _site/
           
-          # Create data directory in _site and copy data files
+          # Create data directory in _site and copy data files (including hidden files)
           mkdir -p _site/data
-          cp -r data/* _site/data/
+          cp -r data/. _site/data/
           
           echo "Site assembled successfully"
           echo "Contents of _site:"
