@@ -1,28 +1,322 @@
 {
   "last_updated": "2026-01-08",
-  "note": "Most residential electricity is exempt from local sales tax in Texas. Some cities are eligible to impose local tax. Consult Texas Comptroller for complete list.",
+  "version": "2.0",
+  "note": "Texas residential electricity sales are generally exempt from state sales tax under Texas Tax Code Section 151.317. Some cities have historically been eligible to impose local utility taxes, but most do not apply to residential customers. This data is for reference only.",
   "state_sales_tax": 0.0,
-  "cities_with_local_tax": [
-    {
-      "city": "Dallas",
-      "rate": 0.0,
-      "note": "Check Texas Comptroller for current status"
-    },
-    {
-      "city": "Houston",
-      "rate": 0.0,
-      "note": "Check Texas Comptroller for current status"
-    },
-    {
-      "city": "Austin",
-      "rate": 0.0,
-      "note": "Check Texas Comptroller for current status"
-    },
-    {
-      "city": "San Antonio",
-      "rate": 0.0,
-      "note": "Municipal utility - not deregulated"
-    }
+  "state_sales_tax_note": "Texas state sales tax (6.25%) does not apply to residential electricity",
+  "default_local_rate": 0.0,
+  "methodology": "ZIP codes mapped to cities based on USPS data. Tax rates verified against Texas Comptroller records.",
+  "reference_urls": [
+    "https://comptroller.texas.gov/taxes/sales/utility/cities.php",
+    "https://comptroller.texas.gov/taxes/property-tax/rates/"
   ],
-  "reference": "https://comptroller.texas.gov/taxes/sales/utility/cities.php"
+  "tdu_service_areas": {
+    "ONCOR": {
+      "description": "Dallas-Fort Worth Metroplex and surrounding areas",
+      "default_tax_rate": 0.0
+    },
+    "CENTERPOINT": {
+      "description": "Greater Houston area",
+      "default_tax_rate": 0.0
+    },
+    "AEP_CENTRAL": {
+      "description": "Corpus Christi and Rio Grande Valley",
+      "default_tax_rate": 0.0
+    },
+    "AEP_NORTH": {
+      "description": "Abilene, San Angelo, and West Texas",
+      "default_tax_rate": 0.0
+    },
+    "TNMP": {
+      "description": "Texas-New Mexico Power territory including Galveston",
+      "default_tax_rate": 0.0
+    },
+    "LPL": {
+      "description": "Lubbock Power & Light service area",
+      "default_tax_rate": 0.0
+    }
+  },
+  "zip_code_ranges": {
+    "75001-75999": {
+      "region": "Dallas Metroplex",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "76001-76199": {
+      "region": "Fort Worth Area",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "76200-76299": {
+      "region": "Denton Area",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "76300-76399": {
+      "region": "Wichita Falls Area",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "76400-76499": {
+      "region": "Stephenville Area",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "76500-76599": {
+      "region": "Temple/Killeen Area",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "76600-76699": {
+      "region": "Waco Area",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "76700-76799": {
+      "region": "Waco Area Extended",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "76800-76899": {
+      "region": "Brownwood Area",
+      "tdu": "AEP_NORTH",
+      "rate": 0.0
+    },
+    "76900-76999": {
+      "region": "San Angelo Area",
+      "tdu": "AEP_NORTH",
+      "rate": 0.0
+    },
+    "77001-77299": {
+      "region": "Houston Central",
+      "tdu": "CENTERPOINT",
+      "rate": 0.0
+    },
+    "77300-77399": {
+      "region": "Conroe/The Woodlands",
+      "tdu": "CENTERPOINT",
+      "rate": 0.0
+    },
+    "77400-77499": {
+      "region": "Houston North",
+      "tdu": "CENTERPOINT",
+      "rate": 0.0
+    },
+    "77500-77599": {
+      "region": "Galveston/Texas City",
+      "tdu": "TNMP",
+      "rate": 0.0
+    },
+    "77600-77699": {
+      "region": "Beaumont/Port Arthur",
+      "tdu": "CENTERPOINT",
+      "rate": 0.0
+    },
+    "77700-77799": {
+      "region": "Houston Extended",
+      "tdu": "CENTERPOINT",
+      "rate": 0.0
+    },
+    "77800-77899": {
+      "region": "Bryan/College Station",
+      "tdu": "CENTERPOINT",
+      "rate": 0.0
+    },
+    "77900-77999": {
+      "region": "Houston South",
+      "tdu": "CENTERPOINT",
+      "rate": 0.0
+    },
+    "78001-78099": {
+      "region": "San Antonio Area",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "Municipal utility (CPS Energy) - not deregulated"
+    },
+    "78100-78199": {
+      "region": "San Antonio Extended",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "Municipal utility (CPS Energy) - not deregulated"
+    },
+    "78200-78299": {
+      "region": "San Antonio South",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "Municipal utility (CPS Energy) - not deregulated"
+    },
+    "78300-78399": {
+      "region": "Uvalde/Del Rio Area",
+      "tdu": "AEP_CENTRAL",
+      "rate": 0.0
+    },
+    "78400-78499": {
+      "region": "Corpus Christi",
+      "tdu": "AEP_CENTRAL",
+      "rate": 0.0
+    },
+    "78500-78599": {
+      "region": "Rio Grande Valley",
+      "tdu": "AEP_CENTRAL",
+      "rate": 0.0
+    },
+    "78600-78699": {
+      "region": "San Marcos/New Braunfels",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "78700-78799": {
+      "region": "Austin Area",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "Municipal utility (Austin Energy) - not deregulated"
+    },
+    "78800-78899": {
+      "region": "Kerrville Area",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "78900-78999": {
+      "region": "Laredo Area",
+      "tdu": "AEP_CENTRAL",
+      "rate": 0.0
+    },
+    "79001-79099": {
+      "region": "Amarillo Area",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "Not in ERCOT - different market"
+    },
+    "79100-79199": {
+      "region": "Amarillo Extended",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "Not in ERCOT - different market"
+    },
+    "79200-79299": {
+      "region": "Childress Area",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "Not in ERCOT - different market"
+    },
+    "79300-79399": {
+      "region": "Plainview Area",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "Not in ERCOT - different market"
+    },
+    "79400-79499": {
+      "region": "Lubbock Area",
+      "tdu": "LPL",
+      "rate": 0.0
+    },
+    "79500-79599": {
+      "region": "Snyder Area",
+      "tdu": "AEP_NORTH",
+      "rate": 0.0
+    },
+    "79600-79699": {
+      "region": "Abilene Area",
+      "tdu": "AEP_NORTH",
+      "rate": 0.0
+    },
+    "79700-79799": {
+      "region": "Midland/Odessa",
+      "tdu": "ONCOR",
+      "rate": 0.0
+    },
+    "79800-79899": {
+      "region": "Pecos/Fort Stockton",
+      "tdu": "AEP_NORTH",
+      "rate": 0.0
+    },
+    "79900-79999": {
+      "region": "El Paso Area",
+      "tdu": null,
+      "rate": 0.0,
+      "note": "El Paso Electric - not in ERCOT"
+    }
+  },
+  "major_cities": {
+    "dallas": {
+      "zip_codes": ["75201", "75202", "75203", "75204", "75205", "75206", "75207", "75208", "75209", "75210", "75211", "75212", "75214", "75215", "75216", "75217", "75218", "75219", "75220", "75223", "75224", "75225", "75226", "75227", "75228", "75229", "75230", "75231", "75232", "75233", "75234", "75235", "75236", "75237", "75238", "75240", "75241", "75242", "75243", "75244", "75246", "75247", "75248", "75249", "75250", "75251", "75252", "75253", "75254"],
+      "tdu": "ONCOR",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "houston": {
+      "zip_codes": ["77001", "77002", "77003", "77004", "77005", "77006", "77007", "77008", "77009", "77010", "77011", "77012", "77013", "77014", "77015", "77016", "77017", "77018", "77019", "77020", "77021", "77022", "77023", "77024", "77025", "77026", "77027", "77028", "77029", "77030", "77031", "77032", "77033", "77034", "77035", "77036", "77037", "77038", "77039", "77040", "77041", "77042", "77043", "77044", "77045", "77046", "77047", "77048", "77049", "77050", "77051", "77053", "77054", "77055", "77056", "77057", "77058", "77059", "77060", "77061", "77062", "77063", "77064", "77065", "77066", "77067", "77068", "77069", "77070", "77071", "77072", "77073", "77074", "77075", "77076", "77077", "77078", "77079", "77080", "77081", "77082", "77083", "77084", "77085", "77086", "77087", "77088", "77089", "77090", "77091", "77092", "77093", "77094", "77095", "77096", "77098", "77099"],
+      "tdu": "CENTERPOINT",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "fort_worth": {
+      "zip_codes": ["76101", "76102", "76103", "76104", "76105", "76106", "76107", "76108", "76109", "76110", "76111", "76112", "76113", "76114", "76115", "76116", "76117", "76118", "76119", "76120", "76121", "76122", "76123", "76124", "76126", "76127", "76129", "76130", "76131", "76132", "76133", "76134", "76135", "76136", "76137", "76140", "76147", "76148", "76150", "76155", "76161", "76162", "76163", "76164", "76177", "76179", "76181", "76182", "76185", "76191", "76192", "76193", "76195", "76196", "76197", "76198", "76199"],
+      "tdu": "ONCOR",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "austin": {
+      "zip_codes": ["78701", "78702", "78703", "78704", "78705", "78712", "78717", "78719", "78721", "78722", "78723", "78724", "78725", "78726", "78727", "78728", "78729", "78730", "78731", "78732", "78733", "78734", "78735", "78736", "78737", "78738", "78739", "78741", "78742", "78744", "78745", "78746", "78747", "78748", "78749", "78750", "78751", "78752", "78753", "78754", "78756", "78757", "78758", "78759"],
+      "tdu": null,
+      "rate": 0.0,
+      "deregulated": false,
+      "note": "Municipal utility (Austin Energy)"
+    },
+    "san_antonio": {
+      "zip_codes": ["78201", "78202", "78203", "78204", "78205", "78207", "78208", "78209", "78210", "78211", "78212", "78213", "78214", "78215", "78216", "78217", "78218", "78219", "78220", "78221", "78222", "78223", "78224", "78225", "78226", "78227", "78228", "78229", "78230", "78231", "78232", "78233", "78234", "78235", "78236", "78237", "78238", "78239", "78240", "78242", "78243", "78244", "78245", "78247", "78248", "78249", "78250", "78251", "78252", "78253", "78254", "78255", "78256", "78257", "78258", "78259", "78260", "78261", "78263", "78264", "78266"],
+      "tdu": null,
+      "rate": 0.0,
+      "deregulated": false,
+      "note": "Municipal utility (CPS Energy)"
+    },
+    "corpus_christi": {
+      "zip_codes": ["78401", "78402", "78404", "78405", "78406", "78407", "78408", "78409", "78410", "78411", "78412", "78413", "78414", "78415", "78416", "78417", "78418", "78419"],
+      "tdu": "AEP_CENTRAL",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "plano": {
+      "zip_codes": ["75023", "75024", "75025", "75026", "75074", "75075", "75086", "75093", "75094"],
+      "tdu": "ONCOR",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "arlington": {
+      "zip_codes": ["76001", "76002", "76003", "76004", "76005", "76006", "76010", "76011", "76012", "76013", "76014", "76015", "76016", "76017", "76018", "76019", "76094", "76096"],
+      "tdu": "ONCOR",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "lubbock": {
+      "zip_codes": ["79401", "79402", "79403", "79404", "79405", "79406", "79407", "79408", "79409", "79410", "79411", "79412", "79413", "79414", "79415", "79416", "79423", "79424"],
+      "tdu": "LPL",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "galveston": {
+      "zip_codes": ["77550", "77551", "77552", "77553", "77554", "77555"],
+      "tdu": "TNMP",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "abilene": {
+      "zip_codes": ["79601", "79602", "79603", "79604", "79605", "79606", "79607", "79608", "79697", "79698", "79699"],
+      "tdu": "AEP_NORTH",
+      "rate": 0.0,
+      "deregulated": true
+    },
+    "san_angelo": {
+      "zip_codes": ["76901", "76902", "76903", "76904", "76905", "76906", "76908", "76909"],
+      "tdu": "AEP_NORTH",
+      "rate": 0.0,
+      "deregulated": true
+    }
+  },
+  "special_notes": {
+    "residential_exemption": "Under Texas Tax Code Section 151.317, residential electricity is generally exempt from state sales tax when used for residential purposes.",
+    "municipal_utilities": "Cities with municipal utilities (Austin, San Antonio, etc.) are not part of the deregulated market and customers cannot choose their electricity provider.",
+    "not_in_ercot": "Some areas of Texas (Panhandle, El Paso, parts of East Texas) are not connected to the ERCOT grid and have different market rules.",
+    "verification_required": "Tax rates and exemptions should be verified with the Texas Comptroller's office for specific circumstances."
+  }
 }

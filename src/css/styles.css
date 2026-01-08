@@ -15,20 +15,35 @@
 }
 
 :root {
-    /* Colors - inspired by Apple's design system */
-    --color-primary: #2563eb;
-    --color-primary-dark: #1d4ed8;
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-danger: #ef4444;
+    /* Apple iOS System Colors - Official HIG Colors */
+    --color-primary: #007AFF;          /* Apple System Blue */
+    --color-primary-dark: #0056CC;     /* Darker blue for hover states */
+    --color-primary-light: #409CFF;    /* Lighter blue for backgrounds */
+    --color-success: #34C759;          /* Apple System Green */
+    --color-success-dark: #248A3D;     /* Dark mode green */
+    --color-warning: #FF9500;          /* Apple System Orange */
+    --color-warning-dark: #C93400;     /* Dark orange for emphasis */
+    --color-danger: #FF3B30;           /* Apple System Red */
+    --color-danger-dark: #D70015;      /* Dark red for emphasis */
 
-    /* Neutrals */
-    --color-text: #1d1d1f;
-    --color-text-secondary: #6e6e73;
-    --color-background: #ffffff;
-    --color-background-alt: #f5f5f7;
-    --color-border: #d2d2d7;
-    --color-border-light: #e5e5ea;
+    /* Additional Apple System Colors */
+    --color-teal: #5AC8FA;             /* Apple System Teal */
+    --color-indigo: #5856D6;           /* Apple System Indigo */
+    --color-purple: #AF52DE;           /* Apple System Purple */
+    --color-pink: #FF2D55;             /* Apple System Pink */
+    --color-yellow: #FFCC00;           /* Apple System Yellow */
+
+    /* Apple Neutrals - SF-inspired grays */
+    --color-text: #1D1D1F;             /* Apple label color */
+    --color-text-secondary: #86868B;   /* Apple secondary label */
+    --color-text-tertiary: #AEAEB2;    /* Apple tertiary label */
+    --color-background: #FFFFFF;
+    --color-background-alt: #F5F5F7;   /* Apple grouped background */
+    --color-background-elevated: #FFFFFF;
+    --color-border: #D1D1D6;           /* Apple separator color */
+    --color-border-light: #E5E5EA;     /* Apple opaque separator */
+    --color-fill: #787880;             /* Apple fill color */
+    --color-fill-secondary: #78788033; /* 20% opacity */
 
     /* Spacing */
     --spacing-xs: 0.5rem;
@@ -179,7 +194,7 @@ a:hover {
    ========================================================================= */
 
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--color-indigo) 0%, var(--color-purple) 100%);
     color: white;
     padding: var(--spacing-2xl) 0;
     text-align: center;
@@ -661,7 +676,7 @@ a:hover {
    ========================================================================= */
 
 .gimmick-plans-container {
-    background-color: #fef3c7;
+    background-color: #FFF9E6;           /* Light yellow/amber background */
     border: 2px solid var(--color-warning);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
@@ -669,12 +684,12 @@ a:hover {
 }
 
 .gimmick-plans-container h2 {
-    color: #92400e;
+    color: var(--color-warning-dark);
     margin-bottom: var(--spacing-sm);
 }
 
 .warning-intro {
-    color: #78350f;
+    color: #8B4500;                      /* Dark orange text */
     margin-bottom: var(--spacing-lg);
 }
 
@@ -703,12 +718,12 @@ a:hover {
 }
 
 .warning-item {
-    background-color: #fef3c7;
+    background-color: #FFF9E6;
     padding: var(--spacing-sm);
     border-radius: var(--radius-sm);
     margin-bottom: var(--spacing-xs);
     font-size: 0.9375rem;
-    color: #78350f;
+    color: #8B4500;
 }
 
 /* ============================================================================
@@ -756,7 +771,7 @@ a:hover {
 }
 
 .gimmick-row {
-    background-color: #fef3c7;
+    background-color: #FFF9E6;
 }
 
 .warning-badge {
@@ -981,9 +996,10 @@ a:hover {
 }
 
 .warnings-section {
-    background-color: #fef3c7;
+    background-color: #FFF9E6;
     padding: var(--spacing-md);
     border-radius: var(--radius-md);
+    border-left: 4px solid var(--color-warning);
 }
 
 .modal-actions {
@@ -1058,5 +1074,312 @@ a:hover {
 
     .monthly-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================================
+   Toast Notifications
+   ========================================================================= */
+
+.toast-container {
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-lg);
+    pointer-events: auto;
+    animation: toastSlideIn 0.3s ease, toastFadeOut 0.3s ease 4.7s forwards;
+    max-width: 400px;
+    font-size: 0.9375rem;
+    border-left: 4px solid var(--color-primary);
+}
+
+.toast-success {
+    border-left-color: var(--color-success);
+}
+
+.toast-success .toast-icon {
+    color: var(--color-success);
+}
+
+.toast-error {
+    border-left-color: var(--color-danger);
+}
+
+.toast-error .toast-icon {
+    color: var(--color-danger);
+}
+
+.toast-warning {
+    border-left-color: var(--color-warning);
+}
+
+.toast-warning .toast-icon {
+    color: var(--color-warning);
+}
+
+.toast-info {
+    border-left-color: var(--color-primary);
+}
+
+.toast-info .toast-icon {
+    color: var(--color-primary);
+}
+
+.toast-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    flex: 1;
+    color: var(--color-text);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.toast-close:hover {
+    color: var(--color-text);
+}
+
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes toastFadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* ============================================================================
+   Loading Skeleton
+   ========================================================================= */
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--color-background-alt) 25%,
+        var(--color-border-light) 50%,
+        var(--color-background-alt) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+}
+
+.skeleton-text-short {
+    width: 60%;
+}
+
+.skeleton-text-medium {
+    width: 80%;
+}
+
+.skeleton-card {
+    min-height: 200px;
+    border-radius: var(--radius-lg);
+}
+
+.skeleton-circle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ============================================================================
+   Loading Spinner
+   ========================================================================= */
+
+.loading-spinner {
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 0.8s linear infinite;
+}
+
+.loading-spinner-large {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 3px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.loading-overlay-text {
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+}
+
+/* ============================================================================
+   Accessibility & Focus States
+   ========================================================================= */
+
+/* Improved focus states for accessibility */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Remove outline for mouse users */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --color-border: #000000;
+        --color-text-secondary: #3D3D3D;
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================================================
+   Dark Mode Support (future-ready)
+   ========================================================================= */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Apple Dark Mode System Colors */
+        --color-primary: #0A84FF;
+        --color-primary-dark: #409CFF;
+        --color-success: #30D158;
+        --color-success-dark: #34C759;
+        --color-warning: #FF9F0A;
+        --color-warning-dark: #FFB340;
+        --color-danger: #FF453A;
+        --color-danger-dark: #FF6961;
+
+        /* Dark mode neutrals */
+        --color-text: #F5F5F7;
+        --color-text-secondary: #98989D;
+        --color-text-tertiary: #6C6C70;
+        --color-background: #1C1C1E;
+        --color-background-alt: #2C2C2E;
+        --color-background-elevated: #3A3A3C;
+        --color-border: #48484A;
+        --color-border-light: #3A3A3C;
+    }
+
+    body {
+        background-color: var(--color-background);
+    }
+
+    .site-header {
+        background-color: rgba(28, 28, 30, 0.8);
+    }
+
+    .input-section {
+        background-color: var(--color-background-alt);
+    }
+
+    .plan-card {
+        background-color: var(--color-background-alt);
+    }
+
+    .modal-content {
+        background-color: var(--color-background-alt);
+    }
+
+    .gimmick-plans-container {
+        background-color: #3D2E00;
+    }
+
+    .gimmick-row {
+        background-color: #3D2E00;
+    }
+
+    .warning-item {
+        background-color: #3D2E00;
+        color: #FFD60A;
+    }
+
+    .warnings-section {
+        background-color: #3D2E00;
+    }
+
+    .toast {
+        background-color: var(--color-background-elevated);
     }
 }
