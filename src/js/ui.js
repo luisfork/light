@@ -174,15 +174,11 @@ const UI = {
             zipInput: document.getElementById('zip-code'),
             tduInfo: document.getElementById('tdu-info'),
             usageSection: document.getElementById('usage-section'),
-            usageTabs: document.querySelectorAll('.usage-tab'),
             homeSizeSelect: document.getElementById('home-size'),
             avgUsageInput: document.getElementById('avg-usage'),
             calculateBtn: document.getElementById('calculate-btn'),
             resultsSection: document.getElementById('results-section'),
-            bestPlans: document.getElementById('best-plans'),
-            gimmickPlans: document.getElementById('gimmick-plans'),
-            comparisonTable: document.getElementById('comparison-table'),
-            dataFreshness: document.getElementById('data-freshness')
+            resultsList: document.getElementById('results-list')
         };
     },
 
@@ -192,8 +188,7 @@ const UI = {
     attachEventListeners() {
         // ZIP code input
         if (this.elements.zipInput) {
-            this.elements.zipInput.addEventListener('input', (e) => this.handleZipCodeInput(e));
-            this.elements.zipInput.addEventListener('change', (e) => this.handleZipCodeChange(e));
+            this.elements.zipInput.addEventListener('blur', (e) => this.handleZipCodeChange(e));
             this.elements.zipInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -201,11 +196,6 @@ const UI = {
                 }
             });
         }
-
-        // Usage type tabs
-        this.elements.usageTabs.forEach(tab => {
-            tab.addEventListener('click', (e) => this.handleUsageTabClick(e));
-        });
 
         // Home size selector
         if (this.elements.homeSizeSelect) {
@@ -259,29 +249,10 @@ const UI = {
      * Show data freshness indicator
      */
     async showDataFreshness() {
-        try {
-            const freshness = await API.getDataFreshness();
-            if (this.elements.dataFreshness) {
-                const date = new Date(freshness.plansUpdated);
-                const formattedDate = date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-                this.elements.dataFreshness.textContent = `Plans updated: ${formattedDate} (${freshness.totalPlans} plans)`;
-            }
-        } catch (error) {
-            console.error('Error showing data freshness:', error);
-        }
+        // Data freshness is now in footer
+        return;
     },
 
-    /**
-     * Handle ZIP code input (format as user types)
-     */
-    handleZipCodeInput(event) {
-        const value = event.target.value.replace(/\D/g, '').substring(0, 5);
-        event.target.value = value;
-    },
 
     /**
      * Handle ZIP code change
@@ -345,17 +316,8 @@ const UI = {
      * Show ZIP code loading state
      */
     showZipCodeLoading() {
-        if (this.elements.zipInput) {
-            this.elements.zipInput.classList.add('loading');
-        }
         if (this.elements.tduInfo) {
-            this.elements.tduInfo.innerHTML = `
-                <div class="tdu-info-box">
-                    <div class="skeleton skeleton-text skeleton-text-medium"></div>
-                    <div class="skeleton skeleton-text skeleton-text-short"></div>
-                </div>
-            `;
-            this.elements.tduInfo.style.display = 'block';
+            this.elements.tduInfo.textContent = 'Detecting service area...';
         }
     },
 
@@ -363,9 +325,7 @@ const UI = {
      * Hide ZIP code loading state
      */
     hideZipCodeLoading() {
-        if (this.elements.zipInput) {
-            this.elements.zipInput.classList.remove('loading');
-        }
+        // No-op
     },
 
     /**
@@ -374,18 +334,7 @@ const UI = {
     showNotDeregulatedMessage(reason) {
         if (this.elements.tduInfo) {
             const message = reason || 'This ZIP code is not in a deregulated service area.';
-            this.elements.tduInfo.innerHTML = `
-                <div class="tdu-info-box" style="border-left-color: var(--color-warning);">
-                    <h3 style="color: var(--color-warning-dark);">Not Available</h3>
-                    <p>${this.escapeHtml(message)}</p>
-                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">
-                        <a href="https://www.powertochoose.org" target="_blank" rel="noopener">
-                            Learn more about Texas electricity deregulation
-                        </a>
-                    </p>
-                </div>
-            `;
-            this.elements.tduInfo.style.display = 'block';
+            this.elements.tduInfo.textContent = message;
         }
         Toast.warning('This area is not in the deregulated market');
     },
@@ -395,20 +344,7 @@ const UI = {
      */
     showTDUInfo(tdu) {
         if (this.elements.tduInfo) {
-            this.elements.tduInfo.innerHTML = `
-                <div class="tdu-info-box">
-                    <h3>${this.escapeHtml(tdu.name)}</h3>
-                    <p>${this.escapeHtml(tdu.service_area)}</p>
-                    <p class="tdu-rates">
-                        Delivery charges: $${tdu.monthly_base_charge.toFixed(2)}/month +
-                        ${tdu.per_kwh_rate.toFixed(2)}¢/kWh
-                    </p>
-                    <p style="font-size: 0.8125rem; color: var(--color-text-tertiary); margin-top: 0.5rem;">
-                        Last updated: ${tdu.last_updated || 'N/A'}
-                    </p>
-                </div>
-            `;
-            this.elements.tduInfo.style.display = 'block';
+            this.elements.tduInfo.textContent = `${tdu.name} • ${tdu.service_area}`;
         }
     },
 
@@ -430,28 +366,6 @@ const UI = {
         }
     },
 
-    /**
-     * Handle usage tab click
-     */
-    handleUsageTabClick(event) {
-        const tab = event.target.closest('.usage-tab');
-        if (!tab) return;
-
-        const usageType = tab.dataset.usageType;
-
-        // Update active tab
-        this.elements.usageTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        // Show corresponding panel
-        document.querySelectorAll('.usage-panel').forEach(p => p.classList.remove('active'));
-        const panel = document.getElementById(`${usageType}-usage-panel`);
-        if (panel) {
-            panel.classList.add('active');
-        }
-
-        this.state.usageType = usageType;
-    },
 
     /**
      * Handle home size change
@@ -489,7 +403,11 @@ const UI = {
             return;
         }
 
-        if (!this.validateInputs()) {
+        // Determine current mode from active segment
+        const activeSegment = document.querySelector('.segment.active');
+        const currentMode = activeSegment ? activeSegment.dataset.mode : 'quick';
+
+        if (!this.validateInputs(currentMode)) {
             return;
         }
 
@@ -500,10 +418,10 @@ const UI = {
             // Determine usage pattern
             let monthlyUsage;
 
-            if (this.state.usageType === 'quick') {
+            if (currentMode === 'quick') {
                 const avgKwh = estimateUsageFromHomeSize(this.state.homeSize);
                 monthlyUsage = estimateUsagePattern(avgKwh);
-            } else if (this.state.usageType === 'average') {
+            } else if (currentMode === 'average') {
                 monthlyUsage = estimateUsagePattern(this.state.avgUsage);
             } else {
                 monthlyUsage = this.state.monthlyUsage;
@@ -548,7 +466,7 @@ const UI = {
     /**
      * Validate inputs
      */
-    validateInputs() {
+    validateInputs(mode) {
         if (!this.state.zipCode) {
             Toast.warning('Please enter a ZIP code');
             this.elements.zipInput?.focus();
@@ -561,19 +479,19 @@ const UI = {
             return false;
         }
 
-        if (this.state.usageType === 'quick' && !this.state.homeSize) {
+        if (mode === 'quick' && !this.state.homeSize) {
             Toast.warning('Please select a home size');
             this.elements.homeSizeSelect?.focus();
             return false;
         }
 
-        if (this.state.usageType === 'average' && !this.state.avgUsage) {
+        if (mode === 'average' && !this.state.avgUsage) {
             Toast.warning('Please enter your average monthly usage');
             this.elements.avgUsageInput?.focus();
             return false;
         }
 
-        if (this.state.usageType === 'monthly') {
+        if (mode === 'detailed') {
             const hasValues = this.state.monthlyUsage &&
                 this.state.monthlyUsage.some(v => v > 0);
             if (!hasValues) {
@@ -586,254 +504,46 @@ const UI = {
     },
 
     /**
-     * Display results
+     * Display results - Editorial Typography-First
      */
     displayResults(plans, monthlyUsage) {
-        // Show best plans
-        this.displayBestPlans(plans.slice(0, 3));
+        if (!this.elements.resultsList) return;
 
-        // Show gimmick plans to avoid
-        const gimmickPlans = plans.filter(p => p.isGimmick).slice(0, 3);
-        if (gimmickPlans.length > 0) {
-            this.displayGimmickPlans(gimmickPlans);
-        } else {
-            this.elements.gimmickPlans.style.display = 'none';
-        }
+        // Show top 10 plans in editorial list format
+        const topPlans = plans.slice(0, 10);
 
-        // Show comparison table
-        this.displayComparisonTable(plans);
+        this.elements.resultsList.innerHTML = topPlans.map((plan, index) => `
+            <article class="plan-item">
+                <div class="plan-rank ${index === 0 ? 'rank-1' : ''}">${index + 1}${index === 0 ? ' • Best Plan' : ''}</div>
+                <h3 class="plan-name">${this.escapeHtml(plan.plan_name)}</h3>
+                <div class="plan-provider">${this.escapeHtml(plan.rep_name)}</div>
+
+                <div class="plan-annual-cost tabular">${formatCurrency(plan.annualCost)}</div>
+                <div class="cost-label">Annual Cost</div>
+
+                <div class="plan-rate">
+                    Effective rate: <span class="plan-rate-value tabular">${formatRate(plan.effectiveRate)}</span> •
+                    ${plan.term_months} months •
+                    ${plan.renewable_pct || 0}% renewable
+                </div>
+
+                ${plan.warnings.length > 0 ? `
+                    <div class="plan-warnings">
+                        ${plan.warnings.map(w => `<div class="warning-text">${this.escapeHtml(w)}</div>`).join('')}
+                    </div>
+                ` : ''}
+            </article>
+        `).join('');
 
         // Show results section
         this.elements.resultsSection.style.display = 'block';
-    },
 
-    /**
-     * Display best plans
-     */
-    displayBestPlans(plans) {
-        if (!this.elements.bestPlans) return;
-
-        this.elements.bestPlans.innerHTML = plans.map((plan, index) => `
-            <div class="plan-card best-plan" data-plan-id="${this.escapeHtml(plan.plan_id)}">
-                <div class="plan-rank">#${index + 1}</div>
-                <h3 class="plan-name">${this.escapeHtml(plan.plan_name)}</h3>
-                <div class="plan-rep">${this.escapeHtml(plan.rep_name)}</div>
-                <div class="plan-annual-cost">${formatCurrency(plan.annualCost)}/year</div>
-                <div class="plan-monthly-avg">${formatCurrency(plan.averageMonthlyCost)}/month average</div>
-                <div class="plan-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Term:</span>
-                        <span class="detail-value">${plan.term_months} months</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Renewable:</span>
-                        <span class="detail-value">${plan.renewable_pct || 0}%</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">ETF:</span>
-                        <span class="detail-value">${formatCurrency(plan.early_termination_fee || 0)}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Effective Rate:</span>
-                        <span class="detail-value">${formatRate(plan.effectiveRate)}</span>
-                    </div>
-                </div>
-                <div class="plan-actions">
-                    <button class="btn-details" onclick="UI.showPlanDetails('${this.escapeHtml(plan.plan_id)}')">
-                        View Details
-                    </button>
-                    ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-efl">View EFL</a>` : ''}
-                </div>
-            </div>
-        `).join('');
-    },
-
-    /**
-     * Display gimmick plans
-     */
-    displayGimmickPlans(plans) {
-        if (!this.elements.gimmickPlans) return;
-
-        this.elements.gimmickPlans.innerHTML = `
-            <h2>Plans to Avoid</h2>
-            <p class="warning-intro">These plans look cheap but cost more due to bill credits, time-of-use restrictions, or rate volatility:</p>
-            ${plans.map(plan => `
-                <div class="plan-card gimmick-plan">
-                    <h3 class="plan-name">${this.escapeHtml(plan.plan_name)}</h3>
-                    <div class="plan-rep">${this.escapeHtml(plan.rep_name)}</div>
-                    <div class="plan-costs">
-                        <div>Advertised at 1000 kWh: ${formatRate(plan.price_kwh_1000)}</div>
-                        <div class="actual-cost">Actual annual cost: ${formatCurrency(plan.annualCost)}</div>
-                    </div>
-                    <div class="plan-warnings">
-                        ${plan.warnings.map(w => `<div class="warning-item">${this.escapeHtml(w)}</div>`).join('')}
-                    </div>
-                </div>
-            `).join('')}
-        `;
-
-        this.elements.gimmickPlans.style.display = 'block';
-    },
-
-    /**
-     * Display comparison table
-     */
-    displayComparisonTable(plans) {
-        if (!this.elements.comparisonTable) return;
-
-        const tableHTML = `
-            <table class="plans-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Provider</th>
-                        <th>Plan</th>
-                        <th>Term</th>
-                        <th>Annual Cost</th>
-                        <th>Monthly Avg</th>
-                        <th>Effective Rate</th>
-                        <th>Renewable</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${plans.map((plan, index) => `
-                        <tr class="${plan.isGimmick ? 'gimmick-row' : ''}">
-                            <td>${index + 1}</td>
-                            <td>${this.escapeHtml(plan.rep_name)}</td>
-                            <td>
-                                ${this.escapeHtml(plan.plan_name)}
-                                ${plan.warnings.length > 0 ? '<span class="warning-badge" title="Has warnings">⚠️</span>' : ''}
-                            </td>
-                            <td>${plan.term_months}mo</td>
-                            <td>${formatCurrency(plan.annualCost)}</td>
-                            <td>${formatCurrency(plan.averageMonthlyCost)}</td>
-                            <td>${formatRate(plan.effectiveRate)}</td>
-                            <td>${plan.renewable_pct || 0}%</td>
-                            <td>
-                                ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-small">EFL</a>` : '-'}
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-
-        this.elements.comparisonTable.innerHTML = tableHTML;
-    },
-
-    /**
-     * Show plan details modal
-     */
-    showPlanDetails(planId) {
-        const plan = this.state.rankedPlans?.find(p => p.plan_id === planId);
-        if (!plan) {
-            Toast.error('Plan not found');
-            return;
-        }
-
-        // Create modal content
-        const modalContent = `
-            <div class="modal-overlay" onclick="UI.closeModal()">
-                <div class="modal-content" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-                    <button class="modal-close" onclick="UI.closeModal()" aria-label="Close modal">&times;</button>
-                    <h2 id="modal-title">${this.escapeHtml(plan.plan_name)}</h2>
-                    <h3>${this.escapeHtml(plan.rep_name)}</h3>
-
-                    <div class="plan-detail-section">
-                        <h4>Annual Cost Breakdown</h4>
-                        <div class="cost-summary">
-                            <div class="cost-item">
-                                <span>Total Annual Cost:</span>
-                                <span class="cost-value">${formatCurrency(plan.annualCost)}</span>
-                            </div>
-                            <div class="cost-item">
-                                <span>Average Monthly Cost:</span>
-                                <span class="cost-value">${formatCurrency(plan.averageMonthlyCost)}</span>
-                            </div>
-                            <div class="cost-item">
-                                <span>Effective Rate:</span>
-                                <span class="cost-value">${formatRate(plan.effectiveRate)}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="plan-detail-section">
-                        <h4>Plan Details</h4>
-                        <div class="details-grid">
-                            <div class="detail-row">
-                                <span class="detail-label">Contract Term:</span>
-                                <span class="detail-value">${plan.term_months} months</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Early Termination Fee:</span>
-                                <span class="detail-value">${formatCurrency(plan.early_termination_fee || 0)}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Base Charge:</span>
-                                <span class="detail-value">${formatCurrency(plan.base_charge_monthly || 0)}/month</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Renewable Energy:</span>
-                                <span class="detail-value">${plan.renewable_pct || 0}%</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Time of Use:</span>
-                                <span class="detail-value">${plan.is_tou ? 'Yes' : 'No'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    ${plan.warnings.length > 0 ? `
-                        <div class="plan-detail-section warnings-section">
-                            <h4>Warnings</h4>
-                            ${plan.warnings.map(w => `<div class="warning-item">${this.escapeHtml(w)}</div>`).join('')}
-                        </div>
-                    ` : ''}
-
-                    <div class="modal-actions">
-                        ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-primary">View EFL</a>` : ''}
-                        ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="btn-secondary">Enroll</a>` : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Remove existing modal if any
-        this.closeModal();
-
-        // Add to DOM
-        const modal = document.createElement('div');
-        modal.id = 'plan-modal';
-        modal.innerHTML = modalContent;
-        document.body.appendChild(modal);
-
-        // Focus trap and escape key handler
-        document.addEventListener('keydown', this.handleModalKeydown);
-
-        // Focus the close button
-        modal.querySelector('.modal-close')?.focus();
-    },
-
-    /**
-     * Handle keydown in modal
-     */
-    handleModalKeydown(event) {
-        if (event.key === 'Escape') {
-            UI.closeModal();
+        // Trigger stagger animation
+        if (window.LightAnimations && window.LightAnimations.animateResults) {
+            setTimeout(() => window.LightAnimations.animateResults(), 100);
         }
     },
 
-    /**
-     * Close modal
-     */
-    closeModal() {
-        const modal = document.getElementById('plan-modal');
-        if (modal) {
-            modal.remove();
-        }
-        document.removeEventListener('keydown', this.handleModalKeydown);
-    },
 
     /**
      * Show loading state
@@ -841,7 +551,7 @@ const UI = {
     showLoading() {
         if (this.elements.calculateBtn) {
             this.elements.calculateBtn.disabled = true;
-            this.elements.calculateBtn.innerHTML = '<span class="loading-spinner"></span> Calculating...';
+            this.elements.calculateBtn.textContent = 'Calculating...';
         }
     },
 
@@ -851,7 +561,7 @@ const UI = {
     hideLoading() {
         if (this.elements.calculateBtn) {
             this.elements.calculateBtn.disabled = false;
-            this.elements.calculateBtn.textContent = 'Find Best Plans';
+            this.elements.calculateBtn.textContent = 'Calculate';
         }
     },
 
