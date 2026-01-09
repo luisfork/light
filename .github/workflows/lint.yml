@@ -49,22 +49,18 @@ jobs:
       - name: Run ruff (Python)
         run: |
           ruff check scripts/
-        continue-on-error: true
 
       - name: Run Biome (JS/TS/JSON)
         run: |
           biome check src/ --error-on-warnings
-        continue-on-error: true
 
       - name: Run markdownlint-cli2
         run: |
           markdownlint-cli2 "**/*.md"
-        continue-on-error: true
 
       - name: Run typos (spelling)
         run: |
           typos
-        continue-on-error: true
 
       - name: Create summary
         if: always()
