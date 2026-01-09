@@ -490,72 +490,44 @@ const API = {
     },
 
     /**
-     * Check if a plan name appears to be in Spanish
-     *
-     * Enhanced detection with more keywords and weighted scoring.
+     * Calculate a preference score for a plan name
+     * Higher scores indicate more preferred plans (e.g., English, shorter names)
      *
      * @param {string} planName - Plan name to check
      * @param {string} specialTerms - Optional special terms text
-     * @returns {Object} Detection result with isSpanish and confidence
+     * @returns {number} Preference score (higher = more preferred)
      */
-    isSpanishPlan(planName, specialTerms = '') {
-        // Strong Spanish indicators (these are very unlikely in English plan names)
-        const strongIndicators = [
-            'verdaderamente', 'energía', 'eléctrica', 'electricidad',
-            'ahorro', 'precio', 'gratis', 'hogar', 'verde',
-            'luz', 'factura', 'tarifa', 'contrato', 'plazo',
-            'kilowatio', 'kilovatio', 'meses', 'años', 'mensual'
-        ];
-
-        // Moderate Spanish indicators (common but could appear in English context)
-        const moderateIndicators = [
-            'fijo', 'fija', 'renovable', 'simple', 'mes', 'año',
-            'sin', 'con', 'para', 'por', 'del', 'las', 'los',
-            'una', 'uno', 'nuevo', 'nueva', 'bajo', 'baja',
-            'mejor', 'total', 'seguro', 'segura'
-        ];
-
+    calculatePlanPreference(planName, specialTerms = '') {
+        let score = 100;
         const text = `${planName} ${specialTerms}`.toLowerCase();
-        let score = 0;
 
-        // Check strong indicators (worth 3 points each)
-        for (const keyword of strongIndicators) {
-            if (text.includes(keyword)) {
-                score += 3;
-            }
-        }
+        // Penalize Spanish-specific characters and patterns
+        if (text.includes('ñ')) score -= 20;
+        if (text.includes('á') || text.includes('é') || text.includes('í') ||
+            text.includes('ó') || text.includes('ú')) score -= 10;
+        if (text.includes('ción')) score -= 15;
 
-        // Check moderate indicators (worth 1 point each)
-        for (const keyword of moderateIndicators) {
-            // Use word boundary check for short words to avoid false positives
-            if (keyword.length <= 3) {
-                const regex = new RegExp(`\\b${keyword}\\b`, 'i');
-                if (regex.test(text)) {
-                    score += 1;
-                }
-            } else if (text.includes(keyword)) {
-                score += 1;
-            }
-        }
+        // Penalize longer names (usually Spanish translations are wordier)
+        const nameLength = planName.length;
+        if (nameLength > 50) score -= 15;
+        else if (nameLength > 30) score -= 10;
+        else if (nameLength > 20) score -= 5;
 
-        // Check for Spanish language patterns
-        if (text.includes('ción') || text.includes('ñ')) {
-            score += 2;
-        }
+        // Prefer names with fewer special characters
+        const specialChars = (planName.match(/[^a-zA-Z0-9\s-]/g) || []).length;
+        score -= specialChars * 2;
 
-        return {
-            isSpanish: score >= 3,
-            confidence: Math.min(score / 10, 1) // 0-1 confidence score
-        };
+        return score;
     },
 
     /**
-     * Deduplicate plans by identifying and removing English/Spanish duplicates
+     * Deduplicate plans by identifying and removing duplicate versions
      *
      * Some REPs list identical plans in both English and Spanish versions.
-     * This function keeps the English version and removes the Spanish duplicate.
+     * This function detects duplicates based on plan features (prices, terms, fees)
+     * and keeps the preferred version (typically English, shorter name).
      *
-     * Enhanced version with better detection and tracking.
+     * Enhanced version using feature comparison instead of language detection.
      *
      * @param {Array} plans - Array of plan objects
      * @returns {Object} Object with deduplicated array, duplicate count, and original count
@@ -572,30 +544,16 @@ const API = {
                 // First occurrence, keep it
                 fingerprintMap.set(fingerprint, {
                     plan: plan,
-                    spanishCheck: this.isSpanishPlan(plan.plan_name, plan.special_terms)
+                    preference: this.calculatePlanPreference(plan.plan_name, plan.special_terms)
                 });
             } else {
-                // Duplicate found
+                // Duplicate found - compare based on plan features
                 duplicateCount++;
                 const existing = fingerprintMap.get(fingerprint);
-                const currentSpanish = this.isSpanishPlan(plan.plan_name, plan.special_terms);
+                const currentPreference = this.calculatePlanPreference(plan.plan_name, plan.special_terms);
 
-                // Determine which version to keep (prefer English)
-                let keepCurrent = false;
-
-                if (currentSpanish.isSpanish && !existing.spanishCheck.isSpanish) {
-                    // Current is Spanish, existing is English - keep existing
-                    keepCurrent = false;
-                } else if (!currentSpanish.isSpanish && existing.spanishCheck.isSpanish) {
-                    // Current is English, existing is Spanish - replace with current
-                    keepCurrent = true;
-                } else if (currentSpanish.confidence < existing.spanishCheck.confidence) {
-                    // Current seems more English - replace
-                    keepCurrent = true;
-                } else if (currentSpanish.confidence === existing.spanishCheck.confidence) {
-                    // Same confidence - prefer shorter plan name (usually the original)
-                    keepCurrent = plan.plan_name.length < existing.plan.plan_name.length;
-                }
+                // Keep the plan with higher preference score
+                const keepCurrent = currentPreference > existing.preference;
 
                 if (keepCurrent) {
                     duplicateDetails.push({
@@ -605,7 +563,7 @@ const API = {
                     });
                     fingerprintMap.set(fingerprint, {
                         plan: plan,
-                        spanishCheck: currentSpanish
+                        preference: currentPreference
                     });
                 } else {
                     duplicateDetails.push({

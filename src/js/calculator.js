@@ -867,6 +867,46 @@ function getMonthName(monthIndex) {
     return months[monthIndex];
 }
 
+/**
+ * Convert quality score to letter grade
+ *
+ * @param {number} score - Quality score (0-100)
+ * @returns {Object} Grade object with letter and description
+ */
+function getQualityGrade(score) {
+    if (score >= 90) {
+        return {
+            letter: 'A',
+            description: 'Excellent',
+            class: 'grade-a'
+        };
+    } else if (score >= 80) {
+        return {
+            letter: 'B',
+            description: 'Good',
+            class: 'grade-b'
+        };
+    } else if (score >= 70) {
+        return {
+            letter: 'C',
+            description: 'Acceptable',
+            class: 'grade-c'
+        };
+    } else if (score >= 60) {
+        return {
+            letter: 'D',
+            description: 'Caution',
+            class: 'grade-d'
+        };
+    } else {
+        return {
+            letter: 'F',
+            description: 'Avoid',
+            class: 'grade-f'
+        };
+    }
+}
+
 // Export functions for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -882,6 +922,7 @@ if (typeof module !== 'undefined' && module.exports) {
         getContractExpirationForPlan,
         calculateEarlyTerminationFee,
         getETFDisplayInfo,
-        getMonthName
+        getMonthName,
+        getQualityGrade
     };
 }

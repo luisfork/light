@@ -1,0 +1,17 @@
+[files]
+# Ignore lock files
+extend-exclude = ["*.lock"]
+
+[default]
+# Don't check binary files
+binary = false
+
+[default.extend-words]
+# Common dev abbreviations
+repo = "repo"
+param = "param"
+params = "params"
+arg = "arg"
+args = "args"
+kwh = "kwh"
+kWh = "kWh"

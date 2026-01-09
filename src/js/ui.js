@@ -673,9 +673,17 @@ const UI = {
     displayTopPlans(plans) {
         if (!this.elements.topPlans) return;
 
-        this.elements.topPlans.innerHTML = plans.map((plan, i) => `
+        this.elements.topPlans.innerHTML = plans.map((plan, i) => {
+            const grade = typeof getQualityGrade === 'function'
+                ? getQualityGrade(plan.qualityScore || 0)
+                : { letter: '-', description: 'N/A', class: 'grade-na' };
+
+            return `
             <div class="plan-item">
-                <div class="plan-item-rank">Rank #${i + 1}</div>
+                <div class="plan-item-rank">
+                    <span>Rank #${i + 1}</span>
+                    <span class="plan-item-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)">${grade.letter}</span>
+                </div>
                 <div class="plan-item-header">
                     <div>
                         <div class="plan-item-name">${this.escapeHtml(plan.plan_name)}</div>
@@ -687,6 +695,10 @@ const UI = {
                     </div>
                 </div>
                 <div class="plan-item-details">
+                    <span class="plan-detail-item">
+                        <span class="plan-detail-label">Quality:</span>
+                        <span class="plan-detail-value">${plan.qualityScore || 0}/100</span>
+                    </span>
                     <span class="plan-detail-item">
                         <span class="plan-detail-label">Term:</span>
                         <span class="plan-detail-value">${plan.term_months} mo</span>
@@ -709,7 +721,8 @@ const UI = {
                     ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-plan-action btn-plan-efl">View EFL</a>` : ''}
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
     },
 
     displayWarningPlans(plans) {
@@ -743,9 +756,20 @@ const UI = {
     displayComparisonTable(plans) {
         if (!this.elements.comparisonBody) return;
 
-        this.elements.comparisonBody.innerHTML = plans.map((plan, i) => `
+        this.elements.comparisonBody.innerHTML = plans.map((plan, i) => {
+            const grade = typeof getQualityGrade === 'function'
+                ? getQualityGrade(plan.qualityScore || 0)
+                : { letter: '-', description: 'N/A', class: 'grade-na' };
+
+            return `
             <tr class="${plan.isGimmick ? 'row-caution' : ''}">
                 <td class="col-rank">${i + 1}</td>
+                <td class="col-grade">
+                    <span class="quality-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)">
+                        ${grade.letter}
+                    </span>
+                    <span class="quality-score">${plan.qualityScore || 0}</span>
+                </td>
                 <td>${this.escapeHtml(plan.rep_name)}</td>
                 <td>${this.escapeHtml(plan.plan_name)}</td>
                 <td>${plan.term_months} mo</td>
@@ -756,7 +780,8 @@ const UI = {
                 <td class="col-etf">${this.formatETF(plan)}</td>
                 <td><button class="btn-view" onclick="UI.showPlanModal('${plan.plan_id}')">View</button></td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
     },
 
     applyFilters() {
