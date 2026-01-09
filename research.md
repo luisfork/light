@@ -1,8 +1,12 @@
 # Texas electricity plans: A complete guide for consumers and developers
 
-**The Texas deregulated electricity market offers significant savings—but only for those who understand its hidden complexity.** The difference between a well-chosen fixed-rate plan and a “gimmick” plan with bill credits can exceed **$800 annually** for the same household. This guide provides both practical shopping advice for consumers and complete technical specifications for developers building comparison tools.
+**Last Updated: January 2026**
+
+**The Texas deregulated electricity market offers significant savings—but only for those who understand its hidden complexity.** The difference between a well-chosen fixed-rate plan and a "gimmick" plan with bill credits can exceed **$1,072 annually** for the same household (EnergyBot 2025 study). This guide provides both practical shopping advice for consumers and complete technical specifications for developers building comparison tools.
 
 The core insight: ignore advertised rates at 1,000 kWh. Calculate your actual annual cost using real usage data, focus exclusively on simple fixed-rate plans, and shop during spring or fall when rates drop 15-25%.
+
+**2026 Market Context:** Texas electricity demand is projected to grow 9.6% in 2026, driven by AI data centers, cryptocurrency mining, and industrial expansion. ERCOT forecasts a 50% demand increase by 2029. Average residential rates range 14-19¢/kWh, with prices expected to rise 3-5% in 2026.
 
 ---
 
@@ -44,11 +48,13 @@ Calculate your expected bill: multiply energy charge by your kWh, add base charg
 
 ---
 
-## The bill credit trap costs Texans $816 annually
+## The bill credit trap costs Texans up to $1,072 annually
 
-An EnergyBot study of over 500 Texas residents found bill credit plans were **34% more expensive per kWh** than traditional fixed-rate plans, costing customers an average of **$816 more annually**. These plans offer deceptively low advertised rates by providing credits at specific usage thresholds—typically $100-$125 if you use exactly 1,000 kWh.
+An EnergyBot study of over 500 Texas residents found bill credit plans were **34% more expensive per kWh** than traditional fixed-rate plans, costing customers an average of **$816-$1,072 more annually** depending on analysis methodology. These plans offer deceptively low advertised rates by providing credits at specific usage thresholds—typically $100-$125 if you use exactly 1,000 kWh.
 
 The math fails because Texas households use 70% of electricity during daytime for AC, and usage varies dramatically by season. Summer consumption often reaches **1,500-2,500 kWh**, while fall months drop to 800-900 kWh. Missing the credit threshold by even 50 kWh in a single month eliminates your savings and triggers effective rates of **22-23¢/kWh**.
+
+**2025-2026 Update:** The complexity of bill credit plans makes it difficult for consumers to predict actual monthly costs. The variability in rates and conditions for receiving credits often leads to unexpected expenses, with many plans marketed using attractive promotional rates that do not reflect true costs.
 
 “Free Nights” and “Free Weekends” plans suffer similar problems. Unless you use more than **65% of electricity during free hours**, you’ll pay more than a standard fixed-rate plan. Most households achieve only 25-35% off-peak usage, far below the 42-50% providers assume when calculating advertised rates. Daytime rates on these plans run **18-19¢/kWh** versus ~9¢ on standard fixed plans.
 
@@ -89,9 +95,18 @@ The holdover rate trap catches many Texans: if you do nothing when your contract
 
 The **Public Utility Commission of Texas (PUCT)** enforces protections under the Public Utility Regulatory Act. Core rights include: clear information via standardized EFLs, protection from unauthorized switching (slamming) and charges (cramming), privacy of customer-specific information, and the right to switch providers within 14 days of contract expiration without penalty.
 
+**2026 Enhanced EFL Requirements:** The PUCT has implemented significant new consumer protections:
+
+- **Mandatory Plain-Language Summaries**: EFLs must now include a simple, top-box summary of key terms with average prices at different usage levels
+- **Enhanced Fee Transparency**: All potential non-recurring fees (disconnection, payment processing, etc.) must be clearly disclosed upfront; hidden fees are now punishable violations
+- **Strengthened Notification Requirements**: Providers face stricter requirements for notifying customers about contract expirations and plan changes
+- **Two-Page Format Requirement**: EFLs must be printable in no more than two pages (PUCT Rule §25.475)
+
+These rules represent the most significant regulatory change since market inception, signaling a shift from passive oversight to active consumer protection.
+
 **To file a complaint**: First contact your REP. If unresolved, file with PUCT online at puc.texas.gov/consumer/complaint, by phone at 1-888-782-8477, or by mail. PUCT investigates regulatory violations, not general satisfaction issues.
 
-**Moving exemption**: Texas PUC prohibits ETFs if you move outside the provider’s service area with proof of relocation.
+**Moving exemption**: Texas PUC prohibits ETFs if you move outside the provider's service area with proof of relocation.
 
 ---
 
@@ -273,10 +288,35 @@ def rank_plans(plans, user_usage_12mo, preferences):
 
 ---
 
+## Market outlook for 2026-2027
+
+**Demand Growth:** EIA forecasts ERCOT demand to grow 11% annually in 2025-2026, with ERCOT projecting a 50% increase by 2029. Growth driven primarily by AI data centers (requiring 24/7 power), cryptocurrency mining operations, and expanding industrial processes.
+
+**Price Trends:** Forecasts suggest 3-5% price increases from 2025 to 2026. Most Texans currently pay 14-19¢/kWh for residential electricity. The market exhibits "contango" conditions with short-term contracts offering good value, though supply-demand fundamentals point to higher long-term prices.
+
+**Grid Reliability:** ERCOT implemented Real-Time Co-optimization Plus Batteries (RTC+B) in December 2025, marking completion of a modernization effort begun in 2019. Battery storage playing increasingly critical role in reliability. December 2025 Monthly Outlook for Resource Adequacy (MORA) indicates sufficient capacity for normal winter conditions.
+
+**Regulatory Changes:** ERCOT evaluating 4CP (4 Coincident Peaks) system revamp, as large industrial users minimize grid cost share by cutting usage during peak demand days, shifting costs to residential consumers.
+
 ## Conclusion
 
 Selecting the best Texas electricity plan requires ignoring marketing and calculating true annual costs. **Simple fixed-rate plans without bill credits consistently deliver the lowest total costs** for most households. Shop during spring or fall, use Smart Meter Texas data to understand your actual consumption pattern, and never let contracts expire without action.
 
-For developers, the Power to Choose API and Smart Meter Texas integration provide the essential data infrastructure. The critical implementation insight is that **annual cost at the user’s actual seasonal usage pattern**—not the advertised 1,000 kWh rate—is the only fair comparison metric. Bill credit plans that look attractive on paper fail in practice because Texas usage varies 800-2,500 kWh seasonally, causing most consumers to miss credit thresholds repeatedly.
+For developers, the Power to Choose API and Smart Meter Texas integration provide the essential data infrastructure. The critical implementation insight is that **annual cost at the user's actual seasonal usage pattern**—not the advertised 1,000 kWh rate—is the only fair comparison metric. Bill credit plans that look attractive on paper fail in practice because Texas usage varies 800-2,500 kWh seasonally, causing most consumers to miss credit thresholds repeatedly.
 
-Build tools that calculate costs across the full 300-3,000 kWh range, flag plans with volatility near the user’s typical usage, and default to recommending straightforward fixed-rate structures. The $816 annual penalty from choosing poorly-designed “gimmick” plans represents real money that better tools can help Texans keep.
+Build tools that calculate costs across the full 300-3,000 kWh range, flag plans with volatility near the user's typical usage, and default to recommending straightforward fixed-rate structures. The $1,072 annual penalty from choosing poorly-designed "gimmick" plans represents real money that better tools can help Texans keep.
+
+---
+
+## Sources
+
+- [RTC Deployed, ERCOT Takes on New Challenges in 2026 - RTO Insider](https://www.rtoinsider.com/122627-rtc-deployed-ercot-takes-on-new-challenges/)
+- [Texas Electricity Rate Trends & Price Forecast for 2026](https://electricityplans.com/texas-electricity-trends/)
+- [Texas Electricity Prices in 2026: Rates, ERCOT Risks & Tips](https://energyoutlet.com/learn/texas-electricity-prices-2026-rates-winter-grid-risks/)
+- [We expect rapid electricity demand growth in Texas and the mid-Atlantic - EIA](https://www.eia.gov/todayinenergy/detail.php?id=65844)
+- [Understanding Bill Credit Electricity Plans: Avoid a Costly Mistake - EnergyBot](https://www.energybot.com/blog/bill-credit-electricity-plans.html)
+- [Electricity Plan Study - EnergyBot](https://www.energybot.com/electricity-plan-study.html)
+- [Study Finds Texans May Be Losing Out on Thousands - Newswire](https://www.newswire.com/news/study-finds-texans-may-be-losing-out-on-thousands-thanks-to-free-22386643)
+- [How New PUCT Rules are Sparking Legal Challenges - LawFuel](https://www.lawfuel.com/how-new-puct-rules-are-sparking-legal-challenges-in-the-texas-energy-market/)
+- [PUCT Subchapter R Customer Protection Rules §25.475](https://www.puc.texas.gov/agency/rulesnlaws/subrules/electric/25.475/25.475.pdf)
+- [Learn About Your Electricity Facts Label - Choose Texas Power](https://www.choosetexaspower.org/energy-resources/electricity-facts-label-guide/)

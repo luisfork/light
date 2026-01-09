@@ -129,6 +129,16 @@ const API = {
                     rep_name: this.formatProviderName(plan.rep_name)
                 }));
 
+                // Remove duplicate plans (English/Spanish versions)
+                const { deduplicated, duplicateCount } = this.deduplicatePlans(data.plans);
+                data.plans = deduplicated;
+
+                // Update total_plans count after deduplication
+                if (duplicateCount > 0) {
+                    data.total_plans = deduplicated.length;
+                    console.info(`Removed ${duplicateCount} duplicate plan(s) (English/Spanish versions)`);
+                }
+
                 // Update cache
                 this.cache.plans = {
                     data: data,
@@ -432,6 +442,100 @@ const API = {
                 age: this.cache.localTaxes.timestamp ? Date.now() - this.cache.localTaxes.timestamp : null,
                 valid: this.isCacheValid('localTaxes')
             }
+        };
+    },
+
+    /**
+     * Create a fingerprint for a plan to detect duplicates
+     *
+     * Duplicates typically occur when providers list the same plan in both English and Spanish
+     * with identical pricing and terms but different plan names.
+     *
+     * @param {Object} plan - Plan object
+     * @returns {string} Plan fingerprint
+     */
+    createPlanFingerprint(plan) {
+        // Create fingerprint from key identifying fields
+        return JSON.stringify({
+            rep: plan.rep_name,
+            tdu: plan.tdu_area,
+            p500: Math.round(plan.price_kwh_500 * 100) / 100,  // Round to avoid floating point issues
+            p1000: Math.round(plan.price_kwh_1000 * 100) / 100,
+            p2000: Math.round(plan.price_kwh_2000 * 100) / 100,
+            term: plan.term_months,
+            etf: plan.early_termination_fee,
+            base: plan.base_charge_monthly,
+            renewable: plan.renewable_pct,
+            prepaid: plan.is_prepaid,
+            tou: plan.is_tou
+        });
+    },
+
+    /**
+     * Check if a plan name appears to be in Spanish
+     *
+     * @param {string} planName - Plan name to check
+     * @returns {boolean} True if likely Spanish
+     */
+    isSpanishPlan(planName) {
+        const spanishKeywords = [
+            'verdaderamente', 'energía', 'fijo', 'fija', 'renovable',
+            'simple', 'ahorro', 'precio', 'plan', 'eléctrica',
+            'mes', 'meses', 'año', 'contrato', 'sin', 'con'
+        ];
+
+        const name = planName.toLowerCase();
+
+        // Count Spanish keyword matches
+        const matches = spanishKeywords.filter(keyword => name.includes(keyword)).length;
+
+        // If 2+ Spanish keywords found, likely Spanish
+        return matches >= 2;
+    },
+
+    /**
+     * Deduplicate plans by identifying and removing English/Spanish duplicates
+     *
+     * Some REPs list identical plans in both English and Spanish versions.
+     * This function keeps the English version and removes the Spanish duplicate.
+     *
+     * @param {Array} plans - Array of plan objects
+     * @returns {Object} Object with deduplicated array and duplicate count
+     */
+    deduplicatePlans(plans) {
+        const fingerprintMap = new Map();
+        let duplicateCount = 0;
+
+        for (const plan of plans) {
+            const fingerprint = this.createPlanFingerprint(plan);
+
+            if (!fingerprintMap.has(fingerprint)) {
+                // First occurrence, keep it
+                fingerprintMap.set(fingerprint, plan);
+            } else {
+                // Duplicate found
+                duplicateCount++;
+                const existing = fingerprintMap.get(fingerprint);
+
+                // Prefer English version over Spanish
+                if (this.isSpanishPlan(plan.plan_name) && !this.isSpanishPlan(existing.plan_name)) {
+                    // Current is Spanish, existing is English - keep existing
+                    continue;
+                } else if (!this.isSpanishPlan(plan.plan_name) && this.isSpanishPlan(existing.plan_name)) {
+                    // Current is English, existing is Spanish - replace with current
+                    fingerprintMap.set(fingerprint, plan);
+                } else {
+                    // Both same language or can't determine - keep whichever has shorter plan_id (likely original)
+                    if (plan.plan_id.length < existing.plan_id.length) {
+                        fingerprintMap.set(fingerprint, plan);
+                    }
+                }
+            }
+        }
+
+        return {
+            deduplicated: Array.from(fingerprintMap.values()),
+            duplicateCount: duplicateCount
         };
     },
 
