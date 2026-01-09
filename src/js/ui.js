@@ -682,7 +682,7 @@ const UI = {
             <div class="plan-item">
                 <div class="plan-item-rank">
                     <span>Rank #${i + 1}</span>
-                    <span class="plan-item-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)">${grade.letter}</span>
+                    <span class="plan-item-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="${grade.description} grade (${plan.qualityScore || 0} out of 100)">${grade.letter}</span>
                 </div>
                 <div class="plan-item-header">
                     <div>
