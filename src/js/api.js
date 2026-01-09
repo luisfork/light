@@ -123,6 +123,12 @@ const API = {
                     throw new Error('Invalid plans data structure');
                 }
 
+                // Format provider names in all plans
+                data.plans = data.plans.map(plan => ({
+                    ...plan,
+                    rep_name: this.formatProviderName(plan.rep_name)
+                }));
+
                 // Update cache
                 this.cache.plans = {
                     data: data,
@@ -427,6 +433,53 @@ const API = {
                 valid: this.isCacheValid('localTaxes')
             }
         };
+    },
+
+    /**
+     * Format provider name by uppercasing and removing common legal suffixes
+     *
+     * @param {string} name - Original provider name
+     * @returns {string} Formatted provider name
+     */
+    formatProviderName(name) {
+        if (!name) return '';
+
+        // Convert to uppercase
+        let formatted = name.toUpperCase().trim();
+
+        // Remove common legal suffixes from the END of the name
+        // Order matters - check longer patterns first
+        const suffixes = [
+            ', LLC',
+            ', INC',
+            ', LP',
+            ', & CO',
+            ' LLC',
+            ' INC',
+            ' LP',
+            ' & CO',
+            ' (TX)',
+            ' (TEXAS)',
+            ' COMPANY'
+        ];
+
+        // Keep removing suffixes until none match
+        let changed = true;
+        while (changed) {
+            changed = false;
+            for (const suffix of suffixes) {
+                if (formatted.endsWith(suffix)) {
+                    formatted = formatted.slice(0, -suffix.length).trim();
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        // Clean up any trailing commas or periods
+        formatted = formatted.replace(/[,.\s]+$/, '');
+
+        return formatted;
     }
 };
 
