@@ -765,7 +765,7 @@ const UI = {
             <tr class="${plan.isGimmick ? 'row-caution' : ''}">
                 <td class="col-rank">${i + 1}</td>
                 <td class="col-grade">
-                    <span class="quality-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)">
+                    <span class="quality-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="Quality grade ${grade.letter}: ${grade.description} (${plan.qualityScore || 0} out of 100)">
                         ${grade.letter}
                     </span>
                     <span class="quality-score">${plan.qualityScore || 0}</span>
