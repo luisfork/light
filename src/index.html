@@ -236,16 +236,25 @@
                             </div>
                         </div>
 
-                        <!-- Calculate Action -->
-                        <div class="action-bar">
-                            <button type="button" id="calculate-btn" class="btn-calculate" disabled>
-                                <span class="btn-text">Calculate Annual Costs</span>
-                                <span class="btn-loading" hidden>
-                                    <span class="spinner"></span>
+                        <!-- Auto-calculation Status -->
+                        <div class="calculation-status" id="calculation-status">
+                            <div class="status-indicator" id="status-indicator">
+                                <span class="status-idle" id="status-idle">
+                                    <span class="status-dot"></span>
+                                    Enter your usage data above to see results
+                                </span>
+                                <span class="status-loading" id="status-loading" hidden>
+                                    <span class="spinner-sm"></span>
                                     Analyzing plans...
                                 </span>
-                            </button>
+                                <span class="status-ready" id="status-ready" hidden>
+                                    <span class="status-check"></span>
+                                    Results ready - scroll down to view
+                                </span>
+                            </div>
                         </div>
+                        <!-- Hidden calculate button for compatibility -->
+                        <button type="button" id="calculate-btn" class="btn-calculate" hidden disabled></button>
                     </div>
                 </section>
 

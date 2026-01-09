@@ -4,10 +4,26 @@
  */
 
 /**
- * Toast Notification System
+ * Toast Notification System - Enhanced Professional Design
  */
 const Toast = {
     container: null,
+
+    // Icon symbols (text-based, no emojis)
+    icons: {
+        success: '&#10003;', // Checkmark
+        error: '&#10007;',   // X mark
+        warning: '!',        // Exclamation
+        info: 'i'            // Info
+    },
+
+    // Default titles for each type
+    titles: {
+        success: 'Success',
+        error: 'Error',
+        warning: 'Warning',
+        info: 'Information'
+    },
 
     init() {
         this.container = document.getElementById('toast-container');
@@ -21,14 +37,34 @@ const Toast = {
         }
     },
 
-    show(message, type = 'info', duration = 5000) {
+    /**
+     * Show a toast notification
+     * @param {string} message - The message to display
+     * @param {string} type - Toast type: 'success', 'error', 'warning', 'info'
+     * @param {number} duration - Duration in ms (0 for persistent)
+     * @param {string} title - Optional custom title
+     */
+    show(message, type = 'info', duration = 5000, title = null) {
         if (!this.container) this.init();
 
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
+
+        const displayTitle = title || this.titles[type] || 'Notification';
+        const icon = this.icons[type] || this.icons.info;
+
         toast.innerHTML = `
-            <span class="toast-message">${this.escapeHtml(message)}</span>
-            <button class="toast-close" aria-label="Dismiss">&times;</button>
+            <span class="toast-icon">${icon}</span>
+            <div class="toast-content">
+                <div class="toast-title">${this.escapeHtml(displayTitle)}</div>
+                <div class="toast-message">${this.escapeHtml(message)}</div>
+            </div>
+            <button class="toast-close" aria-label="Dismiss notification">&times;</button>
+            ${duration > 0 ? `
+                <div class="toast-progress">
+                    <div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div>
+                </div>
+            ` : ''}
         `;
 
         const closeBtn = toast.querySelector('.toast-close');
@@ -50,13 +86,36 @@ const Toast = {
             if (toast.parentNode) {
                 toast.parentNode.removeChild(toast);
             }
-        }, 200);
+        }, 250);
     },
 
-    success(msg, duration) { return this.show(msg, 'success', duration); },
-    error(msg, duration = 7000) { return this.show(msg, 'error', duration); },
-    warning(msg, duration = 6000) { return this.show(msg, 'warning', duration); },
-    info(msg, duration) { return this.show(msg, 'info', duration); },
+    /**
+     * Show success notification
+     */
+    success(msg, duration = 5000, title = 'Success') {
+        return this.show(msg, 'success', duration, title);
+    },
+
+    /**
+     * Show error notification
+     */
+    error(msg, duration = 8000, title = 'Error') {
+        return this.show(msg, 'error', duration, title);
+    },
+
+    /**
+     * Show warning notification
+     */
+    warning(msg, duration = 6000, title = 'Attention') {
+        return this.show(msg, 'warning', duration, title);
+    },
+
+    /**
+     * Show info notification
+     */
+    info(msg, duration = 5000, title = 'Information') {
+        return this.show(msg, 'info', duration, title);
+    },
 
     escapeHtml(text) {
         const div = document.createElement('div');
@@ -77,10 +136,17 @@ const UI = {
         avgUsage: null,
         monthlyUsage: Array(12).fill(0),
         rankedPlans: null,
-        isLoading: false
+        isLoading: false,
+        autoCalculateTimer: null,
+        lastCalculation: null
     },
 
     elements: {},
+
+    /**
+     * Auto-calculate debounce delay (ms)
+     */
+    AUTO_CALCULATE_DELAY: 500,
 
     async init() {
         this.cacheElements();
@@ -88,11 +154,19 @@ const UI = {
         this.attachEventListeners();
 
         try {
-            await API.preloadAll();
+            const { plans } = await API.preloadAll();
             this.updateHeroMetrics();
-            Toast.success('Plan data loaded successfully');
+            Toast.success(
+                `${plans.total_plans.toLocaleString()} electricity plans ready for comparison.`,
+                5000,
+                'Data Loaded'
+            );
         } catch (error) {
-            Toast.error('Failed to load plan data. Please refresh the page.');
+            Toast.error(
+                'Unable to load plan data. Please check your connection and refresh.',
+                0,
+                'Connection Error'
+            );
             console.error('Init error:', error);
         }
     },
@@ -141,7 +215,12 @@ const UI = {
             // Modal
             modalBackdrop: document.getElementById('modal-backdrop'),
             modalBody: document.getElementById('modal-body'),
-            modalClose: document.getElementById('modal-close')
+            modalClose: document.getElementById('modal-close'),
+
+            // Status indicator
+            statusIdle: document.getElementById('status-idle'),
+            statusLoading: document.getElementById('status-loading'),
+            statusReady: document.getElementById('status-ready')
         };
     },
 
@@ -163,38 +242,29 @@ const UI = {
             option.addEventListener('click', () => this.handleMethodChange(option));
         });
 
-        // Home size select
+        // Home size select - auto-calculate on change
         if (this.elements.homeSize) {
             this.elements.homeSize.addEventListener('change', (e) => {
                 this.state.homeSize = e.target.value;
-                this.updateCalculateButton();
+                this.triggerAutoCalculate();
             });
         }
 
-        // Average usage input
+        // Average usage input - auto-calculate on input with debounce
         if (this.elements.avgKwh) {
             this.elements.avgKwh.addEventListener('input', (e) => {
                 this.state.avgUsage = parseFloat(e.target.value) || null;
-                this.updateCalculateButton();
+                this.debounceAutoCalculate();
             });
         }
 
-        // Monthly usage inputs
+        // Monthly usage inputs - auto-calculate with debounce
         const monthInputs = document.querySelectorAll('[data-month]');
         monthInputs.forEach(input => {
-            input.addEventListener('input', () => this.handleMonthlyInput());
-        });
-
-        // Calculate button
-        if (this.elements.calculateBtn) {
-            this.elements.calculateBtn.addEventListener('click', () => this.handleCalculate());
-        }
-
-        // Keyboard shortcut
-        document.addEventListener('keydown', (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !this.state.isLoading) {
-                this.handleCalculate();
-            }
+            input.addEventListener('input', () => {
+                this.handleMonthlyInput();
+                this.debounceAutoCalculate();
+            });
         });
 
         // Filters
@@ -224,14 +294,26 @@ const UI = {
             const freshness = await API.getDataFreshness();
 
             if (this.elements.totalPlansCount) {
+                // Show unique plan count (after deduplication)
                 this.elements.totalPlansCount.textContent = freshness.totalPlans.toLocaleString();
+
+                // Add tooltip with full details
+                if (freshness.duplicateCount > 0) {
+                    this.elements.totalPlansCount.setAttribute(
+                        'title',
+                        `${freshness.originalPlanCount.toLocaleString()} total plans, ` +
+                        `${freshness.duplicateCount} duplicates removed`
+                    );
+                }
             }
 
             if (this.elements.lastUpdate) {
                 const date = new Date(freshness.plansUpdated);
+                // Include year in the date format
                 this.elements.lastUpdate.textContent = date.toLocaleDateString('en-US', {
                     month: 'short',
-                    day: 'numeric'
+                    day: 'numeric',
+                    year: 'numeric'
                 });
             }
         } catch (error) {
@@ -269,7 +351,7 @@ const UI = {
                     this.state.tdu = tdu;
                     this.showTduInfo(tdu);
                     this.enableUsageSection();
-                    this.elements.zipStatus.innerHTML = '<span style="color: var(--color-positive);">Valid</span>';
+                    this.elements.zipStatus.innerHTML = '<span class="zip-status-valid">Valid ZIP</span>';
                     return;
                 }
             }
@@ -282,14 +364,22 @@ const UI = {
                 this.state.tdu = tdu;
                 this.showTduInfo(tdu);
                 this.enableUsageSection();
-                this.elements.zipStatus.innerHTML = '<span style="color: var(--color-positive);">Valid</span>';
+                this.elements.zipStatus.innerHTML = '<span class="zip-status-valid">Valid ZIP</span>';
             } else {
-                Toast.warning('Could not identify TDU for this ZIP code. Please verify the ZIP is in a deregulated area.');
+                Toast.warning(
+                    'This ZIP code may be in a non-deregulated area of Texas. Only deregulated areas can choose providers.',
+                    8000,
+                    'Unknown Service Area'
+                );
                 this.disableUsageSection();
-                this.elements.zipStatus.innerHTML = '<span style="color: var(--color-caution);">Unknown</span>';
+                this.elements.zipStatus.innerHTML = '<span class="zip-status-unknown">Unknown</span>';
             }
         } catch (error) {
-            Toast.error('Error detecting service area');
+            Toast.error(
+                'Unable to verify service area. Please try again.',
+                6000,
+                'Lookup Failed'
+            );
             console.error('ZIP detection error:', error);
             this.disableUsageSection();
         }
@@ -368,32 +458,65 @@ const UI = {
     },
 
     updateCalculateButton() {
+        // Legacy method - now hidden but kept for compatibility
         if (!this.elements.calculateBtn) return;
+        this.elements.calculateBtn.hidden = true;
+    },
 
-        let valid = false;
+    /**
+     * Check if calculation input is valid
+     */
+    isInputValid() {
+        if (!this.state.tdu) return false;
 
-        if (this.state.tdu) {
-            switch (this.state.usageMethod) {
-                case 'estimate':
-                    valid = !!this.state.homeSize || !!this.elements.homeSize?.value;
-                    break;
-                case 'average':
-                    valid = !!(this.state.avgUsage || parseFloat(this.elements.avgKwh?.value));
-                    break;
-                case 'detailed':
-                    valid = this.state.monthlyUsage.some(v => v > 0);
-                    break;
-            }
+        switch (this.state.usageMethod) {
+            case 'estimate':
+                return !!(this.state.homeSize || this.elements.homeSize?.value);
+            case 'average':
+                return !!(this.state.avgUsage || parseFloat(this.elements.avgKwh?.value));
+            case 'detailed':
+                return this.state.monthlyUsage.some(v => v > 0);
+            default:
+                return false;
+        }
+    },
+
+    /**
+     * Debounced auto-calculate trigger
+     */
+    debounceAutoCalculate() {
+        if (this.state.autoCalculateTimer) {
+            clearTimeout(this.state.autoCalculateTimer);
         }
 
-        this.elements.calculateBtn.disabled = !valid;
+        this.state.autoCalculateTimer = setTimeout(() => {
+            this.triggerAutoCalculate();
+        }, this.AUTO_CALCULATE_DELAY);
+    },
+
+    /**
+     * Trigger auto-calculation if input is valid
+     */
+    triggerAutoCalculate() {
+        if (this.state.autoCalculateTimer) {
+            clearTimeout(this.state.autoCalculateTimer);
+            this.state.autoCalculateTimer = null;
+        }
+
+        if (this.isInputValid() && !this.state.isLoading) {
+            this.handleCalculate();
+        }
     },
 
     async handleCalculate() {
         if (this.state.isLoading) return;
 
         if (!this.state.tdu) {
-            Toast.warning('Please enter a valid ZIP code first');
+            Toast.warning(
+                'Enter your 5-digit Texas ZIP code to begin.',
+                5000,
+                'ZIP Required'
+            );
             return;
         }
 
@@ -403,7 +526,11 @@ const UI = {
             case 'estimate':
                 const homeSize = this.elements.homeSize?.value || this.state.homeSize;
                 if (!homeSize) {
-                    Toast.warning('Please select a home size');
+                    Toast.warning(
+                        'Select your home size to estimate usage.',
+                        5000,
+                        'Selection Required'
+                    );
                     return;
                 }
                 monthlyUsage = estimateUsagePattern(parseFloat(homeSize));
@@ -411,14 +538,22 @@ const UI = {
             case 'average':
                 const avgKwh = parseFloat(this.elements.avgKwh?.value) || this.state.avgUsage;
                 if (!avgKwh) {
-                    Toast.warning('Please enter your average monthly usage');
+                    Toast.warning(
+                        'Enter your average monthly kWh usage.',
+                        5000,
+                        'Usage Required'
+                    );
                     return;
                 }
                 monthlyUsage = estimateUsagePattern(avgKwh);
                 break;
             case 'detailed':
                 if (!this.state.monthlyUsage.some(v => v > 0)) {
-                    Toast.warning('Please enter usage for at least one month');
+                    Toast.warning(
+                        'Enter usage for at least one month.',
+                        5000,
+                        'Usage Required'
+                    );
                     return;
                 }
                 monthlyUsage = [...this.state.monthlyUsage];
@@ -437,7 +572,11 @@ const UI = {
             const tduPlans = plansData.plans.filter(p => p.tdu_area === this.state.tdu.code);
 
             if (tduPlans.length === 0) {
-                Toast.warning('No plans available for your TDU area');
+                Toast.warning(
+                    'No electricity plans currently available for your service area.',
+                    6000,
+                    'No Plans Found'
+                );
                 return;
             }
 
@@ -450,10 +589,20 @@ const UI = {
             this.elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             const best = rankedPlans[0];
-            Toast.success(`Found ${rankedPlans.length} plans. Best: ${formatCurrency(best.annualCost)}/year`);
+            const savings = rankedPlans.length > 1 ? rankedPlans[rankedPlans.length - 1].annualCost - best.annualCost : 0;
+            Toast.success(
+                `Lowest cost plan: ${formatCurrency(best.annualCost)}/year. ` +
+                (savings > 0 ? `Save up to ${formatCurrency(savings)} vs other plans.` : ''),
+                6000,
+                `${rankedPlans.length} Plans Analyzed`
+            );
 
         } catch (error) {
-            Toast.error('Calculation error: ' + error.message);
+            Toast.error(
+                'Unable to calculate costs. Please try again.',
+                8000,
+                'Calculation Error'
+            );
             console.error('Calculation error:', error);
         } finally {
             this.state.isLoading = false;
@@ -462,17 +611,24 @@ const UI = {
     },
 
     showLoading() {
-        if (!this.elements.calculateBtn) return;
-        this.elements.calculateBtn.disabled = true;
-        this.elements.calculateBtn.querySelector('.btn-text').hidden = true;
-        this.elements.calculateBtn.querySelector('.btn-loading').hidden = false;
+        // Update status indicator
+        if (this.elements.statusIdle) this.elements.statusIdle.hidden = true;
+        if (this.elements.statusLoading) this.elements.statusLoading.hidden = false;
+        if (this.elements.statusReady) this.elements.statusReady.hidden = true;
     },
 
     hideLoading() {
-        if (!this.elements.calculateBtn) return;
-        this.elements.calculateBtn.querySelector('.btn-text').hidden = false;
-        this.elements.calculateBtn.querySelector('.btn-loading').hidden = true;
-        this.updateCalculateButton();
+        // Update status indicator to show ready
+        if (this.elements.statusIdle) this.elements.statusIdle.hidden = true;
+        if (this.elements.statusLoading) this.elements.statusLoading.hidden = true;
+        if (this.elements.statusReady) this.elements.statusReady.hidden = false;
+    },
+
+    resetStatus() {
+        // Reset status indicator to idle state
+        if (this.elements.statusIdle) this.elements.statusIdle.hidden = false;
+        if (this.elements.statusLoading) this.elements.statusLoading.hidden = true;
+        if (this.elements.statusReady) this.elements.statusReady.hidden = true;
     },
 
     displayResults(plans, monthlyUsage) {
@@ -545,7 +701,7 @@ const UI = {
                     </span>
                     <span class="plan-detail-item">
                         <span class="plan-detail-label">Cancel Fee:</span>
-                        <span class="plan-detail-value">${formatCurrency(plan.early_termination_fee || 0)}</span>
+                        <span class="plan-detail-value">${this.formatETF(plan)}</span>
                     </span>
                 </div>
                 <div class="plan-item-actions">
@@ -597,7 +753,7 @@ const UI = {
                 <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
                 <td class="col-rate"><span class="rate-value">${formatRate(plan.effectiveRate)}</span></td>
                 <td class="col-renewable">${plan.renewable_pct || 0}%</td>
-                <td class="col-etf">${formatCurrency(plan.early_termination_fee || 0)}</td>
+                <td class="col-etf">${this.formatETF(plan)}</td>
                 <td><button class="btn-view" onclick="UI.showPlanModal('${plan.plan_id}')">View</button></td>
             </tr>
         `).join('');
@@ -732,6 +888,20 @@ const UI = {
         const div = document.createElement('div');
         div.textContent = String(text);
         return div.innerHTML;
+    },
+
+    /**
+     * Format ETF for display, handling per-month-remaining fees
+     */
+    formatETF(plan) {
+        if (typeof getETFDisplayInfo === 'function') {
+            const etfInfo = getETFDisplayInfo(plan);
+            return etfInfo.displayText;
+        }
+
+        // Fallback if function not available
+        if (!plan.early_termination_fee) return 'None';
+        return formatCurrency(plan.early_termination_fee);
     }
 };
 
