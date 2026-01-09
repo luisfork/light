@@ -65,10 +65,10 @@ jobs:
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Clean old historical data (keep last 90 days)
+      - name: Verify historical data directory
         run: |
-          find data/historical -name "plans_*.json" -type f -mtime +90 -delete || true
-          echo "Cleaned historical data older than 90 days"
+          echo "Historical plan data archive maintained indefinitely for trend analysis"
+          ls -lh data/historical/ || echo "No historical files yet"
 
       - name: Commit and push changes
         if: steps.check_changes.outputs.changes == 'true'

@@ -261,20 +261,22 @@ function detectTDU(zipCode, tduList) {
 /**
  * Rank plans by annual cost and identify gimmicks
  *
+ * Enhanced ranking system with quality scoring and penalties for bad plan features
+ *
  * @param {Object[]} plans - Array of plan objects
  * @param {number[]} userUsage - 12-month usage pattern
  * @param {Object} tduRates - TDU rate object
  * @param {Object} options - Ranking options
- * @returns {Object[]} Ranked plans with warnings
+ * @returns {Object[]} Ranked plans with warnings and quality scores
  */
 function rankPlans(plans, userUsage, tduRates, options = {}) {
-    const { localTaxRate = 0, termLengthPreference = null } = options;
+    const { localTaxRate = 0, termLengthPreference = null, contractStartDate = null } = options;
 
-    // Calculate annual cost for each plan
+    // Calculate metrics for all plans first
     const rankedPlans = plans.map(plan => {
         const annualResult = calculateAnnualCost(userUsage, plan, tduRates, localTaxRate);
         const volatility = calculateVolatility(plan, userUsage);
-        const warnings = identifyWarnings(plan, userUsage);
+        const warnings = identifyWarnings(plan, userUsage, contractStartDate);
 
         return {
             ...plan,
@@ -282,6 +284,7 @@ function rankPlans(plans, userUsage, tduRates, options = {}) {
             averageMonthlyCost: annualResult.averageMonthlyCost,
             effectiveRate: annualResult.effectiveAnnualRate,
             monthlyCosts: annualResult.monthlyCosts,
+            totalUsage: annualResult.totalUsage,
             volatility: volatility,
             warnings: warnings,
             isGimmick: warnings.length > 0 || volatility > 0.3
@@ -291,10 +294,112 @@ function rankPlans(plans, userUsage, tduRates, options = {}) {
     // Filter to fixed-rate only
     const fixedRatePlans = rankedPlans.filter(p => p.rate_type === 'FIXED');
 
-    // Sort by annual cost (lowest first)
-    fixedRatePlans.sort((a, b) => a.annualCost - b.annualCost);
+    if (fixedRatePlans.length === 0) {
+        return [];
+    }
+
+    // Find best annual cost for quality scoring
+    const bestAnnualCost = Math.min(...fixedRatePlans.map(p => p.annualCost));
+
+    // Calculate quality scores with penalties for bad features
+    fixedRatePlans.forEach(plan => {
+        plan.qualityScore = calculateQualityScore(plan, bestAnnualCost, options);
+    });
+
+    // Sort by annual cost (primary), then quality score (tie-breaker)
+    fixedRatePlans.sort((a, b) => {
+        // Primary: Annual cost
+        const costDiff = a.annualCost - b.annualCost;
+        if (Math.abs(costDiff) > 1.0) {
+            return costDiff;
+        }
+
+        // Tie-breaker 1: Quality score (higher is better)
+        const qualityDiff = b.qualityScore - a.qualityScore;
+        if (Math.abs(qualityDiff) > 2.0) {
+            return qualityDiff;
+        }
+
+        // Tie-breaker 2: Volatility (lower is better)
+        const volatilityDiff = a.volatility - b.volatility;
+        if (Math.abs(volatilityDiff) > 0.05) {
+            return volatilityDiff;
+        }
+
+        // Tie-breaker 3: Shorter term preferred for flexibility
+        return a.term_months - b.term_months;
+    });
 
     return fixedRatePlans;
+}
+
+/**
+ * Calculate quality score for a plan (0-100 scale)
+ *
+ * Higher scores indicate better overall value considering cost, reliability, and features
+ *
+ * @param {Object} plan - Plan object with calculated metrics
+ * @param {number} bestAnnualCost - Lowest annual cost among all plans
+ * @param {Object} options - Scoring options
+ * @returns {number} Quality score (0-100)
+ */
+function calculateQualityScore(plan, bestAnnualCost, options = {}) {
+    let score = 100;
+
+    // Penalty 1: Cost penalty (0-40 points)
+    // Plans more expensive than the best lose up to 40 points
+    if (plan.annualCost > bestAnnualCost) {
+        const costDiffPercent = (plan.annualCost - bestAnnualCost) / bestAnnualCost;
+        const costPenalty = Math.min(40, costDiffPercent * 100);
+        score -= costPenalty;
+    }
+
+    // Penalty 2: Volatility penalty (0-25 points)
+    // High volatility plans lose up to 25 points
+    const volatilityPenalty = plan.volatility * 25;
+    score -= volatilityPenalty;
+
+    // Penalty 3: Warning penalty (5 points per warning, max 25)
+    const warningPenalty = Math.min(25, plan.warnings.length * 5);
+    score -= warningPenalty;
+
+    // Penalty 4: High base charge penalty (0-5 points)
+    // Base charges over $15/month are penalized
+    if (plan.base_charge_monthly > 15) {
+        const baseChargePenalty = Math.min(5, (plan.base_charge_monthly - 15) / 3);
+        score -= baseChargePenalty;
+    }
+
+    // Penalty 5: Prepaid penalty (10 points)
+    // Prepaid plans are less convenient for most users
+    if (plan.is_prepaid) {
+        score -= 10;
+    }
+
+    // Bonus 1: Renewable energy bonus (0-5 points)
+    // 100% renewable plans get 5 points, scaled linearly
+    if (plan.renewable_pct >= 50) {
+        const renewableBonus = (plan.renewable_pct / 100) * 5;
+        score += renewableBonus;
+    }
+
+    // Bonus 2: Low rate variance bonus (0-5 points)
+    // Plans with consistent rates across usage levels get bonus
+    const rate500 = plan.price_kwh_500;
+    const rate1000 = plan.price_kwh_1000;
+    const rate2000 = plan.price_kwh_2000;
+    const maxVariance = Math.max(
+        Math.abs(rate500 - rate1000) / rate1000,
+        Math.abs(rate2000 - rate1000) / rate1000
+    );
+    if (maxVariance < 0.1) {  // Less than 10% variance
+        score += 5;
+    } else if (maxVariance < 0.2) {  // Less than 20% variance
+        score += 2;
+    }
+
+    // Ensure score stays in 0-100 range
+    return Math.max(0, Math.min(100, Math.round(score)));
 }
 
 /**

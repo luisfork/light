@@ -10,7 +10,7 @@ Live Site: https://luisfork.github.io/light/ (deployed automatically via GitHub 
 
 ## Why Light?
 
-Most Texans overpay $800+ annually by choosing plans with deceptive bill credits that look cheap at 1,000 kWh but cost dramatically more throughout the year. Additionally, many users inadvertently renew contracts during expensive summer months, compounding long-term costs.
+Most Texans overpay $816-$1,072 annually (EnergyBot 2025 study) by choosing plans with deceptive bill credits that look cheap at 1,000 kWh but cost dramatically more throughout the year. Additionally, many users inadvertently renew contracts during expensive summer months, compounding long-term costs.
 
 Light calculates true costs by:
 
@@ -39,6 +39,8 @@ Light calculates true costs by:
 - **Gimmick Detection** - Identifies and warns about bill credit traps and time-of-use plans
 - **Provider Name Formatting** - All provider names displayed in clean, professional uppercase format
 - **Enhanced ETF Calculation** - Properly handles per-month-remaining early termination fees
+- **Duplicate Plan Detection** - Automatically removes duplicate English/Spanish versions of same plan
+- **Quality Scoring System** - NEW: 0-100 scoring system with penalties for bad plan features
 - **Clean, Professional UI** - Beautiful design, mobile-first, accessible, NO emojis, NO bento grids
 - **100% Free & Unbiased** - No commissions, no ads, no hidden costs
 
@@ -46,7 +48,7 @@ Light calculates true costs by:
 
 - **Static Site** - Zero hosting cost via GitHub Pages
 - **Daily Data Updates** - GitHub Actions automatically fetches latest plans at 2 AM CT
-- **Historical Data Storage** - Maintains 90-day archive of plan data for trend analysis
+- **Historical Data Storage** - Maintains unlimited archive of plan data in `data/historical/` for trend analysis
 - **Transparent Calculations** - All formulas visible in open-source code
 - **Fast Performance** - Pre-fetched data, no external API calls during use
 - **Cross-Browser Compatible** - Works on all modern browsers and platforms
@@ -70,6 +72,7 @@ Light calculates your true annual electricity cost using this algorithm:
 
 // Then rank plans by:
 - Annual cost (lowest first)
+- Quality score (0-100, considering cost, volatility, warnings, features)
 - Volatility score (simpler plans preferred)
 - Contract expiration timing (avoiding expensive renewal periods)
 ```
@@ -203,9 +206,20 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 ### Historical Data Archive
 
 **Storage:** `data/historical/` directory
-**Retention:** 90 days of daily snapshots
+**Retention:** Unlimited (growing archive of all historical snapshots)
 **Format:** Timestamped JSON files (`plans_YYYY-MM-DD.json`)
-**Purpose:** Trend analysis, rate monitoring, data integrity verification
+**Purpose:** Trend analysis, rate monitoring, data integrity verification, long-term price tracking
+
+**Accessing Historical Data:**
+```javascript
+// Load historical plan data from specific date
+const historicalData = await fetch('/data/historical/plans_2025-12-01.json');
+const plans = await historicalData.json();
+
+// Compare current vs historical rates
+const current = await API.loadPlans();
+console.log(`Plan count: ${plans.total_plans} → ${current.total_plans}`);
+```
 
 ---
 
@@ -221,7 +235,12 @@ light/
 │   ├── plans.json               # Current electricity plans (updated daily)
 │   ├── tdu-rates.json           # TDU delivery charges (updated Mar/Sep)
 │   ├── local-taxes.json         # Texas local tax rates
-│   └── historical/              # 90-day archive of plan snapshots
+│   └── historical/              # Unlimited archive of historical plan snapshots
+├── docs/                        # Comprehensive technical documentation
+│   ├── api-response-schema.md   # API response formats and data structures
+│   ├── calculation-algorithm.md # Detailed algorithm walkthrough
+│   ├── tdu-service-areas.md     # TDU coverage mapping and rates
+│   └── data-schema-plans.md     # plans.json structure specification
 ├── src/
 │   ├── index.html               # Main application
 │   ├── css/
@@ -234,10 +253,12 @@ light/
 │   ├── fetch_plans.py           # Fetch from Power to Choose API
 │   ├── fetch_tdu_rates.py       # TDU rate management
 │   └── generate_sample_data.py  # Sample data generator
-├── research.md                  # Market research and algorithm documentation
+├── research.md                  # Texas electricity market research (updated Jan 2026)
+├── CONTRACT_EXPIRATION_FEATURE.md  # Contract timing analysis documentation
 ├── pyproject.toml               # Python dependencies
-├── README.md
-└── LICENSE
+├── requirements.txt             # Python package requirements
+├── README.md                    # This file
+└── LICENSE                      # MIT License
 ```
 
 ---
@@ -293,9 +314,9 @@ python scripts/fetch_tdu_rates.py
 
 **Daily Data Updates** (`update-plans.yml`):
 - Runs at 2 AM Central Time (7 AM UTC)
-- Archives current plans to `data/historical/`
+- Archives current plans to `data/historical/` (unlimited retention)
 - Fetches latest plans from Power to Choose API
-- Cleans historical data older than 90 days
+- Removes duplicate English/Spanish plan versions
 - Commits and pushes if changes detected
 - Triggers deployment workflow
 
@@ -349,7 +370,52 @@ calculateETF(plan, monthsRemaining):
     return baseFee
 ```
 
-### 3. Provider Name Formatting
+### 3. Quality Scoring System (NEW)
+
+Comprehensive 0-100 scoring considering multiple factors:
+
+```javascript
+calculateQualityScore(plan, bestAnnualCost):
+  score = 100
+
+  // Penalties
+  - Cost vs best plan: up to -40 points
+  - Volatility score: up to -25 points
+  - Warnings: -5 points each (max -25)
+  - High base charge (>$15/mo): up to -5 points
+  - Prepaid plan: -10 points
+
+  // Bonuses
+  + Renewable energy (50%+): up to +5 points
+  + Low rate variance (<10%): +5 points
+
+  return clamp(score, 0, 100)
+```
+
+**Quality Grades:**
+- 90-100: A (Excellent - highly recommended)
+- 80-89: B (Good - solid choice)
+- 70-79: C (Acceptable - minor issues)
+- 60-69: D (Caution - significant drawbacks)
+- 0-59: F (Avoid - high cost or high risk)
+
+### 4. Duplicate Plan Detection (NEW)
+
+Automatically identifies and removes duplicate English/Spanish plan versions:
+
+```javascript
+deduplicatePlans(plans):
+  1. Create fingerprint from: rep_name, tdu_area, prices, term, fees
+  2. Detect duplicates with identical fingerprints
+  3. Prefer English version over Spanish
+  4. Remove duplicates, keep one version per unique plan
+
+  return { deduplicated, duplicateCount }
+```
+
+Some providers list the same plan twice (e.g., "Truly Simple 12" and "Verdaderamente Simple 12") with identical pricing. Light detects these and shows only one version.
+
+### 5. Provider Name Formatting
 
 Ensures professional, consistent display:
 
@@ -362,7 +428,7 @@ formatProviderName(name):
 Example: "Reliant Energy Retail Services, LLC" → "RELIANT ENERGY RETAIL SERVICES"
 ```
 
-### 4. Historical Data Tracking
+### 6. Historical Data Tracking
 
 Unlike competitors, Light maintains 90-day historical archive:
 
