@@ -196,10 +196,14 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
         if not reader.fieldnames:
             raise ValueError("No columns found in CSV")
 
-        expected_columns = ["REP Name", "Product", "TDU"]
-        missing = [col for col in expected_columns if col not in reader.fieldnames]
-        if missing:
-            print(f"Warning: Missing expected columns: {missing}", file=sys.stderr)
+        # Power to Choose uses bracketed column names like [TduCompanyName]
+        # Map both old and new column formats
+        print(f"  Found {len(reader.fieldnames)} columns")
+
+        # Check for new bracket format
+        has_brackets = any(col.startswith('[') for col in reader.fieldnames if col)
+        if has_brackets:
+            print("  Detected Power to Choose bracket column format")
 
     except csv.Error as e:
         print(f"CSV parsing error: {e}", file=sys.stderr)
@@ -211,37 +215,71 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
     for row in reader:
         row_count += 1
         try:
+            # Get values with support for both old and new column formats
+            def get_val(*keys):
+                """Try multiple possible column names."""
+                for key in keys:
+                    val = row.get(key)
+                    if val:
+                        return val
+                    # Try with brackets
+                    val = row.get(f"[{key}]")
+                    if val:
+                        return val
+                return ""
+
             # Filter to fixed-rate plans only as specified in requirements
-            rate_type = row.get("Rate Type", "").upper()
-            if "FIXED" not in rate_type:
+            rate_type = get_val("RateType", "Rate Type", "Fixed").upper()
+            fixed_flag = get_val("Fixed")
+
+            # Check if it's a fixed rate plan
+            is_fixed = "FIXED" in rate_type or fixed_flag == "1" or fixed_flag == "True"
+            if not is_fixed:
                 continue
+
+            # Get TDU area and normalize it
+            tdu_raw = get_val("TduCompanyName", "TDU", "TDU Area")
+            tdu_area = normalize_tdu_name(tdu_raw)
+
+            # Parse prices - Power to Choose now returns decimal rates (e.g., 0.1600)
+            # Convert to cents if needed
+            price_500_raw = get_val("kwh500", "Price/kWh: 500 kWh", "Price500")
+            price_1000_raw = get_val("kwh1000", "Price/kWh: 1000 kWh", "Price1000")
+            price_2000_raw = get_val("kwh2000", "Price/kWh: 2000 kWh", "Price2000")
+
+            price_500 = parse_price(price_500_raw)
+            price_1000 = parse_price(price_1000_raw)
+            price_2000 = parse_price(price_2000_raw)
 
             # Parse plan data with validation
             plan = {
-                "plan_id": sanitize_string(row.get("ID Plan", row.get("Plan ID", ""))),
-                "rep_name": sanitize_string(row.get("REP Name", "")),
-                "plan_name": sanitize_string(row.get("Product", row.get("Plan Name", ""))),
-                "tdu_area": sanitize_string(row.get("TDU", "")).upper(),
+                "plan_id": sanitize_string(get_val("idKey", "ID Plan", "Plan ID")),
+                "rep_name": sanitize_string(get_val("RepCompany", "REP Name")),
+                "plan_name": sanitize_string(get_val("Product", "Plan Name")),
+                "tdu_area": tdu_area,
                 # Prices at standard usage levels (in cents per kWh)
-                "price_kwh_500": parse_float(row.get("Price/kWh: 500 kWh", row.get("Price500", ""))),
-                "price_kwh_1000": parse_float(row.get("Price/kWh: 1000 kWh", row.get("Price1000", ""))),
-                "price_kwh_2000": parse_float(row.get("Price/kWh: 2000 kWh", row.get("Price2000", ""))),
+                "price_kwh_500": price_500,
+                "price_kwh_1000": price_1000,
+                "price_kwh_2000": price_2000,
                 # Plan details
-                "term_months": parse_int(row.get("Term Value", row.get("Term", ""))),
+                "term_months": parse_int(get_val("TermValue", "Term Value", "Term")),
                 "rate_type": "FIXED",
-                "renewable_pct": parse_int(row.get("Renewable Content", row.get("Renewable", "0"))),
-                "is_prepaid": row.get("Prepaid", "").upper() == "YES",
-                "is_tou": row.get("Time of Use", "").upper() == "YES",
+                "renewable_pct": parse_int(get_val("Renewable", "Renewable Content") or "0"),
+                "is_prepaid": get_val("PrePaid", "Prepaid").upper() in ("TRUE", "YES", "1"),
+                "is_tou": get_val("TimeOfUse", "Time of Use").upper() in ("TRUE", "YES", "1"),
                 # Fees
-                "early_termination_fee": parse_float(row.get("Cancellation Fee", row.get("ETF", "0"))),
-                "base_charge_monthly": parse_float(row.get("Monthly Recurring Charge", row.get("Base Charge", "0"))),
+                "early_termination_fee": parse_float(get_val("CancelFee", "Cancellation Fee", "ETF") or "0"),
+                "base_charge_monthly": 0.0,  # Not directly provided in CSV
                 # URLs
-                "efl_url": sanitize_url(row.get("Electricity Facts Label (EFL) URL", row.get("EFL URL", ""))),
-                "enrollment_url": sanitize_url(row.get("Enroll URL", row.get("Enrollment URL", ""))),
-                "terms_url": sanitize_url(row.get("Terms of Service (TOS) URL", row.get("TOS URL", ""))),
+                "efl_url": sanitize_url(get_val("FactsURL", "Electricity Facts Label (EFL) URL", "EFL URL")),
+                "enrollment_url": sanitize_url(get_val("EnrollURL", "Enroll URL", "Enrollment URL")),
+                "terms_url": sanitize_url(get_val("TermsURL", "Terms of Service (TOS) URL", "TOS URL")),
                 # Special features
-                "special_terms": sanitize_string(row.get("Special terms and conditions", row.get("Special Terms", ""))),
-                "promotion_details": sanitize_string(row.get("Promotion details", row.get("Promotions", ""))),
+                "special_terms": sanitize_string(get_val("SpecialTerms", "Special terms and conditions", "Special Terms")),
+                "promotion_details": sanitize_string(get_val("PromotionDesc", "Promotion", "Promotion details", "Promotions")),
+                # Additional fields
+                "fees_credits": sanitize_string(get_val("Fees/Credits", "MinUsageFeesCredits")),
+                "min_usage_fees": sanitize_string(get_val("MinUsageFeesCredits", "Min Usage Fees")),
             }
 
             # Validation: Only include plans with valid pricing data
@@ -270,6 +308,72 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
         print(f"Warning: {error_count - 5} additional parsing errors suppressed", file=sys.stderr)
 
     return plans
+
+
+def normalize_tdu_name(tdu_raw: str) -> str:
+    """Normalize TDU company name to standard code."""
+    if not tdu_raw:
+        return "UNKNOWN"
+
+    tdu_upper = tdu_raw.upper().strip()
+
+    # Map full names to codes
+    tdu_mapping = {
+        "CENTERPOINT": "CENTERPOINT",
+        "CENTERPOINT ENERGY": "CENTERPOINT",
+        "CENTERPOINT ENERGY HOUSTON": "CENTERPOINT",
+        "CENTERPOINT ENERGY HOUSTON ELECTRIC": "CENTERPOINT",
+        "CENTERPOINT ENERGY HOUSTON ELECTRIC LLC": "CENTERPOINT",
+        "ONCOR": "ONCOR",
+        "ONCOR ELECTRIC": "ONCOR",
+        "ONCOR ELECTRIC DELIVERY": "ONCOR",
+        "ONCOR ELECTRIC DELIVERY COMPANY": "ONCOR",
+        "AEP TEXAS CENTRAL": "AEP_CENTRAL",
+        "AEP TEXAS CENTRAL COMPANY": "AEP_CENTRAL",
+        "AEP CENTRAL": "AEP_CENTRAL",
+        "AEP TEXAS NORTH": "AEP_NORTH",
+        "AEP TEXAS NORTH COMPANY": "AEP_NORTH",
+        "AEP NORTH": "AEP_NORTH",
+        "TEXAS-NEW MEXICO POWER": "TNMP",
+        "TEXAS-NEW MEXICO POWER COMPANY": "TNMP",
+        "TNMP": "TNMP",
+        "LUBBOCK POWER": "LPL",
+        "LUBBOCK POWER & LIGHT": "LPL",
+        "LPL": "LPL",
+    }
+
+    # Try exact match first
+    if tdu_upper in tdu_mapping:
+        return tdu_mapping[tdu_upper]
+
+    # Try partial match
+    for key, code in tdu_mapping.items():
+        if key in tdu_upper or tdu_upper in key:
+            return code
+
+    return tdu_upper
+
+
+def parse_price(value: Any) -> float | None:
+    """Parse price value, handling both cents and decimal formats."""
+    if value is None:
+        return None
+    try:
+        if isinstance(value, (int, float)):
+            num = float(value)
+        else:
+            cleaned = str(value).strip().replace("$", "").replace(",", "").replace("%", "")
+            if not cleaned:
+                return None
+            num = float(cleaned)
+
+        # Power to Choose returns rates as decimals (e.g., 0.1600 = 16 cents)
+        # If value is less than 1, it's in dollars per kWh, convert to cents
+        if num < 1.0:
+            return num * 100
+        return num
+    except (ValueError, AttributeError):
+        return None
 
 
 def parse_json_to_plans(json_text: str) -> list[dict[str, Any]]:
