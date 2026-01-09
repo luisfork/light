@@ -38,11 +38,11 @@ These prices include TDU delivery charges—they represent your total expected c
 
 **Key EFL sections to scrutinize:**
 
--   **Energy charge**: The per-kWh rate for electricity supply
--   **Base charge**: Fixed monthly fee regardless of usage ($0-$30)
--   **Bill credits**: Discounts conditional on hitting usage thresholds
--   **Early termination fee**: Flat amount or per-month-remaining formula
--   **Renewable content**: Percentage from renewable sources (Texas average ~33%)
+- **Energy charge**: The per-kWh rate for electricity supply
+- **Base charge**: Fixed monthly fee regardless of usage ($0-$30)
+- **Bill credits**: Discounts conditional on hitting usage thresholds
+- **Early termination fee**: Flat amount or per-month-remaining formula
+- **Renewable content**: Percentage from renewable sources (Texas average ~33%)
 
 Calculate your expected bill: multiply energy charge by your kWh, add base charge, add TDU charges (both fixed and per-kWh components), then subtract any bill credits you’ll actually qualify for.
 
@@ -141,7 +141,7 @@ Smart Meter Texas (smartmetertexas.com) provides **15-minute interval data** for
 
 1. Public SSL certificate (CA-authorized for production)
 1. Static public IP address
-1. Email to support@smartmetertexas.com with IP, ESIID, User ID, and certificate
+1. Email to <support@smartmetertexas.com> with IP, ESIID, User ID, and certificate
 1. Await approval and setup
 
 **Rate limits**: 2 meter reads per hour per ESIID, 24 reads per calendar day.
@@ -271,12 +271,12 @@ def rank_plans(plans, user_usage_12mo, preferences):
 
 ### Edge cases and error handling
 
--   **Bill credit near usage boundary**: Flag plans where user’s average usage is within 10% of credit threshold
--   **Seasonal threshold misses**: Calculate percentage of months user would miss credit thresholds
--   **TDU rate changes**: Cache TDU rates with effective dates; check for updates March 1 and September 1
--   **SMT rate limiting**: Implement exponential backoff; cache successful reads
--   **EFL parsing failures**: Fall back to Power to Choose 500/1000/2000 kWh prices if PDF extraction fails
--   **Variable TDU pricing**: Some plans show “unbundled” rates—verify TDU inclusion method
+- **Bill credit near usage boundary**: Flag plans where user’s average usage is within 10% of credit threshold
+- **Seasonal threshold misses**: Calculate percentage of months user would miss credit thresholds
+- **TDU rate changes**: Cache TDU rates with effective dates; check for updates March 1 and September 1
+- **SMT rate limiting**: Implement exponential backoff; cache successful reads
+- **EFL parsing failures**: Fall back to Power to Choose 500/1000/2000 kWh prices if PDF extraction fails
+- **Variable TDU pricing**: Some plans show “unbundled” rates—verify TDU inclusion method
 
 ### Supplementary data sources
 

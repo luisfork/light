@@ -4,7 +4,7 @@
 
 Light is a high-performance static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, seasonal variations, and contract expiration timing—not deceptive advertised rates.
 
-Live Site: https://luisfork.github.io/light/ (deployed automatically via GitHub Actions)
+Live Site: <https://luisfork.github.io/light/> (deployed automatically via GitHub Actions)
 
 ---
 
@@ -87,7 +87,7 @@ We apply Texas-specific seasonal multipliers based on real consumption patterns:
 
 This reflects real Texas usage patterns where summer AC dominates annual consumption.
 
-### Contract Expiration Timing Analysis (NEW)
+### Contract Expiration Timing Analysis
 
 Light now analyzes when your electricity contract will expire and warns if renewal falls during expensive months:
 
@@ -136,7 +136,8 @@ The official Public Utility Commission of Texas (PUCT) Power to Choose platform 
 **Base URL:** `http://api.powertochoose.org/`
 
 **Primary Endpoints:**
-```
+
+```bash
 GET/POST /api/PowerToChoose/plans
   Returns: Array of electricity plans with full details
   Parameters:
@@ -154,6 +155,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 ```
 
 **Available Data Fields:**
+
 - Plan ID, REP name, Product name
 - TDU service area
 - Pricing at 500/1000/2000 kWh (includes TDU charges)
@@ -167,6 +169,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 - Promotional details and special terms
 
 **Important Notes:**
+
 - REPs directly submit plan information (PUCT does not independently verify)
 - Each REP limited to 5 plans on platform
 - Prices shown include TDU delivery charges (all-inclusive per PUCT rules)
@@ -174,6 +177,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 - No authentication required for public endpoints
 
 **Our Implementation:**
+
 - Fetch via CSV export endpoint (most reliable)
 - Fallback to JSON API if CSV unavailable
 - Retry logic with exponential backoff
@@ -187,7 +191,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 **Current Rates (as of January 2026):**
 
 | TDU | Monthly Base | Per-kWh Rate | Effective Date |
-|-----|--------------|--------------|----------------|
+| --- | ------------ | ------------ | -------------- |
 | CenterPoint Energy Houston | $4.90 | 6.0009¢ | Dec 7, 2025 |
 | Oncor Electric Delivery | $4.23 | 5.5833¢ | Sep 1, 2025 |
 | AEP Texas Central | $5.49 | 5.6954¢ | Sep 1, 2025 |
@@ -207,20 +211,23 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 Light maintains a growing archive of electricity plan data for trend analysis and research.
 
-**JSON Archive**
+#### JSON Archive
+
 - **Location:** `data/historical/` directory
 - **Format:** Timestamped JSON files (`plans_YYYY-MM-DD.json`)
 - **Retention:** Unlimited (growing archive of all historical snapshots)
 - **Purpose:** Programmatic access, trend analysis, data integrity verification
 
-**CSV Archive (NEW)**
+#### CSV Archive
+
 - **Location:** `data/archive-csv/` directory
 - **Format:** Timestamped CSV files (`plans_YYYY-MM-DD.csv`)
 - **Retention:** Unlimited (daily snapshots)
 - **Purpose:** Easy analysis in Excel, Google Sheets, or data science tools
 
 **CSV Columns:**
-```
+
+```bash
 plan_id, plan_name, rep_name, tdu_area, rate_type,
 term_months, price_kwh_500, price_kwh_1000, price_kwh_2000,
 base_charge_monthly, early_termination_fee, renewable_pct,
@@ -256,6 +263,7 @@ for f in csv_files[-5:]:  # Last 5 days
 ```
 
 **Use Cases:**
+
 - Track rate changes over time
 - Identify seasonal pricing patterns
 - Research provider pricing strategies
@@ -266,7 +274,7 @@ for f in csv_files[-5:]:  # Last 5 days
 
 ## Project Structure
 
-```
+```bash
 light/
 ├── .github/
 │   └── workflows/
@@ -315,12 +323,14 @@ light/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/luisfork/light.git
    cd light
    ```
 
 2. **Install Python dependencies**
+
    ```bash
    # Using uv (recommended):
    uv pip install --system requests beautifulsoup4 lxml
@@ -330,11 +340,13 @@ light/
    ```
 
 3. **Generate sample data** (for development)
+
    ```bash
    python scripts/generate_sample_data.py
    ```
 
 4. **Serve locally**
+
    ```bash
    cd src
    python -m http.server 8000
@@ -354,6 +366,7 @@ python scripts/fetch_tdu_rates.py
 ### GitHub Actions Workflows
 
 **Daily Data Updates** (`update-plans.yml`):
+
 - Runs at 2 AM Central Time (7 AM UTC)
 - Archives current plans to `data/historical/` (unlimited retention)
 - Fetches latest plans from Power to Choose API
@@ -362,6 +375,7 @@ python scripts/fetch_tdu_rates.py
 - Triggers deployment workflow
 
 **Deployment** (`deploy.yml`):
+
 - Triggered on push to `main` branch
 - Triggered after successful data update
 - Builds site and deploys to GitHub Pages
@@ -381,6 +395,7 @@ Based on research showing Texans often renew during expensive months, Light impl
 - Warns users proactively about expensive renewal periods
 
 **Algorithm:**
+
 ```javascript
 Renewal Seasonality Scores:
 - April, October: 0.0 (best)
@@ -434,6 +449,7 @@ calculateQualityScore(plan, bestAnnualCost):
 ```
 
 **Quality Grades:**
+
 - 90-100: A (Excellent - highly recommended)
 - 80-89: B (Good - solid choice)
 - 70-79: C (Acceptable - minor issues)
@@ -508,24 +524,6 @@ Unlike competitors, Light maintains 90-day historical archive:
 
 ---
 
-## Contributing
-
-Contributions welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make changes with clear commit messages
-4. Test thoroughly (especially calculation accuracy)
-5. Submit pull request with description
-
-**Priority areas:**
-- Additional TDU service area ZIP code mappings
-- Smart Meter Texas integration for automatic usage import
-- Plan recommendation ML model based on historical choices
-- Mobile app (React Native or Flutter)
-
----
-
 ## License
 
 MIT License - See LICENSE file for details
@@ -536,9 +534,6 @@ MIT License - See LICENSE file for details
 
 - **Power to Choose** - Official PUCT data source
 - **Texas Public Utility Commission** - Regulatory oversight and consumer protection
-- **RateGrinder** - Inspiration for advanced features (historical tracking, TDU data)
-- **Texas Power Guide** - Insights on optimal shopping timing
-- **research.md** - Comprehensive market research informing algorithm design
 
 ---
 
@@ -546,7 +541,5 @@ MIT License - See LICENSE file for details
 
 For questions, issues, or suggestions:
 
-- **GitHub Issues:** https://github.com/luisfork/light/issues
-- **Pull Requests:** https://github.com/luisfork/light/pulls
-
-**Last Updated:** January 9, 2026
+- **GitHub Issues:** <https://github.com/luisfork/light/issues>
+- **Pull Requests:** <https://github.com/luisfork/light/pulls>
