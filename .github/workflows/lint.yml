@@ -1,0 +1,69 @@
+name: Lint Code
+
+on:
+  push:
+    branches:
+      - main
+      - 'claude/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Python linter (ruff)
+        run: |
+          pip install ruff
+
+      - name: Install Biome
+        run: |
+          npm install -g @biomejs/biome
+
+      - name: Install markdownlint-cli2
+        run: |
+          npm install -g markdownlint-cli2
+
+      - name: Install typos
+        run: |
+          curl -LsSf https://github.com/crate-ci/typos/releases/latest/download/typos-x86_64-unknown-linux-musl.tar.gz | tar xz -C /usr/local/bin
+
+      - name: Run ruff (Python)
+        run: |
+          ruff check scripts/
+
+      - name: Run Biome (JS/TS/JSON)
+        run: |
+          biome check src/ --error-on-warnings
+
+      - name: Run markdownlint-cli2
+        run: |
+          markdownlint-cli2 "**/*.md"
+
+      - name: Run typos (spelling)
+        run: |
+          typos
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## Linting Summary" >> $GITHUB_STEP_SUMMARY
+          echo "All linting checks completed. Review individual step outputs for details." >> $GITHUB_STEP_SUMMARY
