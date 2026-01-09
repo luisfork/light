@@ -205,14 +205,32 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 ### Historical Data Archive
 
-**Storage:** `data/historical/` directory
-**Retention:** Unlimited (growing archive of all historical snapshots)
-**Format:** Timestamped JSON files (`plans_YYYY-MM-DD.json`)
-**Purpose:** Trend analysis, rate monitoring, data integrity verification, long-term price tracking
+Light maintains a growing archive of electricity plan data for trend analysis and research.
+
+**JSON Archive**
+- **Location:** `data/historical/` directory
+- **Format:** Timestamped JSON files (`plans_YYYY-MM-DD.json`)
+- **Retention:** Unlimited (growing archive of all historical snapshots)
+- **Purpose:** Programmatic access, trend analysis, data integrity verification
+
+**CSV Archive (NEW)**
+- **Location:** `data/archive-csv/` directory
+- **Format:** Timestamped CSV files (`plans_YYYY-MM-DD.csv`)
+- **Retention:** Unlimited (daily snapshots)
+- **Purpose:** Easy analysis in Excel, Google Sheets, or data science tools
+
+**CSV Columns:**
+```
+plan_id, plan_name, rep_name, tdu_area, rate_type,
+term_months, price_kwh_500, price_kwh_1000, price_kwh_2000,
+base_charge_monthly, early_termination_fee, renewable_pct,
+is_prepaid, is_tou, special_terms, efl_url, enrollment_url
+```
 
 **Accessing Historical Data:**
+
 ```javascript
-// Load historical plan data from specific date
+// Load historical plan data from specific date (JavaScript)
 const historicalData = await fetch('/data/historical/plans_2025-12-01.json');
 const plans = await historicalData.json();
 
@@ -220,6 +238,29 @@ const plans = await historicalData.json();
 const current = await API.loadPlans();
 console.log(`Plan count: ${plans.total_plans} → ${current.total_plans}`);
 ```
+
+```python
+# Load CSV archive for analysis (Python)
+import pandas as pd
+
+# Load specific date
+df = pd.read_csv('data/archive-csv/plans_2026-01-01.csv')
+
+# Compare rates over time
+from pathlib import Path
+csv_files = sorted(Path('data/archive-csv').glob('plans_*.csv'))
+for f in csv_files[-5:]:  # Last 5 days
+    df = pd.read_csv(f)
+    avg_rate = df['price_kwh_1000'].mean()
+    print(f"{f.stem}: avg rate = {avg_rate:.2f}¢/kWh")
+```
+
+**Use Cases:**
+- Track rate changes over time
+- Identify seasonal pricing patterns
+- Research provider pricing strategies
+- Build predictive models for rate forecasting
+- Verify data integrity across updates
 
 ---
 
@@ -508,4 +549,4 @@ For questions, issues, or suggestions:
 - **GitHub Issues:** https://github.com/luisfork/light/issues
 - **Pull Requests:** https://github.com/luisfork/light/pulls
 
-**Last Updated:** January 2026
+**Last Updated:** January 9, 2026

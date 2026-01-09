@@ -376,14 +376,7 @@ function calculateQualityScore(plan, bestAnnualCost, options = {}) {
         score -= 10;
     }
 
-    // Bonus 1: Renewable energy bonus (0-5 points)
-    // 100% renewable plans get 5 points, scaled linearly
-    if (plan.renewable_pct >= 50) {
-        const renewableBonus = (plan.renewable_pct / 100) * 5;
-        score += renewableBonus;
-    }
-
-    // Bonus 2: Low rate variance bonus (0-5 points)
+    // Bonus: Low rate variance bonus (0-5 points)
     // Plans with consistent rates across usage levels get bonus
     const rate500 = plan.price_kwh_500;
     const rate1000 = plan.price_kwh_1000;
@@ -495,15 +488,22 @@ function identifyWarnings(plan, userUsage, contractStartDate = null) {
     }
 
     // Early Termination Fee warnings (properly calculated for per-month fees)
-    if (plan.early_termination_fee > 0) {
+    if (plan.early_termination_fee > 0 || plan.special_terms) {
         // Calculate ETF at contract midpoint for warning purposes
-        const midpointMonths = Math.floor(plan.term_months / 2);
-        const totalETF = calculateEarlyTerminationFee(plan, midpointMonths);
+        const midpointMonths = Math.floor((plan.term_months || 12) / 2);
+        const etfResult = calculateEarlyTerminationFee(plan, midpointMonths);
 
-        if (totalETF > 200) {
-            warnings.push(
-                `High early termination fee: $${totalETF.toFixed(0)} if cancelled at month ${midpointMonths}`
-            );
+        if (etfResult.total > 200) {
+            if (etfResult.structure === 'per-month' || etfResult.structure === 'per-month-inferred') {
+                warnings.push(
+                    `High cancellation fee: $${etfResult.perMonthRate}/month remaining ` +
+                    `($${etfResult.total.toFixed(0)} at contract midpoint)`
+                );
+            } else {
+                warnings.push(
+                    `High early termination fee: $${etfResult.total.toFixed(0)}`
+                );
+            }
         }
     }
 
@@ -567,71 +567,122 @@ function formatRate(rate) {
  * - Highest: July, August, January (peak demand months)
  * - Lowest: April, May, October, November (shoulder months)
  *
- * @param {Date|string} startDate - Contract start date
+ * Enhanced version with robust date handling and better recommendations.
+ *
+ * @param {Date|string|null} startDate - Contract start date (defaults to today)
  * @param {number} termMonths - Contract length in months
  * @returns {Object} Expiration analysis
  */
 function calculateContractExpiration(startDate, termMonths) {
-    const start = new Date(startDate);
+    // Default to today if no start date provided
+    let start;
+    if (!startDate) {
+        start = new Date();
+    } else if (typeof startDate === 'string') {
+        start = new Date(startDate);
+    } else {
+        start = new Date(startDate);
+    }
+
+    // Handle invalid dates
+    if (isNaN(start.getTime())) {
+        start = new Date();
+    }
+
+    // Handle invalid or missing term
+    const term = termMonths && termMonths > 0 ? termMonths : 12;
+
     const expiration = new Date(start);
-    expiration.setMonth(expiration.getMonth() + termMonths);
+    expiration.setMonth(expiration.getMonth() + term);
 
     const expirationMonth = expiration.getMonth(); // 0-11
 
     // Rate seasonality (0 = best time to renew, 1 = worst time to renew)
+    // Based on Texas electricity market historical data and ERCOT patterns
     const renewalSeasonality = {
-        0: 0.7,  // January - expensive (winter peak)
-        1: 0.5,  // February - moderate
-        2: 0.2,  // March - good
-        3: 0.0,  // April - excellent (best)
-        4: 0.1,  // May - excellent
-        5: 0.6,  // June - expensive (summer starts)
-        6: 1.0,  // July - very expensive (summer peak)
-        7: 1.0,  // August - very expensive (summer peak)
-        8: 0.7,  // September - expensive
-        9: 0.0,  // October - excellent (best)
-        10: 0.2, // November - good
-        11: 0.6  // December - moderate to expensive
+        0: 0.7,  // January - expensive (winter peak, heating demand)
+        1: 0.5,  // February - moderate (post-winter)
+        2: 0.2,  // March - good (spring shoulder)
+        3: 0.0,  // April - excellent (BEST - lowest demand)
+        4: 0.1,  // May - excellent (still low demand)
+        5: 0.6,  // June - expensive (summer demand rising)
+        6: 1.0,  // July - WORST (summer peak, AC at maximum)
+        7: 1.0,  // August - WORST (summer peak, highest demand)
+        8: 0.7,  // September - expensive (still hot in Texas)
+        9: 0.0,  // October - excellent (BEST - fall shoulder)
+        10: 0.2, // November - good (fall shoulder)
+        11: 0.6  // December - moderate to expensive (winter begins)
     };
 
     const seasonalityScore = renewalSeasonality[expirationMonth];
 
-    // Categorize renewal timing
+    // Categorize renewal timing with more detailed advice
     let renewalTiming;
     let renewalAdvice;
     let riskLevel;
+    let estimatedRateImpact;
 
     if (seasonalityScore >= 0.8) {
-        renewalTiming = 'Peak Season (Expensive)';
-        renewalAdvice = 'Your contract expires during the most expensive renewal period. Consider switching 60 days before expiration to lock in better rates, or choose a different contract length to shift your renewal to April/May or October/November.';
+        renewalTiming = 'Peak Season - Expensive Renewal';
+        renewalAdvice = 'Your contract expires during peak rate season when demand is highest. ' +
+                        'Consider a different contract length to shift renewal to April/May or October. ' +
+                        'Alternatively, start shopping 60-90 days early to lock in better rates.';
         riskLevel = 'high';
+        estimatedRateImpact = '15-40% higher rates than optimal months';
     } else if (seasonalityScore >= 0.5) {
         renewalTiming = 'Moderate Season';
-        renewalAdvice = 'Your contract expires during a moderate-cost period. Shopping 30-60 days before expiration recommended.';
+        renewalAdvice = 'Your contract expires during a moderate-cost period. ' +
+                        'Shopping 30-60 days before expiration is recommended. ' +
+                        'You may find slightly better rates with adjusted timing.';
         riskLevel = 'medium';
-    } else {
-        renewalTiming = 'Optimal Season (Low Rates)';
-        renewalAdvice = 'Excellent timing! Your contract expires during a low-rate period, giving you access to better renewal options.';
+        estimatedRateImpact = '5-15% higher rates than optimal months';
+    } else if (seasonalityScore >= 0.2) {
+        renewalTiming = 'Good Season';
+        renewalAdvice = 'Your contract expires during a favorable period for renewal. ' +
+                        'This is a good time to shop for competitive rates.';
         riskLevel = 'low';
+        estimatedRateImpact = 'Near-optimal rates available';
+    } else {
+        renewalTiming = 'Optimal Season - Best Rates';
+        renewalAdvice = 'Excellent timing! Your contract expires during the best possible ' +
+                        'renewal period when rates are typically lowest.';
+        riskLevel = 'optimal';
+        estimatedRateImpact = 'Optimal rates - best time to shop';
     }
 
     // Calculate alternative contract lengths for better timing
     const alternatives = [];
-    for (let altTerm of [6, 9, 12, 18, 24, 36]) {
-        if (altTerm === termMonths) continue;
+    const termsToCheck = [3, 6, 9, 12, 15, 18, 24, 36];
+
+    for (const altTerm of termsToCheck) {
+        if (altTerm === term) continue;
 
         const altExpiration = new Date(start);
         altExpiration.setMonth(altExpiration.getMonth() + altTerm);
         const altMonth = altExpiration.getMonth();
         const altScore = renewalSeasonality[altMonth];
 
-        if (altScore < seasonalityScore - 0.3) {
+        // Calculate improvement percentage
+        const improvement = seasonalityScore > 0
+            ? ((seasonalityScore - altScore) / seasonalityScore * 100)
+            : (seasonalityScore < altScore ? -100 : 0);
+
+        // Only suggest if meaningfully better (30%+ improvement or moving to optimal)
+        if (improvement >= 30 || (altScore <= 0.1 && seasonalityScore > 0.3)) {
+            let altRiskLevel;
+            if (altScore >= 0.8) altRiskLevel = 'high';
+            else if (altScore >= 0.5) altRiskLevel = 'medium';
+            else if (altScore >= 0.2) altRiskLevel = 'low';
+            else altRiskLevel = 'optimal';
+
             alternatives.push({
                 termMonths: altTerm,
                 expirationDate: altExpiration,
                 expirationMonth: altMonth,
+                expirationMonthName: getMonthName(altMonth),
                 seasonalityScore: altScore,
-                improvement: ((seasonalityScore - altScore) * 100).toFixed(0) + '%'
+                riskLevel: altRiskLevel,
+                improvement: Math.round(Math.max(0, improvement)) + '% better timing'
             });
         }
     }
@@ -639,20 +690,44 @@ function calculateContractExpiration(startDate, termMonths) {
     // Sort alternatives by seasonality score (best first)
     alternatives.sort((a, b) => a.seasonalityScore - b.seasonalityScore);
 
+    // Calculate days/months until expiration
+    const now = new Date();
+    const daysUntilExpiration = Math.max(0, Math.ceil((expiration - now) / (1000 * 60 * 60 * 24)));
+    const monthsUntilExpiration = Math.max(0, Math.round(daysUntilExpiration / 30));
+
     return {
         startDate: start,
         expirationDate: expiration,
-        termMonths: termMonths,
+        termMonths: term,
         expirationMonth: expirationMonth,
-        expirationMonthName: expiration.toLocaleString('en-US', { month: 'long' }),
+        expirationMonthName: getMonthName(expirationMonth),
         expirationYear: expiration.getFullYear(),
         renewalTiming: renewalTiming,
         renewalAdvice: renewalAdvice,
         riskLevel: riskLevel,
         seasonalityScore: seasonalityScore,
+        estimatedRateImpact: estimatedRateImpact,
         alternativeTerms: alternatives.slice(0, 3), // Top 3 alternatives
-        daysUntilExpiration: Math.ceil((expiration - new Date()) / (1000 * 60 * 60 * 24))
+        daysUntilExpiration: daysUntilExpiration,
+        monthsUntilExpiration: monthsUntilExpiration,
+        formattedExpiration: expiration.toLocaleDateString('en-US', {
+            month: 'long',
+            year: 'numeric'
+        })
     };
+}
+
+/**
+ * Get contract expiration analysis for a plan (assuming start today)
+ *
+ * @param {Object} plan - Plan object with term_months
+ * @returns {Object} Expiration analysis
+ */
+function getContractExpirationForPlan(plan) {
+    if (!plan || !plan.term_months) {
+        return calculateContractExpiration(new Date(), 12);
+    }
+    return calculateContractExpiration(new Date(), plan.term_months);
 }
 
 /**
@@ -663,33 +738,119 @@ function calculateContractExpiration(startDate, termMonths) {
  *
  * @param {Object} plan - Plan object
  * @param {number} monthsRemaining - Months remaining in contract
- * @returns {number} Total early termination fee in dollars
+ * @returns {Object} ETF calculation result with total and structure type
  */
 function calculateEarlyTerminationFee(plan, monthsRemaining) {
-    if (!plan.early_termination_fee) return 0;
+    // Parse the ETF value - handle various formats
+    let etfValue = 0;
+    let etfStructure = 'flat';
+    let perMonthRate = 0;
 
-    const etfValue = plan.early_termination_fee;
-
-    // Check if ETF is per-month-remaining (common pattern: $10-20 per month)
-    // If the ETF is a small value ($50 or less) and the plan has a long term,
-    // it's likely a per-month fee
-    if (etfValue <= 50 && plan.term_months >= 12) {
-        // Likely per-month-remaining
-        return etfValue * monthsRemaining;
-    }
-
-    // Check if special_terms mentions per-month
+    // First check special_terms for per-month patterns
     if (plan.special_terms) {
         const terms = plan.special_terms.toLowerCase();
-        if (terms.includes('per month remaining') ||
+
+        // Pattern 1: "$X per month remaining" or "$X/month remaining"
+        const perMonthMatch = terms.match(/\$(\d+(?:\.\d{2})?)\s*(?:per|\/)\s*(?:each\s+)?(?:month|mo)(?:nth)?\s*(?:remaining|left)/i);
+        if (perMonthMatch) {
+            perMonthRate = parseFloat(perMonthMatch[1]);
+            etfStructure = 'per-month';
+        }
+
+        // Pattern 2: "$X times remaining months" or "$X x months remaining"
+        if (!perMonthRate) {
+            const timesMatch = terms.match(/\$(\d+(?:\.\d{2})?)\s*(?:times|x|×)\s*(?:remaining\s+)?months/i);
+            if (timesMatch) {
+                perMonthRate = parseFloat(timesMatch[1]);
+                etfStructure = 'per-month';
+            }
+        }
+
+        // Pattern 3: "per remaining month" without explicit dollar amount
+        if (!perMonthRate && (
             terms.includes('per remaining month') ||
-            terms.includes('$' + etfValue + ' per month')) {
-            return etfValue * monthsRemaining;
+            terms.includes('per month remaining') ||
+            terms.includes('each remaining month') ||
+            terms.includes('multiplied by months remaining') ||
+            terms.includes('times months remaining')
+        )) {
+            // ETF value is the per-month rate
+            if (plan.early_termination_fee && plan.early_termination_fee <= 50) {
+                perMonthRate = plan.early_termination_fee;
+                etfStructure = 'per-month';
+            }
         }
     }
 
+    // If we found a per-month pattern, calculate total ETF
+    if (etfStructure === 'per-month' && perMonthRate > 0) {
+        etfValue = perMonthRate * monthsRemaining;
+        return {
+            total: etfValue,
+            structure: 'per-month',
+            perMonthRate: perMonthRate,
+            monthsRemaining: monthsRemaining
+        };
+    }
+
+    // Handle the base ETF value
+    if (!plan.early_termination_fee) {
+        return { total: 0, structure: 'none', perMonthRate: 0, monthsRemaining: monthsRemaining };
+    }
+
+    etfValue = plan.early_termination_fee;
+
+    // Heuristic: If ETF is small ($50 or less) and contract is long (12+ months),
+    // it's likely a per-month fee even if not explicitly stated
+    if (etfValue <= 50 && plan.term_months >= 12) {
+        return {
+            total: etfValue * monthsRemaining,
+            structure: 'per-month-inferred',
+            perMonthRate: etfValue,
+            monthsRemaining: monthsRemaining
+        };
+    }
+
     // Otherwise, it's a flat fee
-    return etfValue;
+    return {
+        total: etfValue,
+        structure: 'flat',
+        perMonthRate: 0,
+        monthsRemaining: monthsRemaining
+    };
+}
+
+/**
+ * Get the display value for early termination fee
+ *
+ * @param {Object} plan - Plan object
+ * @param {number} monthsRemaining - Optional, defaults to contract midpoint
+ * @returns {Object} Display information for ETF
+ */
+function getETFDisplayInfo(plan, monthsRemaining = null) {
+    if (monthsRemaining === null) {
+        monthsRemaining = Math.floor((plan.term_months || 12) / 2);
+    }
+
+    const result = calculateEarlyTerminationFee(plan, monthsRemaining);
+
+    // Create display string
+    let displayText;
+    if (result.structure === 'none') {
+        displayText = 'None';
+    } else if (result.structure === 'flat') {
+        displayText = formatCurrency(result.total);
+    } else {
+        // Per-month structure
+        displayText = `$${result.perMonthRate}/mo remaining`;
+    }
+
+    return {
+        ...result,
+        displayText: displayText,
+        exampleTotal: result.total,
+        exampleMonths: monthsRemaining
+    };
 }
 
 /**
@@ -718,7 +879,9 @@ if (typeof module !== 'undefined' && module.exports) {
         formatCurrency,
         formatRate,
         calculateContractExpiration,
+        getContractExpirationForPlan,
         calculateEarlyTerminationFee,
+        getETFDisplayInfo,
         getMonthName
     };
 }
