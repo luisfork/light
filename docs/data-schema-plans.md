@@ -64,12 +64,14 @@ interface PlansJSON {
 **Purpose:** Timestamp indicating when data was fetched from Power to Choose API.
 
 **Generation:**
+
 ```python
 from datetime import datetime, timezone
 last_updated = datetime.now(timezone.utc).isoformat()
 ```
 
 **UI Display:**
+
 ```javascript
 const date = new Date(data.last_updated);
 const displayDate = date.toLocaleDateString('en-US', {
@@ -102,7 +104,7 @@ const displayDate = date.toLocaleDateString('en-US', {
 **Required:** Yes
 **Recommended Value:**
 
-```
+```bash
 "Plan information is subject to change. All rates, terms, and conditions should be verified with the provider before enrollment. Light is not affiliated with any Retail Electric Provider and does not earn commissions. Data sourced from Power to Choose, the official PUCT comparison platform."
 ```
 
@@ -176,12 +178,14 @@ type TDUCode =
 **Example:** `"4EE1FC26-B5D4-4F9E-9B8E-4A7C8B3E9D12"`
 
 **Validation:**
+
 ```javascript
 assert(typeof plan_id === 'string' && plan_id.length > 0);
 assert(plan_id.match(/^[A-Z0-9-]+$/i));  // Alphanumeric + hyphens
 ```
 
 **Notes:**
+
 - REPs may change plan_id when updating plans
 - Not suitable as long-term stable identifier
 - Combine with rep_name and plan_name for better uniqueness
@@ -195,6 +199,7 @@ assert(plan_id.match(/^[A-Z0-9-]+$/i));  // Alphanumeric + hyphens
 **Example:** `"TXU ENERGY RETAIL"` (not "TXU Energy Retail Company LLC")
 
 **Transformation:**
+
 ```javascript
 function formatProviderName(rawName) {
     return rawName
@@ -206,6 +211,7 @@ function formatProviderName(rawName) {
 ```
 
 **Validation:**
+
 ```javascript
 assert(rep_name === rep_name.toUpperCase());
 assert(rep_name.length >= 2 && rep_name.length <= 50);
@@ -213,6 +219,7 @@ assert(!rep_name.match(/\b(LLC|INC|L\.P\.|LP)\b/i));  // Suffixes removed
 ```
 
 **Common Providers:**
+
 - `"TXU ENERGY RETAIL"`
 - `"RELIANT ENERGY RETAIL SERVICES"`
 - `"DIRECT ENERGY"`
@@ -229,12 +236,14 @@ assert(!rep_name.match(/\b(LLC|INC|L\.P\.|LP)\b/i));  // Suffixes removed
 **Example:** `"Champion 12-Month Plan"`
 
 **Validation:**
+
 ```javascript
 assert(typeof plan_name === 'string');
 assert(plan_name.length >= 5 && plan_name.length <= 200);
 ```
 
 **Notes:**
+
 - May contain version numbers: "Plan v2.1"
 - May include promotional text: "Holiday Special 2026"
 - Duplicate names possible across different REPs
@@ -247,6 +256,7 @@ assert(plan_name.length >= 5 && plan_name.length <= 200);
 **Source:** Power to Choose `TDU` field (normalized)
 
 **Normalization Mapping:**
+
 ```javascript
 const tduNormalization = {
   "Oncor Electric Delivery": "ONCOR",
@@ -277,6 +287,7 @@ const tduNormalization = {
 ```
 
 **Validation:**
+
 ```javascript
 const validTDUs = ["ONCOR", "CENTERPOINT", "AEP_CENTRAL", "AEP_NORTH", "TNMP", "LPL"];
 assert(validTDUs.includes(tdu_area));
@@ -291,6 +302,7 @@ assert(validTDUs.includes(tdu_area));
 **Range:** 5.0 - 50.0 (typical), may exceed for specialty plans
 
 **Validation:**
+
 ```javascript
 assert(typeof price_kwh_500 === 'number' && !isNaN(price_kwh_500));
 assert(price_kwh_500 >= 5.0 && price_kwh_500 <= 50.0);
@@ -307,13 +319,15 @@ if (price_kwh_500 < price_kwh_1000) {
 ```
 
 **Important Notes:**
+
 - Prices are **all-inclusive**: energy + TDU charges + base fees
 - Directly from EFL (Electricity Facts Label), PUCT-mandated format
 - Represent **average price** at that usage level, not marginal rate
 - Used for interpolation to calculate cost at arbitrary usage levels
 
 **Typical Patterns:**
-```
+
+```bash
 Good Simple Plan:  13.5¢ → 10.0¢ → 9.8¢  (decreasing, reasonable variance)
 Bill Credit Trap:  24.0¢ → 9.9¢ → 12.0¢  (dramatic drop at 1000, spike at 2000)
 Flat-ish Plan:     10.5¢ → 10.2¢ → 10.0¢ (minimal variance, predictable)
@@ -328,12 +342,14 @@ Flat-ish Plan:     10.5¢ → 10.2¢ → 10.0¢ (minimal variance, predictable)
 **Range:** 1-36 (typical), 1 = month-to-month
 
 **Validation:**
+
 ```javascript
 assert(Number.isInteger(term_months));
 assert(term_months >= 1 && term_months <= 36);
 ```
 
 **Common Values:**
+
 - 1 month: Month-to-month (no commitment)
 - 6 months: Short-term fixed
 - 12 months: Most common
@@ -351,6 +367,7 @@ Best contract lengths depend on start date to avoid expensive renewal seasons.
 **Source:** Power to Choose `RateType` field
 
 **Filtering Logic:**
+
 ```python
 def should_include_plan(plan_data):
     return plan_data['RateType'].upper() == 'FIXED'
@@ -368,12 +385,14 @@ Variable and indexed-rate plans expose users to unpredictable costs. Light focus
 **Default:** 0 (if not specified)
 
 **Validation:**
+
 ```javascript
 assert(Number.isInteger(renewable_pct));
 assert(renewable_pct >= 0 && renewable_pct <= 100);
 ```
 
 **Interpretation:**
+
 - 0%: Standard Texas grid mix (~33% renewable)
 - 25-49%: Partial renewable content
 - 50-99%: Majority renewable
@@ -390,16 +409,19 @@ Allows filtering to plans with ≥50% or 100% renewable content.
 **Default:** `false`
 
 **Transformation:**
+
 ```javascript
 is_prepaid = (rawData.PrepaidYN === 'Y' || rawData.PrepaidProduct === true);
 ```
 
 **Validation:**
+
 ```javascript
 assert(typeof is_prepaid === 'boolean');
 ```
 
 **Notes:**
+
 - Prepaid plans not currently displayed in Light (filtered out)
 - Different payment structure makes comparison difficult
 - May be added as separate category in future
@@ -412,16 +434,19 @@ assert(typeof is_prepaid === 'boolean');
 **Default:** `false`
 
 **Transformation:**
+
 ```javascript
 is_tou = (rawData.TimeOfUseYN === 'Y');
 ```
 
 **Validation:**
+
 ```javascript
 assert(typeof is_tou === 'boolean');
 ```
 
 **Usage:**
+
 - Flags plans requiring off-peak usage shifting
 - Includes "Free Nights" and "Free Weekends" plans
 - Triggers warning in UI: "Most households save more with fixed-rate plans"
@@ -435,12 +460,14 @@ assert(typeof is_tou === 'boolean');
 **Default:** 0 (if not specified)
 
 **Validation:**
+
 ```javascript
 assert(typeof early_termination_fee === 'number' && !isNaN(early_termination_fee));
 assert(early_termination_fee >= 0 && early_termination_fee <= 500);
 ```
 
 **Fee Structure Detection:**
+
 ```javascript
 // Small ETF on long contract → likely per-month-remaining
 if (early_termination_fee <= 50 && term_months >= 12) {
@@ -453,6 +480,7 @@ if (early_termination_fee <= 50 && term_months >= 12) {
 ```
 
 **Common Patterns:**
+
 - $0: No ETF (rare, usually month-to-month)
 - $10-$20: Per-month-remaining (12-36 month contracts)
 - $150-$300: Flat fee (6-12 month contracts)
@@ -467,6 +495,7 @@ if (early_termination_fee <= 50 && term_months >= 12) {
 **Default:** 0 (if not specified)
 
 **Parsing Logic:**
+
 ```python
 def extract_base_charge(fees_text):
     # Pattern: "$9.95 base charge"
@@ -477,12 +506,14 @@ def extract_base_charge(fees_text):
 ```
 
 **Validation:**
+
 ```javascript
 assert(typeof base_charge_monthly === 'number' && !isNaN(base_charge_monthly));
 assert(base_charge_monthly >= 0 && base_charge_monthly <= 30);
 ```
 
 **Common Values:**
+
 - $0: All-inclusive pricing (no separate base charge)
 - $4.95-$9.95: Typical base charges
 - $15-$30: High base charges (unusual)
@@ -498,6 +529,7 @@ Base charges favor high-usage households and penalize low-usage customers.
 **Format:** HTTPS URL to PDF document
 
 **Validation:**
+
 ```javascript
 if (efl_url !== '') {
   assert(efl_url.startsWith('http://') || efl_url.startsWith('https://'));
@@ -506,6 +538,7 @@ if (efl_url !== '') {
 ```
 
 **Purpose:**
+
 - Official PUCT-mandated disclosure document
 - Contains all plan details, fees, and terms
 - Required reading before enrollment
@@ -518,6 +551,7 @@ if (efl_url !== '') {
 **Format:** HTTPS URL to provider's signup page
 
 **Validation:**
+
 ```javascript
 if (enrollment_url !== '') {
   assert(enrollment_url.startsWith('http://') || enrollment_url.startsWith('https://'));
@@ -535,6 +569,7 @@ Deep link to plan-specific signup page for user convenience.
 **Format:** HTTPS URL to terms and conditions
 
 **Validation:**
+
 ```javascript
 if (terms_url !== '') {
   assert(terms_url.startsWith('http://') || terms_url.startsWith('https://'));
@@ -549,6 +584,7 @@ if (terms_url !== '') {
 **Format:** Free-text description
 
 **Common Content:**
+
 - Bill credit conditions: "$100 credit when usage is 1000-1050 kWh"
 - Minimum usage requirements: "Minimum 500 kWh per month or $25 fee"
 - Auto-renewal terms: "Automatically renews at variable rate"
@@ -565,6 +601,7 @@ Used by `calculateBillCredits()` and warning detection functions.
 **Format:** Free-text description
 
 **Common Content:**
+
 - "$100 Visa gift card after 60 days of service"
 - "First month free with annual contract"
 - "No deposit required with credit check"
@@ -580,6 +617,7 @@ Promotions often have eligibility requirements and redemption complexities. Not 
 **Format:** Free-text description
 
 **Common Content:**
+
 - "$9.95 monthly base charge"
 - "$50 returned payment fee"
 - "$20 late payment fee"
@@ -593,6 +631,7 @@ Promotions often have eligibility requirements and redemption complexities. Not 
 **Format:** Free-text description
 
 **Common Content:**
+
 - "$25 fee if usage below 500 kWh"
 - "Minimum 1000 kWh usage required"
 - "No minimum usage requirement"
@@ -775,6 +814,7 @@ def validate_plan(plan):
 Some REPs list identical plans in both English and Spanish versions with different plan_ids but identical pricing and terms.
 
 **Example:**
+
 ```json
 {
   "plan_id": "EN-12345",
@@ -865,7 +905,7 @@ function isSpanishPlan(plan) {
 
 When duplicates are detected, notify user:
 
-```
+```bash
 "Note: {count} duplicate plans removed (English/Spanish versions of same plan)"
 ```
 
@@ -877,7 +917,7 @@ Historical plan data stored in `data/historical/plans_YYYY-MM-DD.json` uses iden
 
 ### Filename Convention
 
-```
+```bash
 plans_2026-01-08.json
 plans_2026-01-09.json
 plans_2026-01-10.json
@@ -976,9 +1016,9 @@ For programmatic validation:
 
 ## References
 
-- **Power to Choose API**: http://api.powertochoose.org/
+- **Power to Choose API**: <http://api.powertochoose.org/>
 - **PUCT EFL Requirements**: §25.475
-- **JSON Schema Specification**: https://json-schema.org/
+- **JSON Schema Specification**: <https://json-schema.org/>
 
 ---
 

@@ -35,10 +35,10 @@ A **Transmission and Distribution Utility (TDU)** is a regulated entity that own
 
 ### What TDUs Do NOT Do
 
-- ❌ Generate electricity
-- ❌ Sell retail electricity plans
-- ❌ Set retail electricity prices
-- ❌ Handle customer billing for energy charges
+- Generate electricity
+- Sell retail electricity plans
+- Set retail electricity prices
+- Handle customer billing for energy charges
 
 ### Regulatory Oversight
 
@@ -57,6 +57,7 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Service Territory:** 119,000 square miles across north-central Texas
 
 **Major Cities Served:**
+
 - Dallas
 - Fort Worth
 - Arlington
@@ -74,11 +75,13 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Counties:** Dallas, Tarrant, Collin, Denton, Ellis, Kaufman, Rockwall, Parker, Johnson, Hood, Somervell, McLennan, Taylor, and 90+ others
 
 **ZIP Code Ranges:**
+
 - 75001-75999 (Dallas County and surrounding)
 - 76001-76999 (Tarrant/Parker Counties)
 - 79600-79699 (Abilene area)
 
 **Current Rates (Effective Sep 1, 2025):**
+
 - Monthly Base Charge: $4.23
 - Per-kWh Delivery Rate: 5.5833¢
 
@@ -95,6 +98,7 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Service Territory:** 5,000 square miles in southeast Texas
 
 **Major Cities Served:**
+
 - Houston
 - Pasadena
 - Pearland
@@ -107,6 +111,7 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Counties:** Harris (primary), parts of Fort Bend, Montgomery, Galveston, Brazoria, Chambers
 
 **ZIP Code Ranges:**
+
 - 77001-77099 (Houston proper)
 - 77201-77299 (Houston downtown/post office)
 - 77301-77399 (Conroe/Montgomery County)
@@ -114,6 +119,7 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 - 77501-77599 (Pasadena/Baytown area)
 
 **Current Rates (Effective Dec 7, 2025):**
+
 - Monthly Base Charge: $4.90
 - Per-kWh Delivery Rate: 6.0009¢
 
@@ -132,6 +138,7 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Service Territory:** 27 counties in south Texas
 
 **Major Cities Served:**
+
 - Corpus Christi
 - McAllen
 - Edinburg
@@ -145,11 +152,13 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Counties:** Nueces, Cameron, Hidalgo, Willacy, Starr, Victoria, Kleberg, Kenedy, Brooks, Jim Hogg, Zapata, and others
 
 **ZIP Code Ranges:**
+
 - 78401-78499 (Corpus Christi area)
 - 78500-78599 (Rio Grande Valley)
 - 77901-77999 (Victoria area)
 
 **Current Rates (Effective Sep 1, 2025):**
+
 - Monthly Base Charge: $5.49
 - Per-kWh Delivery Rate: 5.6954¢
 
@@ -166,6 +175,7 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Service Territory:** 42 counties in west-central Texas
 
 **Major Cities Served:**
+
 - San Angelo
 - Abilene (partial, overlaps with Oncor)
 - Sweetwater
@@ -175,11 +185,13 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Counties:** Tom Green, Taylor (partial), Nolan, Scurry, Fisher, Jones, Callahan, Coleman, Runnels, and others
 
 **ZIP Code Ranges:**
+
 - 76901-76999 (San Angelo area)
 - 79601-79699 (Abilene area, partial)
 - 79500-79599 (Snyder/Sweetwater area)
 
 **Current Rates (Effective Sep 1, 2025):**
+
 - Monthly Base Charge: $5.49
 - Per-kWh Delivery Rate: 5.2971¢
 
@@ -198,6 +210,7 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Service Territory:** Non-contiguous pockets in 80+ Texas counties
 
 **Major Cities Served:**
+
 - Galveston
 - Texas City
 - Lewisville
@@ -210,11 +223,13 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 - Uvalde
 
 **Service Area Characteristics:**
+
 - **Most Fragmented**: TNMP serves many small, non-connected territories
 - **Not Continuous**: Service areas are "islands" across the state
 - **Hardest to Map**: ZIP code alone may not uniquely identify TNMP service
 
 **Major ZIP Code Ranges:**
+
 - 77550-77554 (Galveston area)
 - 77590-77592 (Texas City)
 - 75028-75029 (Flower Mound)
@@ -223,6 +238,7 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 - 78861 (Hondo)
 
 **Current Rates (Effective Sep 1, 2025):**
+
 - Monthly Base Charge: $7.85 (highest in Texas)
 - Per-kWh Delivery Rate: 6.0509¢
 
@@ -241,21 +257,25 @@ All TDU rates are regulated by the **Public Utility Commission of Texas (PUCT)**
 **Service Territory:** 130 square miles (Lubbock city and small adjacent areas)
 
 **Major Cities Served:**
+
 - Lubbock (exclusively)
 
 **Counties:** Lubbock County (city limits only)
 
 **ZIP Code Ranges:**
+
 - 79401-79499 (Lubbock proper)
 - 79310-79329 (Lubbock suburbs/county, partial)
 
 **Current Rates (Effective Sep 1, 2025):**
+
 - Monthly Base Charge: $0.00 (unique!)
 - Per-kWh Delivery Rate: 6.31¢
 
 **Typical Monthly Cost at 1,000 kWh:** $63.10
 
 **Special Status:**
+
 - LP&L joined the competitive retail market on **January 1, 2024** (newest entrant)
 - Previously a vertically integrated municipal utility
 - Only TDU with $0 monthly base charge (all costs in per-kWh rate)
@@ -279,7 +299,7 @@ All Texas TDUs use a **two-part tariff** structure (except LP&L which uses one-p
 
 ### Total TDU Cost Formula
 
-```
+```bash
 Monthly TDU Cost = Base Charge + (Usage in kWh × Per-kWh Rate ÷ 100)
 
 Example (Oncor, 1,000 kWh):
@@ -292,7 +312,7 @@ Example (Oncor, 1,000 kWh):
 
 At typical usage (1,000 kWh) and average retail rate (12¢/kWh):
 
-```
+```bash
 Total Bill = $120
 TDU Charges = $60
 TDU Percentage = 50%
@@ -331,6 +351,7 @@ TDU Percentage = 50%
 | 79601-79699 | Oncor / AEP North | Abilene (mixed) |
 
 **Important Notes:**
+
 - Some ZIP codes span multiple TDU territories (especially in overlapping service areas)
 - Exact address or meter number required for 100% accurate TDU identification
 - Light app uses ZIP code mapping with 95%+ accuracy for initial TDU detection
@@ -391,16 +412,19 @@ function detectTDU(zipCode, tduList) {
 ### Boundary Cases and Overlaps
 
 **Abilene (79601-79699):**
+
 - Oncor serves northern/eastern parts
 - AEP North serves western/southern parts
 - Resolution: Default to Oncor (larger coverage), but note possible error
 
 **Pasadena/Baytown Area (77501-77549):**
+
 - CenterPoint serves most
 - TNMP serves small pockets
 - Resolution: Default to CenterPoint
 
 **Sweetwater/Snyder (79500-79599):**
+
 - Oncor and AEP North both present
 - Resolution: Default to Oncor
 
@@ -413,11 +437,13 @@ For production systems, ESIID (Electric Service Identifier ID) from meter is def
 ### Semi-Annual Update Cycle
 
 **March 1:**
+
 - New TDU rates effective for billing periods starting March 1
 - Typically 5-10% decrease (lower winter demand, lower fuel costs)
 - Filed with PUCT by January 15
 
 **September 1:**
+
 - New TDU rates effective for billing periods starting September 1
 - Typically 3-8% increase (higher summer demand, infrastructure investment recovery)
 - Filed with PUCT by July 15
@@ -425,6 +451,7 @@ For production systems, ESIID (Electric Service Identifier ID) from meter is def
 ### Recent Rate History
 
 **March 2025 Update (Most Recent):**
+
 - Oncor: 3.2% decrease
 - CenterPoint: No change (special Dec 2025 adjustment approved)
 - AEP Central: 4.1% decrease
@@ -433,6 +460,7 @@ For production systems, ESIID (Electric Service Identifier ID) from meter is def
 - LP&L: First update cycle (new entrant)
 
 **September 2025 Update:**
+
 - Oncor: +3.8% increase
 - CenterPoint: +4.2% increase
 - AEP Central: +3.5% increase
@@ -443,6 +471,7 @@ For production systems, ESIID (Electric Service Identifier ID) from meter is def
 ### Ad-Hoc Rate Adjustments
 
 TDUs may file for interim rate changes due to:
+
 - Major storm recovery costs (e.g., CenterPoint post-Hurricane Beryl)
 - Transmission infrastructure projects
 - Federal regulatory changes
@@ -509,6 +538,7 @@ These cities have vertically integrated municipal utilities and are NOT part of 
 | LP&L | 0.85 | 88 min | 103 min | 0.85/customer/year |
 
 **Metrics Definitions:**
+
 - **SAIFI** (System Average Interruption Frequency Index): Average outages per customer per year
 - **SAIDI** (System Average Interruption Duration Index): Average outage duration in minutes per customer per year
 - **CAIDI** (Customer Average Interruption Duration Index): Average restoration time per outage
@@ -537,12 +567,12 @@ These cities have vertically integrated municipal utilities and are NOT part of 
 
 ## References
 
-- **PUCT TDU Rate Archive**: https://www.puc.texas.gov/industry/electric/rates/tdarchive.aspx
-- **Oncor Service Territory Map**: https://www.oncor.com/en/about-us/service-area
-- **CenterPoint Coverage**: https://www.centerpointenergy.com/en-us/corporate/about-us/service-areas
-- **AEP Texas Service Areas**: https://www.aeptexas.com/info/facts/serviceareas.aspx
-- **TNMP Territory**: https://www.tnmp.com/service-area/
-- **LP&L Deregulation Info**: https://lp-l.com/about-lubbock-power-light/deregulation
+- **PUCT TDU Rate Archive**: <https://www.puc.texas.gov/industry/electric/rates/tdarchive.aspx>
+- **Oncor Service Territory Map**: <https://www.oncor.com/en/about-us/service-area>
+- **CenterPoint Coverage**: <https://www.centerpointenergy.com/en-us/corporate/about-us/service-areas>
+- **AEP Texas Service Areas**: <https://www.aeptexas.com/info/facts/serviceareas.aspx>
+- **TNMP Territory**: <https://www.tnmp.com/service-area/>
+- **LP&L Deregulation Info**: <https://lp-l.com/about-lubbock-power-light/deregulation>
 
 ---
 

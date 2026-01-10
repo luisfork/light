@@ -28,7 +28,7 @@ This document provides a comprehensive, step-by-step explanation of the cost cal
 
 The calculation engine follows this high-level flow:
 
-```
+```bash
 User Input (ZIP + Usage Pattern)
     ↓
 [1] Detect TDU from ZIP code
@@ -100,6 +100,7 @@ function interpolateRate(usageKwh, plan) {
 ### Step-by-Step Example
 
 **Given Plan:**
+
 - 500 kWh: 13.5¢/kWh
 - 1000 kWh: 10.2¢/kWh
 - 2000 kWh: 9.8¢/kWh
@@ -108,12 +109,15 @@ function interpolateRate(usageKwh, plan) {
 
 1. Usage (750) is between 500 and 1000
 2. Calculate interpolation ratio:
+
    ```
    ratio = (750 - 500) / (1000 - 500)
          = 250 / 500
          = 0.5
    ```
+
 3. Interpolate rate:
+
    ```
    rate = 13.5 + (10.2 - 13.5) × 0.5
         = 13.5 + (-3.3 × 0.5)
@@ -125,12 +129,15 @@ function interpolateRate(usageKwh, plan) {
 
 1. Usage (1500) is between 1000 and 2000
 2. Calculate ratio:
+
    ```
    ratio = (1500 - 1000) / (2000 - 1000)
          = 500 / 1000
          = 0.5
    ```
+
 3. Interpolate:
+
    ```
    rate = 10.2 + (9.8 - 10.2) × 0.5
         = 10.2 + (-0.4 × 0.5)
@@ -148,6 +155,7 @@ function interpolateRate(usageKwh, plan) {
 ### Alternative: Polynomial Interpolation (Not Used)
 
 Polynomial (quadratic or cubic) interpolation could fit a smoother curve but:
+
 - Adds computational complexity
 - Can produce unrealistic rates between tiers
 - Requires assumptions about rate structures
@@ -160,7 +168,7 @@ For transparency, we chose linear interpolation.
 
 ### Formula
 
-```
+```bash
 Total Monthly Cost = Energy Cost + TDU Cost + Base Cost - Credits + Tax
 
 Where:
@@ -215,6 +223,7 @@ function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
 ### Detailed Example
 
 **Scenario:**
+
 - Usage: 1,200 kWh
 - Plan: 500kWh=13.0¢, 1000kWh=10.0¢, 2000kWh=9.5¢, Base=$9.95
 - TDU (Oncor): Base=$4.23, Rate=5.58¢/kWh
@@ -224,17 +233,20 @@ function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
 **Calculation:**
 
 1. **Interpolate energy rate:**
+
    ```
    Ratio = (1200 - 1000) / (2000 - 1000) = 200/1000 = 0.2
    Rate = 10.0 + (9.5 - 10.0) × 0.2 = 10.0 - 0.1 = 9.9¢/kWh
    ```
 
 2. **Energy cost:**
+
    ```
    Energy = 1200 kWh × 9.9¢/kWh ÷ 100 = $118.80
    ```
 
 3. **TDU cost:**
+
    ```
    TDU = $4.23 + (1200 × 5.58¢ ÷ 100)
        = $4.23 + $66.96
@@ -242,31 +254,37 @@ function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
    ```
 
 4. **Base cost:**
+
    ```
    Base = $9.95
    ```
 
 5. **Subtotal:**
+
    ```
    Subtotal = $118.80 + $9.95 = $128.75
    ```
 
 6. **Credits:**
+
    ```
    Credits = $0 (no bill credit applicable)
    ```
 
 7. **Tax:**
+
    ```
    Tax = ($128.75 - $0) × 0.02 = $2.58
    ```
 
 8. **Total:**
+
    ```
    Total = $128.75 - $0 + $2.58 = $131.33
    ```
 
 9. **Effective Rate:**
+
    ```
    Effective = $131.33 ÷ 1200 kWh × 100 = 10.94¢/kWh
    ```
@@ -394,6 +412,7 @@ function calculateAnnualCost(monthlyUsageArray, plan, tduRates, localTaxRate = 0
 ### Step-by-Step Example
 
 **Inputs:**
+
 - Monthly usage: [1000, 900, 800, 750, 900, 1400, 1800, 2000, 1500, 950, 850, 1100]
 - Plan: Same as previous example
 - TDU: Oncor
@@ -417,12 +436,14 @@ function calculateAnnualCost(monthlyUsageArray, plan, tduRates, localTaxRate = 0
 | Dec | 1100 | $109.45 | $65.61 | $9.95 | $3.70 | $188.71 |
 
 **Results:**
+
 - Annual Cost: $2,368.02
 - Average Monthly: $197.33
 - Total Usage: 13,950 kWh
 - Effective Annual Rate: 16.98¢/kWh
 
 **Insights:**
+
 - Summer months (Jun-Aug) cost $860.54 (36% of annual)
 - Winter/shoulder (Apr, Oct, Nov) cost $446.71 (19% of annual)
 - Peak month (Aug) is 2.4× cheapest month (Apr)
@@ -480,7 +501,7 @@ function estimateUsagePattern(avgMonthlyKwh, homeSize = null) {
 
 **Calculation:**
 
-```
+```bash
 Adjustment Factor = 12 / 14.6 = 0.8219
 
 January:   1000 × 1.2  × 0.8219 = 986 kWh
@@ -602,7 +623,8 @@ function calculateVolatility(plan, userUsage) {
 - Rates: 10.5¢, 10.0¢, 9.8¢ (low variance)
 
 **Calculation:**
-```
+
+```bash
 Credit Risk = 0
 TOU Risk = 0
 Variance = max(|10.5-10.0|/10.0, |9.8-10.0|/10.0) = max(0.05, 0.02) = 0.05
@@ -618,7 +640,8 @@ Volatility = 0 + 0 + 0 = 0.0 (Very Low)
 - User usage: mostly 800-900 or 1200-1400 kWh (misses 8 months)
 
 **Calculation:**
-```
+
+```bash
 Credit Risk = 0.5 + (8/12 × 0.3) = 0.5 + 0.2 = 0.7
 TOU Risk = 0
 Variance Risk = 0 (assume low variance)
@@ -633,7 +656,8 @@ Volatility = 0.7 + 0 + 0 = 0.7 (Very High)
 - Rates: 18.0¢, 10.0¢, 9.5¢ (designed to punish low usage)
 
 **Calculation:**
-```
+
+```bash
 Credit Risk = 0
 TOU Risk = 0
 Variance = |18.0-10.0|/10.0 = 8.0/10.0 = 0.8 (80% variance!)
@@ -651,6 +675,7 @@ Volatility = 0 + 0 + 0.4 = 0.4 (Moderate-High)
 **Primary:** Annual cost at user's actual usage (lowest first)
 
 **Secondary (tie-breakers):**
+
 1. Volatility score (lower preferred)
 2. Quality score (higher preferred)
 3. Contract term (shorter preferred for flexibility)
@@ -852,7 +877,8 @@ function calculateEarlyTerminationFee(plan, monthsRemaining) {
 - Months Remaining: 6
 
 **Calculation:**
-```
+
+```bash
 ETF = $150 does not meet small ETF heuristic
 No "per month" text in special_terms
 Result: $150 flat (regardless of months remaining)
@@ -866,7 +892,8 @@ Result: $150 flat (regardless of months remaining)
 - Special Terms: "Early termination fee of $15 per month remaining"
 
 **Calculation:**
-```
+
+```bash
 ETF = $15 ≤ $50 AND term = 24 ≥ 12 → Likely per-month
 Special terms confirms "per month remaining"
 Result: $15 × 18 = $270
@@ -902,12 +929,14 @@ See full implementation in api-response-schema.md, calculateContractExpiration()
 ### Example
 
 **Scenario:**
+
 - Start Date: July 1, 2026
 - Term: 12 months
 - Expiration: July 1, 2027
 
 **Analysis:**
-```
+
+```bash
 Expiration Month: July (index 6)
 Seasonality Score: 1.0 (worst)
 Risk Level: High
@@ -929,7 +958,7 @@ Holistic 0-100 score combining cost, volatility, and warnings for easy compariso
 
 ### Formula
 
-```
+```bash
 Quality Score = 100 - (Cost Penalty + Volatility Penalty + Warning Penalty)
 
 Where:

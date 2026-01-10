@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Texas electricity plan comparison tool. Calculate your true annual cost based on actual usage patterns. Free, transparent, and unbiased analysis.">
-    <meta name="keywords" content="Texas electricity, electricity plans, power to choose, electricity rates, Texas energy, ERCOT">
+    <meta name="description"
+        content="Texas electricity plan comparison tool. Calculate your true annual cost based on actual usage patterns. Free, transparent, and unbiased analysis.">
+    <meta name="keywords"
+        content="Texas electricity, electricity plans, power to choose, electricity rates, Texas energy, ERCOT">
     <meta name="author" content="Light Project">
     <title>Light - Texas Electricity Cost Calculator</title>
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
+
 <body>
     <div class="page-wrapper">
         <!-- Navigation -->
@@ -23,7 +27,8 @@
                 <nav class="main-nav" aria-label="Main navigation">
                     <a href="./index.html" class="nav-item active">Calculator</a>
                     <a href="#methodology" class="nav-item">Methodology</a>
-                    <a href="https://github.com/luisfork/light" class="nav-item" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://github.com/luisfork/light" class="nav-item" target="_blank"
+                        rel="noopener">GitHub</a>
                 </nav>
             </div>
         </header>
@@ -34,8 +39,10 @@
                 <div class="hero-content">
                     <h1 class="hero-title">Find your lowest-cost electricity plan</h1>
                     <p class="hero-description">
-                        Most Texans overpay hundreds of dollars annually by choosing plans based on misleading advertised rates.
-                        This calculator computes your true annual cost using your actual monthly usage pattern, accounting for
+                        Most Texans overpay hundreds of dollars annually by choosing plans based on misleading
+                        advertised rates.
+                        This calculator computes your true annual cost using your actual monthly usage pattern,
+                        accounting for
                         seasonal variations, TDU delivery charges, base fees, and bill credit eligibility.
                     </p>
                     <div class="hero-metrics">
@@ -72,17 +79,9 @@
                         <div class="field-group">
                             <label for="zip-code" class="field-label">Texas ZIP Code</label>
                             <div class="input-wrapper">
-                                <input
-                                    type="text"
-                                    id="zip-code"
-                                    class="field-input field-input-zip"
-                                    placeholder="75001"
-                                    maxlength="5"
-                                    pattern="[0-9]{5}"
-                                    inputmode="numeric"
-                                    autocomplete="postal-code"
-                                    required
-                                >
+                                <input type="text" id="zip-code" class="field-input field-input-zip" placeholder="75001"
+                                    maxlength="5" pattern="[0-9]{5}" inputmode="numeric" autocomplete="postal-code"
+                                    required>
                                 <span class="input-status" id="zip-status"></span>
                             </div>
                         </div>
@@ -121,110 +120,125 @@
                     <div class="step-content">
                         <!-- Usage Method Selector -->
                         <div class="method-selector" role="tablist" aria-label="Usage input method">
-                            <button class="method-option active" role="tab" aria-selected="true" data-method="estimate" id="tab-estimate">
+                            <button class="method-option active" role="tab" aria-selected="true" data-method="estimate"
+                                id="tab-estimate">
                                 <span class="method-name">Quick Estimate</span>
                                 <span class="method-desc">Based on home size</span>
                             </button>
-                            <button class="method-option" role="tab" aria-selected="false" data-method="average" id="tab-average">
+                            <button class="method-option" role="tab" aria-selected="false" data-method="average"
+                                id="tab-average">
                                 <span class="method-name">Monthly Average</span>
                                 <span class="method-desc">Single value input</span>
                             </button>
-                            <button class="method-option" role="tab" aria-selected="false" data-method="detailed" id="tab-detailed">
+                            <button class="method-option" role="tab" aria-selected="false" data-method="detailed"
+                                id="tab-detailed">
                                 <span class="method-name">Detailed Usage</span>
                                 <span class="method-desc">12-month breakdown</span>
                             </button>
                         </div>
 
                         <!-- Estimate Panel -->
-                        <div class="usage-panel active" id="panel-estimate" role="tabpanel" aria-labelledby="tab-estimate">
+                        <div class="usage-panel active" id="panel-estimate" role="tabpanel"
+                            aria-labelledby="tab-estimate">
                             <div class="field-group">
                                 <label for="home-size" class="field-label">Home Size / Typical Usage</label>
                                 <select id="home-size" class="field-select">
                                     <option value="">Select typical monthly usage...</option>
-                                    <option value="400">Apartment, 1 bedroom - ~400 kWh/month</option>
-                                    <option value="600">Apartment, 2 bedroom - ~600 kWh/month</option>
-                                    <option value="800">Small house, 1,000-1,500 sq ft - ~800 kWh/month</option>
-                                    <option value="1000">Medium house, 1,500-2,000 sq ft - ~1,000 kWh/month</option>
-                                    <option value="1200">Medium-large house, 2,000-2,500 sq ft - ~1,200 kWh/month</option>
-                                    <option value="1500">Large house, 2,500-3,000 sq ft - ~1,500 kWh/month</option>
-                                    <option value="2000">Very large house, 3,000+ sq ft - ~2,000 kWh/month</option>
-                                    <option value="2500">Estate or high-usage home - ~2,500+ kWh/month</option>
+                                    <option value="400">Apartment, 1 bedroom (~400 kWh/month)</option>
+                                    <option value="600">Apartment, 2 bedroom (~600 kWh/month)</option>
+                                    <option value="800">Small house, 1,000-1,500 sq ft (~800 kWh/month)</option>
+                                    <option value="1000">Medium house, 1,500-2,000 sq ft (~1,000 kWh/month)</option>
+                                    <option value="1200">Medium-large house, 2,000-2,500 sq ft (~1,200 kWh/month)
+                                    </option>
+                                    <option value="1500">Large house, 2,500-3,000 sq ft (~1,500 kWh/month)</option>
+                                    <option value="2000">Very large house, 3,000+ sq ft (~2,000 kWh/month)</option>
+                                    <option value="2500">Estate or high-usage home (~2,500+ kWh/month)</option>
                                 </select>
-                                <p class="field-hint">Texas seasonal patterns will be applied automatically (summer AC, winter heating)</p>
+                                <p class="field-hint">Texas seasonal patterns will be applied automatically (summer AC,
+                                    winter heating)</p>
                             </div>
                         </div>
 
                         <!-- Average Panel -->
-                        <div class="usage-panel" id="panel-average" role="tabpanel" aria-labelledby="tab-average" hidden>
+                        <div class="usage-panel" id="panel-average" role="tabpanel" aria-labelledby="tab-average"
+                            hidden>
                             <div class="field-group">
                                 <label for="avg-kwh" class="field-label">Average Monthly Usage (kWh)</label>
                                 <div class="input-with-unit">
-                                    <input
-                                        type="number"
-                                        id="avg-kwh"
-                                        class="field-input"
-                                        placeholder="1000"
-                                        min="100"
-                                        max="10000"
-                                        step="10"
-                                    >
+                                    <input type="number" id="avg-kwh" class="field-input" placeholder="1000" min="100"
+                                        max="10000" step="10">
                                     <span class="input-unit">kWh</span>
                                 </div>
-                                <p class="field-hint">Find this value on your electricity bill or Smart Meter Texas account</p>
+                                <p class="field-hint">Find this value on your electricity bill or Smart Meter Texas
+                                    account</p>
                             </div>
                         </div>
 
                         <!-- Detailed Panel -->
-                        <div class="usage-panel" id="panel-detailed" role="tabpanel" aria-labelledby="tab-detailed" hidden>
-                            <p class="panel-intro">Enter your actual monthly usage for the most accurate calculation. You can find this data on Smart Meter Texas or your past utility bills.</p>
+                        <div class="usage-panel" id="panel-detailed" role="tabpanel" aria-labelledby="tab-detailed"
+                            hidden>
+                            <p class="panel-intro">Enter your actual monthly usage for the most accurate calculation.
+                                You can find this data on Smart Meter Texas or your past utility bills.</p>
                             <div class="monthly-usage-grid">
                                 <div class="month-field">
                                     <label for="month-jan">Jan</label>
-                                    <input type="number" id="month-jan" class="field-input-compact" placeholder="kWh" min="0" data-month="0">
+                                    <input type="number" id="month-jan" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="0">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-feb">Feb</label>
-                                    <input type="number" id="month-feb" class="field-input-compact" placeholder="kWh" min="0" data-month="1">
+                                    <input type="number" id="month-feb" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="1">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-mar">Mar</label>
-                                    <input type="number" id="month-mar" class="field-input-compact" placeholder="kWh" min="0" data-month="2">
+                                    <input type="number" id="month-mar" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="2">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-apr">Apr</label>
-                                    <input type="number" id="month-apr" class="field-input-compact" placeholder="kWh" min="0" data-month="3">
+                                    <input type="number" id="month-apr" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="3">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-may">May</label>
-                                    <input type="number" id="month-may" class="field-input-compact" placeholder="kWh" min="0" data-month="4">
+                                    <input type="number" id="month-may" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="4">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-jun">Jun</label>
-                                    <input type="number" id="month-jun" class="field-input-compact" placeholder="kWh" min="0" data-month="5">
+                                    <input type="number" id="month-jun" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="5">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-jul">Jul</label>
-                                    <input type="number" id="month-jul" class="field-input-compact" placeholder="kWh" min="0" data-month="6">
+                                    <input type="number" id="month-jul" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="6">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-aug">Aug</label>
-                                    <input type="number" id="month-aug" class="field-input-compact" placeholder="kWh" min="0" data-month="7">
+                                    <input type="number" id="month-aug" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="7">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-sep">Sep</label>
-                                    <input type="number" id="month-sep" class="field-input-compact" placeholder="kWh" min="0" data-month="8">
+                                    <input type="number" id="month-sep" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="8">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-oct">Oct</label>
-                                    <input type="number" id="month-oct" class="field-input-compact" placeholder="kWh" min="0" data-month="9">
+                                    <input type="number" id="month-oct" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="9">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-nov">Nov</label>
-                                    <input type="number" id="month-nov" class="field-input-compact" placeholder="kWh" min="0" data-month="10">
+                                    <input type="number" id="month-nov" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="10">
                                 </div>
                                 <div class="month-field">
                                     <label for="month-dec">Dec</label>
-                                    <input type="number" id="month-dec" class="field-input-compact" placeholder="kWh" min="0" data-month="11">
+                                    <input type="number" id="month-dec" class="field-input-compact" placeholder="kWh"
+                                        min="0" data-month="11">
                                 </div>
                             </div>
                             <div class="usage-summary">
@@ -296,7 +310,8 @@
                     <!-- Warnings Section -->
                     <div class="warnings-section" id="warnings-section" hidden>
                         <h3 class="section-heading section-heading-caution">Plans Requiring Caution</h3>
-                        <p class="section-intro">These plans have advertised rates that appear low but may cost more due to bill credit requirements, time-of-use restrictions, or high rate variance.</p>
+                        <p class="section-intro">These plans have advertised rates that appear low but may cost more due
+                            to bill credit requirements, time-of-use restrictions, or high rate variance.</p>
                         <div class="warning-list" id="warning-plans"></div>
                     </div>
 
@@ -392,7 +407,8 @@
                         <h3 class="method-heading">Complete Cost Accounting</h3>
                         <p class="method-text">
                             The advertised rate on Power to Choose shows cost at exactly 1,000 kWh. This obscures the
-                            true cost for most users. We calculate monthly bills at your actual usage level, incorporating
+                            true cost for most users. We calculate monthly bills at your actual usage level,
+                            incorporating
                             the energy rate, TDU delivery charges, base fees, and applicable taxes to determine your
                             real annual cost for each plan.
                         </p>
@@ -430,16 +446,20 @@
                         <div class="footer-col">
                             <h4 class="footer-heading">Resources</h4>
                             <ul class="footer-list">
-                                <li><a href="https://www.powertochoose.org" target="_blank" rel="noopener">Power to Choose (PUCT)</a></li>
-                                <li><a href="https://www.smartmetertexas.com" target="_blank" rel="noopener">Smart Meter Texas</a></li>
-                                <li><a href="https://www.puc.texas.gov" target="_blank" rel="noopener">Public Utility Commission</a></li>
+                                <li><a href="https://www.powertochoose.org" target="_blank" rel="noopener">Power to
+                                        Choose (PUCT)</a></li>
+                                <li><a href="https://www.smartmetertexas.com" target="_blank" rel="noopener">Smart Meter
+                                        Texas</a></li>
+                                <li><a href="https://www.puc.texas.gov" target="_blank" rel="noopener">Public Utility
+                                        Commission</a></li>
                             </ul>
                         </div>
                         <div class="footer-col">
                             <h4 class="footer-heading">Project</h4>
                             <ul class="footer-list">
                                 <li><a href="./about.html">About This Tool</a></li>
-                                <li><a href="https://github.com/luisfork/light" target="_blank" rel="noopener">View Source Code</a></li>
+                                <li><a href="https://github.com/luisfork/light" target="_blank" rel="noopener">View
+                                        Source Code</a></li>
                             </ul>
                         </div>
                     </div>
@@ -473,4 +493,5 @@
     <script src="./js/api.js"></script>
     <script src="./js/ui.js"></script>
 </body>
+
 </html>

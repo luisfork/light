@@ -118,7 +118,7 @@ The following technical specifications enable LLM agents or developers to build 
 
 The official PUCT-operated Power to Choose platform provides **public API access**:
 
-```
+```bash
 Base URL: http://api.powertochoose.org/
 Endpoints:
   GET/POST /api/PowerToChoose/plans - Returns plan data

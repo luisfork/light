@@ -10,7 +10,7 @@ This document provides complete schema specifications for all data structures us
 
 ### Base URL
 
-```
+```bash
 http://api.powertochoose.org/
 ```
 
@@ -21,6 +21,7 @@ http://api.powertochoose.org/
 Returns array of electricity plans from all REPs in Texas deregulated markets.
 
 **Query Parameters:**
+
 - `zip_code` (optional): Filter plans by 5-digit ZIP code
 - `language` (optional): `en-us` (default) or `es-mx`
 
@@ -93,13 +94,14 @@ Returns array of electricity plans from all REPs in Texas deregulated markets.
 
 **CSV Export Alternative:**
 
-```
+```bash
 http://www.powertochoose.org/en-us/Plan/ExportToCsv
 ```
 
 Returns identical data in CSV format. More reliable than JSON API in production environments.
 
 **Important Notes:**
+
 - Prices at 500/1000/2000 kWh are **all-inclusive** (energy + TDU + base charges)
 - REPs self-report data; PUCT does not independently verify accuracy
 - Each REP limited to 5 plans on platform (strategic curation)
@@ -252,6 +254,7 @@ TDU delivery charges updated semi-annually (March 1, September 1).
 | LPL | Lubbock Power & Light | $0.00 | 6.31¢ | 2025-09-01 |
 
 **TDU Rate Updates:**
+
 - **March 1**: Typically 5-10% decrease (lower winter demand)
 - **September 1**: Typically 3-8% increase (higher summer demand)
 - Source: PUCT tariff filings (puc.texas.gov/industry/electric/rates/tdarchive.aspx)
@@ -291,6 +294,7 @@ ZIP code to TDU mapping and local tax rates.
 - **Municipal/Regulated**: Austin (Austin Energy), San Antonio (CPS Energy), El Paso (El Paso Electric)
 
 **Local Tax Implementation:**
+
 - Most Texas cities: 0-3% local sales tax on residential electricity
 - Exempt from state sales tax (Texas law)
 - Collected by REPs, remitted to municipalities
@@ -416,6 +420,7 @@ calculateEarlyTerminationFee(plan, 18) → 150.00
 ```
 
 **ETF Detection Logic:**
+
 1. If `early_termination_fee ≤ $50` AND `term_months ≥ 12` → Per-month-remaining
 2. If `special_terms` contains "per month remaining" → Per-month-remaining
 3. Otherwise → Flat fee
@@ -533,6 +538,7 @@ const CACHE_CONFIG = {
 ## Changelog
 
 ### Version 2.0 (January 2026)
+
 - Added contract expiration analysis fields to rankPlans response
 - Enhanced ETF calculation to detect per-month-remaining structures
 - Added `qualityScore` field to ranked plans (0-100 scale)
@@ -540,11 +546,13 @@ const CACHE_CONFIG = {
 - Added duplicate plan detection for English/Spanish versions
 
 ### Version 1.5 (December 2025)
+
 - Added CenterPoint rate update (Dec 7, 2025 effective date)
 - Enhanced volatility calculation algorithm
 - Improved bill credit parsing for complex threshold rules
 
 ### Version 1.0 (September 2025)
+
 - Initial schema documentation
 - Power to Choose API integration
 - Core calculation functions defined
@@ -553,9 +561,9 @@ const CACHE_CONFIG = {
 
 ## References
 
-- **Power to Choose Platform**: https://www.powertochoose.org
-- **PUCT Tariff Archive**: https://www.puc.texas.gov/industry/electric/rates/tdarchive.aspx
-- **ERCOT Grid Data**: https://www.ercot.com
+- **Power to Choose Platform**: <https://www.powertochoose.org>
+- **PUCT Tariff Archive**: <https://www.puc.texas.gov/industry/electric/rates/tdarchive.aspx>
+- **ERCOT Grid Data**: <https://www.ercot.com>
 - **Texas Deregulation Law**: PURA §39.001 et seq.
 - **EFL Requirements**: PUCT Substantive Rule §25.475
 

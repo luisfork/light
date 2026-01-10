@@ -1,4 +1,4 @@
-# Contract Expiration Timing Feature - Technical Documentation
+# Contract Expiration Timing Feature (DOCUMENTATION MIGHT BE OUTDATED)
 
 ## Overview
 
@@ -42,7 +42,7 @@ However, they often overlook **when the contract expires** and **when they'll ne
 Based on historical Power to Choose data and market research:
 
 | Month | Average Rate Trend | Renewal Quality | Seasonality Score |
-|-------|-------------------|-----------------|-------------------|
+| --- | --- | --- | --- |
 | January | High (winter peak) | Poor | 0.7 |
 | February | Moderate-High | Fair | 0.5 |
 | March | Moderate | Good | 0.2 |
