@@ -7,7 +7,7 @@ for development and testing purposes.
 """
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -346,7 +346,7 @@ def save_sample_data(output_path: Path) -> None:
     plans = generate_sample_plans()
 
     data = {
-        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "last_updated": datetime.now(UTC).isoformat(),
         "data_source": "Sample Data (for development)",
         "note": "This is sample data for development. Replace with real Power to Choose data in production.",
         "total_plans": len(plans),

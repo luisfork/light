@@ -14,16 +14,14 @@ Features:
 
 import csv
 import json
+import random
 import sys
 import time
-import random
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import urljoin
 
 import requests
-
 
 # Configuration
 MAX_RETRIES = 4
@@ -100,7 +98,7 @@ def retry_with_backoff(func, *args, **kwargs):
             last_exception = e
             if attempt < MAX_RETRIES - 1:
                 # Exponential backoff with jitter
-                delay = BASE_DELAY * (2 ** attempt) + random.uniform(0, 1)
+                delay = BASE_DELAY * (2**attempt) + random.uniform(0, 1)
                 print(f"  Attempt {attempt + 1} failed: {e}")
                 print(f"  Retrying in {delay:.1f} seconds...")
                 time.sleep(delay)
@@ -135,7 +133,7 @@ def fetch_from_endpoint(endpoint: dict) -> tuple[str, str]:
     response.raise_for_status()
 
     # Validate response content
-    content_type = response.headers.get("Content-Type", "")
+    response.headers.get("Content-Type", "")
     content = response.text
 
     if not content or len(content) < 100:
@@ -187,7 +185,7 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
     plans = []
 
     # Handle potential BOM and normalize line endings
-    csv_text = csv_text.lstrip('\ufeff').replace('\r\n', '\n').replace('\r', '\n')
+    csv_text = csv_text.lstrip("\ufeff").replace("\r\n", "\n").replace("\r", "\n")
 
     try:
         reader = csv.DictReader(csv_text.splitlines())
@@ -201,7 +199,7 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
         print(f"  Found {len(reader.fieldnames)} columns")
 
         # Check for new bracket format
-        has_brackets = any(col.startswith('[') for col in reader.fieldnames if col)
+        has_brackets = any(col.startswith("[") for col in reader.fieldnames if col)
         if has_brackets:
             print("  Detected Power to Choose bracket column format")
 
@@ -212,25 +210,24 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
     row_count = 0
     error_count = 0
 
+    def get_val(row: dict, *keys: str) -> str:
+        """Try multiple possible column names."""
+        for key in keys:
+            val = row.get(key)
+            if val:
+                return val
+            # Try with brackets
+            val = row.get(f"[{key}]")
+            if val:
+                return val
+        return ""
+
     for row in reader:
         row_count += 1
         try:
-            # Get values with support for both old and new column formats
-            def get_val(*keys):
-                """Try multiple possible column names."""
-                for key in keys:
-                    val = row.get(key)
-                    if val:
-                        return val
-                    # Try with brackets
-                    val = row.get(f"[{key}]")
-                    if val:
-                        return val
-                return ""
-
             # Filter to fixed-rate plans only as specified in requirements
-            rate_type = get_val("RateType", "Rate Type", "Fixed").upper()
-            fixed_flag = get_val("Fixed")
+            rate_type = get_val(row, "RateType", "Rate Type", "Fixed").upper()
+            fixed_flag = get_val(row, "Fixed")
 
             # Check if it's a fixed rate plan
             is_fixed = "FIXED" in rate_type or fixed_flag == "1" or fixed_flag == "True"
@@ -238,14 +235,14 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
                 continue
 
             # Get TDU area and normalize it
-            tdu_raw = get_val("TduCompanyName", "TDU", "TDU Area")
+            tdu_raw = get_val(row, "TduCompanyName", "TDU", "TDU Area")
             tdu_area = normalize_tdu_name(tdu_raw)
 
             # Parse prices - Power to Choose now returns decimal rates (e.g., 0.1600)
             # Convert to cents if needed
-            price_500_raw = get_val("kwh500", "Price/kWh: 500 kWh", "Price500")
-            price_1000_raw = get_val("kwh1000", "Price/kWh: 1000 kWh", "Price1000")
-            price_2000_raw = get_val("kwh2000", "Price/kWh: 2000 kWh", "Price2000")
+            price_500_raw = get_val(row, "kwh500", "Price/kWh: 500 kWh", "Price500")
+            price_1000_raw = get_val(row, "kwh1000", "Price/kWh: 1000 kWh", "Price1000")
+            price_2000_raw = get_val(row, "kwh2000", "Price/kWh: 2000 kWh", "Price2000")
 
             price_500 = parse_price(price_500_raw)
             price_1000 = parse_price(price_1000_raw)
@@ -253,33 +250,49 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
 
             # Parse plan data with validation
             plan = {
-                "plan_id": sanitize_string(get_val("idKey", "ID Plan", "Plan ID")),
-                "rep_name": sanitize_string(get_val("RepCompany", "REP Name")),
-                "plan_name": sanitize_string(get_val("Product", "Plan Name")),
+                "plan_id": sanitize_string(get_val(row, "idKey", "ID Plan", "Plan ID")),
+                "rep_name": sanitize_string(get_val(row, "RepCompany", "REP Name")),
+                "plan_name": sanitize_string(get_val(row, "Product", "Plan Name")),
                 "tdu_area": tdu_area,
                 # Prices at standard usage levels (in cents per kWh)
                 "price_kwh_500": price_500,
                 "price_kwh_1000": price_1000,
                 "price_kwh_2000": price_2000,
                 # Plan details
-                "term_months": parse_int(get_val("TermValue", "Term Value", "Term")),
+                "term_months": parse_int(get_val(row, "TermValue", "Term Value", "Term")),
                 "rate_type": "FIXED",
-                "renewable_pct": parse_int(get_val("Renewable", "Renewable Content") or "0"),
-                "is_prepaid": get_val("PrePaid", "Prepaid").upper() in ("TRUE", "YES", "1"),
-                "is_tou": get_val("TimeOfUse", "Time of Use").upper() in ("TRUE", "YES", "1"),
+                "renewable_pct": parse_int(get_val(row, "Renewable", "Renewable Content") or "0"),
+                "is_prepaid": get_val(row, "PrePaid", "Prepaid").upper() in ("TRUE", "YES", "1"),
+                "is_tou": get_val(row, "TimeOfUse", "Time of Use").upper() in ("TRUE", "YES", "1"),
                 # Fees
-                "early_termination_fee": parse_float(get_val("CancelFee", "Cancellation Fee", "ETF") or "0"),
+                "early_termination_fee": parse_float(
+                    get_val(row, "CancelFee", "Cancellation Fee", "ETF") or "0"
+                ),
                 "base_charge_monthly": 0.0,  # Not directly provided in CSV
                 # URLs
-                "efl_url": sanitize_url(get_val("FactsURL", "Electricity Facts Label (EFL) URL", "EFL URL")),
-                "enrollment_url": sanitize_url(get_val("EnrollURL", "Enroll URL", "Enrollment URL")),
-                "terms_url": sanitize_url(get_val("TermsURL", "Terms of Service (TOS) URL", "TOS URL")),
+                "efl_url": sanitize_url(
+                    get_val(row, "FactsURL", "Electricity Facts Label (EFL) URL", "EFL URL")
+                ),
+                "enrollment_url": sanitize_url(
+                    get_val(row, "EnrollURL", "Enroll URL", "Enrollment URL")
+                ),
+                "terms_url": sanitize_url(
+                    get_val(row, "TermsURL", "Terms of Service (TOS) URL", "TOS URL")
+                ),
                 # Special features
-                "special_terms": sanitize_string(get_val("SpecialTerms", "Special terms and conditions", "Special Terms")),
-                "promotion_details": sanitize_string(get_val("PromotionDesc", "Promotion", "Promotion details", "Promotions")),
+                "special_terms": sanitize_string(
+                    get_val(row, "SpecialTerms", "Special terms and conditions", "Special Terms")
+                ),
+                "promotion_details": sanitize_string(
+                    get_val(row, "PromotionDesc", "Promotion", "Promotion details", "Promotions")
+                ),
                 # Additional fields
-                "fees_credits": sanitize_string(get_val("Fees/Credits", "MinUsageFeesCredits")),
-                "min_usage_fees": sanitize_string(get_val("MinUsageFeesCredits", "Min Usage Fees")),
+                "fees_credits": sanitize_string(
+                    get_val(row, "Fees/Credits", "MinUsageFeesCredits")
+                ),
+                "min_usage_fees": sanitize_string(
+                    get_val(row, "MinUsageFeesCredits", "Min Usage Fees")
+                ),
             }
 
             # Validation: Only include plans with valid pricing data
@@ -415,8 +428,12 @@ def parse_json_to_plans(json_text: str) -> list[dict[str, Any]]:
                 "renewable_pct": parse_int(item.get("renewablePct", item.get("renewable", "0"))),
                 "is_prepaid": item.get("isPrepaid", item.get("prepaid", False)),
                 "is_tou": item.get("isTou", item.get("timeOfUse", False)),
-                "early_termination_fee": parse_float(item.get("etf", item.get("cancellationFee", "0"))),
-                "base_charge_monthly": parse_float(item.get("baseCharge", item.get("monthlyCharge", "0"))),
+                "early_termination_fee": parse_float(
+                    item.get("etf", item.get("cancellationFee", "0"))
+                ),
+                "base_charge_monthly": parse_float(
+                    item.get("baseCharge", item.get("monthlyCharge", "0"))
+                ),
                 "efl_url": sanitize_url(item.get("eflUrl", item.get("factLabel", ""))),
                 "enrollment_url": sanitize_url(item.get("enrollUrl", item.get("enroll", ""))),
                 "terms_url": sanitize_url(item.get("tosUrl", item.get("terms", ""))),
@@ -431,7 +448,7 @@ def parse_json_to_plans(json_text: str) -> list[dict[str, Any]]:
                     plan["price_kwh_2000"] = plan["price_kwh_1000"]
                 plans.append(plan)
 
-        except (ValueError, KeyError, TypeError) as e:
+        except (ValueError, KeyError, TypeError):
             continue
 
     return plans
@@ -449,11 +466,11 @@ def sanitize_url(value: Any) -> str:
     if value is None:
         return ""
     url = str(value).strip()
-    if url and not url.startswith(('http://', 'https://')):
-        if url.startswith('//'):
-            url = 'https:' + url
-        elif url.startswith('/'):
-            url = 'https://www.powertochoose.org' + url
+    if url and not url.startswith(("http://", "https://")):
+        if url.startswith("//"):
+            url = "https:" + url
+        elif url.startswith("/"):
+            url = "https://www.powertochoose.org" + url
     return url
 
 
@@ -464,7 +481,9 @@ def parse_float(value: Any) -> float | None:
     try:
         if isinstance(value, (int, float)):
             return float(value)
-        cleaned = str(value).strip().replace("$", "").replace("¢", "").replace(",", "").replace("%", "")
+        cleaned = (
+            str(value).strip().replace("$", "").replace("¢", "").replace(",", "").replace("%", "")
+        )
         return float(cleaned) if cleaned else None
     except (ValueError, AttributeError):
         return None
@@ -514,7 +533,7 @@ def save_plans(plans: list[dict[str, Any]], output_path: Path) -> None:
     plans = deduplicate_plans(plans)
 
     data = {
-        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "last_updated": datetime.now(UTC).isoformat(),
         "data_source": "Power to Choose (https://www.powertochoose.org)",
         "total_plans": len(plans),
         "disclaimer": "Plan information is subject to change. Always verify details on the official EFL before enrolling.",
@@ -547,7 +566,7 @@ def print_summary(plans: list[dict[str, Any]]) -> None:
     # Show price range
     prices = [p["price_kwh_1000"] for p in plans if p.get("price_kwh_1000")]
     if prices:
-        print(f"\n  Price range at 1000 kWh:")
+        print("\n  Price range at 1000 kWh:")
         print(f"    Lowest:  {min(prices):.2f}¢/kWh")
         print(f"    Highest: {max(prices):.2f}¢/kWh")
         print(f"    Average: {sum(prices) / len(prices):.2f}¢/kWh")
