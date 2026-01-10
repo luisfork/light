@@ -46,9 +46,10 @@ jobs:
 
           # Archive CSV
           if [ -f data/plans.json ]; then
-            python -c "
+            python3 << 'PYTHON_SCRIPT'
 import json
 import csv
+import os
 from datetime import datetime
 
 with open('data/plans.json', 'r') as f:
@@ -56,22 +57,21 @@ with open('data/plans.json', 'r') as f:
 
 plans = data.get('plans', [])
 if plans:
-    # Define CSV columns
     columns = [
         'plan_id', 'plan_name', 'rep_name', 'tdu_area', 'rate_type',
         'term_months', 'price_kwh_500', 'price_kwh_1000', 'price_kwh_2000',
         'base_charge_monthly', 'early_termination_fee', 'renewable_pct',
         'is_prepaid', 'is_tou', 'special_terms', 'efl_url', 'enrollment_url'
     ]
-
-    timestamp = '${TIMESTAMP}'
+    timestamp = os.environ.get('TIMESTAMP', datetime.now().strftime('%Y%m%d_%H%M%S'))
+    os.makedirs('data/archive-csv', exist_ok=True)
     with open(f'data/archive-csv/plans_{timestamp}.csv', 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=columns, extrasaction='ignore')
         writer.writeheader()
         for plan in plans:
             writer.writerow(plan)
     print(f'Archived {len(plans)} plans to data/archive-csv/plans_{timestamp}.csv')
-"
+PYTHON_SCRIPT
           fi
 
       - name: Fetch electricity plans

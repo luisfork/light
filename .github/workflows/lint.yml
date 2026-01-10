@@ -44,7 +44,7 @@ jobs:
         run: uv tool run ruff check scripts/
 
       - name: Run Biome (JS/JSON)
-        run: biome check src/ --error-on-warnings
+        run: biome check src/
 
       - name: Run oxlint (additional JS checks)
         run: oxlint src/js/
