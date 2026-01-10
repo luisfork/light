@@ -324,7 +324,7 @@ light/
 │   ├── archive_to_csv.py        # Archive plans.json to CSV format
 │   └── generate_sample_data.py  # Sample data generator
 ├── biome.json                   # Biome linter configuration (JS/JSON)
-
+├── _typos.toml                  # Typos spell checker configuration
 ├── pyproject.toml               # Python deps + Ruff linter config
 ├── README.md                    # This file (hello!)
 └── LICENSE                      # MIT License
