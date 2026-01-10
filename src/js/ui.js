@@ -7,735 +7,741 @@
  * Toast Notification System - Enhanced Professional Design
  */
 const Toast = {
-    container: null,
+  container: null,
 
-    // Icon symbols (text-based, no emojis)
-    icons: {
-        success: '&#10003;', // Checkmark
-        error: '&#10007;',   // X mark
-        warning: '!',        // Exclamation
-        info: 'i'            // Info
-    },
+  // Icon symbols (text-based, no emojis)
+  icons: {
+    success: '&#10003;', // Checkmark
+    error: '&#10007;', // X mark
+    warning: '!', // Exclamation
+    info: 'i' // Info
+  },
 
-    // Default titles for each type
-    titles: {
-        success: 'Success',
-        error: 'Error',
-        warning: 'Warning',
-        info: 'Information'
-    },
+  // Default titles for each type
+  titles: {
+    success: 'Success',
+    error: 'Error',
+    warning: 'Warning',
+    info: 'Information'
+  },
 
-    init() {
-        this.container = document.getElementById('toast-container');
-        if (!this.container) {
-            this.container = document.createElement('div');
-            this.container.id = 'toast-container';
-            this.container.className = 'toast-container';
-            this.container.setAttribute('aria-live', 'polite');
-            this.container.setAttribute('aria-atomic', 'true');
-            document.body.appendChild(this.container);
-        }
-    },
+  init() {
+    this.container = document.getElementById('toast-container');
+    if (!this.container) {
+      this.container = document.createElement('div');
+      this.container.id = 'toast-container';
+      this.container.className = 'toast-container';
+      this.container.setAttribute('aria-live', 'polite');
+      this.container.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(this.container);
+    }
+  },
 
-    /**
-     * Show a toast notification
-     * @param {string} message - The message to display
-     * @param {string} type - Toast type: 'success', 'error', 'warning', 'info'
-     * @param {number} duration - Duration in ms (0 for persistent)
-     * @param {string} title - Optional custom title
-     */
-    show(message, type = 'info', duration = 5000, title = null) {
-        if (!this.container) this.init();
+  /**
+   * Show a toast notification
+   * @param {string} message - The message to display
+   * @param {string} type - Toast type: 'success', 'error', 'warning', 'info'
+   * @param {number} duration - Duration in ms (0 for persistent)
+   * @param {string} title - Optional custom title
+   */
+  show(message, type = 'info', duration = 5000, title = null) {
+    if (!this.container) this.init();
 
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
 
-        const displayTitle = title || this.titles[type] || 'Notification';
-        const icon = this.icons[type] || this.icons.info;
+    const displayTitle = title || this.titles[type] || 'Notification';
+    const icon = this.icons[type] || this.icons.info;
 
-        toast.innerHTML = `
+    toast.innerHTML = `
             <span class="toast-icon">${icon}</span>
             <div class="toast-content">
                 <div class="toast-title">${this.escapeHtml(displayTitle)}</div>
                 <div class="toast-message">${this.escapeHtml(message)}</div>
             </div>
             <button class="toast-close" aria-label="Dismiss notification">&times;</button>
-            ${duration > 0 ? `
+            ${
+              duration > 0
+                ? `
                 <div class="toast-progress">
                     <div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div>
                 </div>
-            ` : ''}
+            `
+                : ''
+            }
         `;
 
-        const closeBtn = toast.querySelector('.toast-close');
-        closeBtn.addEventListener('click', () => this.dismiss(toast));
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => this.dismiss(toast));
 
-        this.container.appendChild(toast);
+    this.container.appendChild(toast);
 
-        if (duration > 0) {
-            setTimeout(() => this.dismiss(toast), duration);
-        }
-
-        return toast;
-    },
-
-    dismiss(toast) {
-        if (!toast || !toast.parentNode) return;
-        toast.classList.add('toast-out');
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, 250);
-    },
-
-    /**
-     * Show success notification
-     */
-    success(msg, duration = 5000, title = 'Success') {
-        return this.show(msg, 'success', duration, title);
-    },
-
-    /**
-     * Show error notification
-     */
-    error(msg, duration = 8000, title = 'Error') {
-        return this.show(msg, 'error', duration, title);
-    },
-
-    /**
-     * Show warning notification
-     */
-    warning(msg, duration = 6000, title = 'Attention') {
-        return this.show(msg, 'warning', duration, title);
-    },
-
-    /**
-     * Show info notification
-     */
-    info(msg, duration = 5000, title = 'Information') {
-        return this.show(msg, 'info', duration, title);
-    },
-
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+    if (duration > 0) {
+      setTimeout(() => this.dismiss(toast), duration);
     }
+
+    return toast;
+  },
+
+  dismiss(toast) {
+    if (!toast || !toast.parentNode) return;
+    toast.classList.add('toast-out');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 250);
+  },
+
+  /**
+   * Show success notification
+   */
+  success(msg, duration = 5000, title = 'Success') {
+    return this.show(msg, 'success', duration, title);
+  },
+
+  /**
+   * Show error notification
+   */
+  error(msg, duration = 8000, title = 'Error') {
+    return this.show(msg, 'error', duration, title);
+  },
+
+  /**
+   * Show warning notification
+   */
+  warning(msg, duration = 6000, title = 'Attention') {
+    return this.show(msg, 'warning', duration, title);
+  },
+
+  /**
+   * Show info notification
+   */
+  info(msg, duration = 5000, title = 'Information') {
+    return this.show(msg, 'info', duration, title);
+  },
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
 };
 
 /**
  * Main UI Controller
  */
 const UI = {
-    state: {
-        zipCode: null,
-        tdu: null,
-        usageMethod: 'estimate',
-        homeSize: null,
-        avgUsage: null,
-        monthlyUsage: Array(12).fill(0),
-        rankedPlans: null,
-        isLoading: false,
-        autoCalculateTimer: null,
-        zipValidationTimer: null,
-        lastCalculation: null
-    },
+  state: {
+    zipCode: null,
+    tdu: null,
+    usageMethod: 'estimate',
+    homeSize: null,
+    avgUsage: null,
+    monthlyUsage: Array(12).fill(0),
+    rankedPlans: null,
+    isLoading: false,
+    autoCalculateTimer: null,
+    zipValidationTimer: null,
+    lastCalculation: null
+  },
 
-    elements: {},
+  elements: {},
 
-    /**
-     * Auto-calculate debounce delay (ms)
-     */
-    AUTO_CALCULATE_DELAY: 500,
+  /**
+   * Auto-calculate debounce delay (ms)
+   */
+  AUTO_CALCULATE_DELAY: 500,
 
-    /**
-     * ZIP validation debounce delay (ms)
-     */
-    ZIP_VALIDATION_DELAY: 300,
+  /**
+   * ZIP validation debounce delay (ms)
+   */
+  ZIP_VALIDATION_DELAY: 300,
 
-    async init() {
-        this.cacheElements();
-        Toast.init();
-        this.attachEventListeners();
+  async init() {
+    this.cacheElements();
+    Toast.init();
+    this.attachEventListeners();
 
-        try {
-            const { plans } = await API.preloadAll();
-            this.updateHeroMetrics();
-            Toast.success(
-                `${plans.total_plans.toLocaleString()} electricity plans ready for comparison.`,
-                5000,
-                'Data Loaded'
-            );
-        } catch (error) {
-            Toast.error(
-                'Unable to load plan data. Please check your connection and refresh.',
-                0,
-                'Connection Error'
-            );
-            console.error('Init error:', error);
+    try {
+      const { plans } = await API.preloadAll();
+      this.updateHeroMetrics();
+      Toast.success(
+        `${plans.total_plans.toLocaleString()} electricity plans ready for comparison.`,
+        5000,
+        'Data Loaded'
+      );
+    } catch (error) {
+      Toast.error(
+        'Unable to load plan data. Please check your connection and refresh.',
+        0,
+        'Connection Error'
+      );
+      console.error('Init error:', error);
+    }
+  },
+
+  cacheElements() {
+    this.elements = {
+      // Hero
+      totalPlansCount: document.getElementById('total-plans-count'),
+      lastUpdate: document.getElementById('last-update'),
+
+      // Step 1: Location
+      zipInput: document.getElementById('zip-code'),
+      zipStatus: document.getElementById('zip-status'),
+      tduDisplay: document.getElementById('tdu-display'),
+      tduName: document.getElementById('tdu-name'),
+      tduBase: document.getElementById('tdu-base'),
+      tduRate: document.getElementById('tdu-rate'),
+      tduArea: document.getElementById('tdu-area'),
+
+      // Step 2: Usage
+      stepUsage: document.getElementById('step-usage'),
+      methodOptions: document.querySelectorAll('.method-option'),
+      panelEstimate: document.getElementById('panel-estimate'),
+      panelAverage: document.getElementById('panel-average'),
+      panelDetailed: document.getElementById('panel-detailed'),
+      homeSize: document.getElementById('home-size'),
+      avgKwh: document.getElementById('avg-kwh'),
+      annualUsageTotal: document.getElementById('annual-usage-total'),
+      monthlyUsageAvg: document.getElementById('monthly-usage-avg'),
+      calculateBtn: document.getElementById('calculate-btn'),
+
+      // Results
+      resultsSection: document.getElementById('results-section'),
+      resultsCount: document.getElementById('results-count'),
+      usageChart: document.getElementById('usage-chart'),
+      profileAnnual: document.getElementById('profile-annual'),
+      profileAvg: document.getElementById('profile-avg'),
+      profilePeak: document.getElementById('profile-peak'),
+      topPlans: document.getElementById('top-plans'),
+      warningsSection: document.getElementById('warnings-section'),
+      warningPlans: document.getElementById('warning-plans'),
+      comparisonBody: document.getElementById('comparison-body'),
+      filterTerm: document.getElementById('filter-term'),
+      filterRenewable: document.getElementById('filter-renewable'),
+
+      // Modal
+      modalBackdrop: document.getElementById('modal-backdrop'),
+      modalBody: document.getElementById('modal-body'),
+      modalClose: document.getElementById('modal-close'),
+
+      // Status indicator
+      statusIdle: document.getElementById('status-idle'),
+      statusLoading: document.getElementById('status-loading'),
+      statusReady: document.getElementById('status-ready')
+    };
+  },
+
+  attachEventListeners() {
+    // ZIP code input
+    if (this.elements.zipInput) {
+      this.elements.zipInput.addEventListener('input', (e) => this.handleZipInput(e));
+      this.elements.zipInput.addEventListener('blur', () => this.handleZipBlur());
+      this.elements.zipInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.handleZipBlur();
         }
-    },
+      });
+    }
 
-    cacheElements() {
-        this.elements = {
-            // Hero
-            totalPlansCount: document.getElementById('total-plans-count'),
-            lastUpdate: document.getElementById('last-update'),
+    // Usage method tabs
+    this.elements.methodOptions.forEach((option) => {
+      option.addEventListener('click', () => this.handleMethodChange(option));
+    });
 
-            // Step 1: Location
-            zipInput: document.getElementById('zip-code'),
-            zipStatus: document.getElementById('zip-status'),
-            tduDisplay: document.getElementById('tdu-display'),
-            tduName: document.getElementById('tdu-name'),
-            tduBase: document.getElementById('tdu-base'),
-            tduRate: document.getElementById('tdu-rate'),
-            tduArea: document.getElementById('tdu-area'),
+    // Home size select - auto-calculate on change
+    if (this.elements.homeSize) {
+      this.elements.homeSize.addEventListener('change', (e) => {
+        this.state.homeSize = e.target.value;
+        this.triggerAutoCalculate();
+      });
+    }
 
-            // Step 2: Usage
-            stepUsage: document.getElementById('step-usage'),
-            methodOptions: document.querySelectorAll('.method-option'),
-            panelEstimate: document.getElementById('panel-estimate'),
-            panelAverage: document.getElementById('panel-average'),
-            panelDetailed: document.getElementById('panel-detailed'),
-            homeSize: document.getElementById('home-size'),
-            avgKwh: document.getElementById('avg-kwh'),
-            annualUsageTotal: document.getElementById('annual-usage-total'),
-            monthlyUsageAvg: document.getElementById('monthly-usage-avg'),
-            calculateBtn: document.getElementById('calculate-btn'),
+    // Average usage input - auto-calculate on input with debounce
+    if (this.elements.avgKwh) {
+      this.elements.avgKwh.addEventListener('input', (e) => {
+        this.state.avgUsage = parseFloat(e.target.value) || null;
+        this.debounceAutoCalculate();
+      });
+    }
 
-            // Results
-            resultsSection: document.getElementById('results-section'),
-            resultsCount: document.getElementById('results-count'),
-            usageChart: document.getElementById('usage-chart'),
-            profileAnnual: document.getElementById('profile-annual'),
-            profileAvg: document.getElementById('profile-avg'),
-            profilePeak: document.getElementById('profile-peak'),
-            topPlans: document.getElementById('top-plans'),
-            warningsSection: document.getElementById('warnings-section'),
-            warningPlans: document.getElementById('warning-plans'),
-            comparisonBody: document.getElementById('comparison-body'),
-            filterTerm: document.getElementById('filter-term'),
-            filterRenewable: document.getElementById('filter-renewable'),
+    // Monthly usage inputs - auto-calculate with debounce
+    const monthInputs = document.querySelectorAll('[data-month]');
+    monthInputs.forEach((input) => {
+      input.addEventListener('input', () => {
+        this.handleMonthlyInput();
+        this.debounceAutoCalculate();
+      });
+    });
 
-            // Modal
-            modalBackdrop: document.getElementById('modal-backdrop'),
-            modalBody: document.getElementById('modal-body'),
-            modalClose: document.getElementById('modal-close'),
+    // Filters
+    if (this.elements.filterTerm) {
+      this.elements.filterTerm.addEventListener('change', () => this.applyFilters());
+    }
+    if (this.elements.filterRenewable) {
+      this.elements.filterRenewable.addEventListener('change', () => this.applyFilters());
+    }
 
-            // Status indicator
-            statusIdle: document.getElementById('status-idle'),
-            statusLoading: document.getElementById('status-loading'),
-            statusReady: document.getElementById('status-ready')
-        };
-    },
+    // Modal
+    if (this.elements.modalBackdrop) {
+      this.elements.modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.elements.modalBackdrop) this.closeModal();
+      });
+    }
+    if (this.elements.modalClose) {
+      this.elements.modalClose.addEventListener('click', () => this.closeModal());
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.closeModal();
+    });
+  },
 
-    attachEventListeners() {
-        // ZIP code input
-        if (this.elements.zipInput) {
-            this.elements.zipInput.addEventListener('input', (e) => this.handleZipInput(e));
-            this.elements.zipInput.addEventListener('blur', () => this.handleZipBlur());
-            this.elements.zipInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.handleZipBlur();
-                }
-            });
+  async updateHeroMetrics() {
+    try {
+      const freshness = await API.getDataFreshness();
+
+      if (this.elements.totalPlansCount) {
+        // Show unique plan count (after deduplication)
+        this.elements.totalPlansCount.textContent = freshness.totalPlans.toLocaleString();
+
+        // Add tooltip with full details
+        if (freshness.duplicateCount > 0) {
+          this.elements.totalPlansCount.setAttribute(
+            'title',
+            `${freshness.originalPlanCount.toLocaleString()} total plans, ` +
+              `${freshness.duplicateCount} duplicates removed`
+          );
         }
+      }
 
-        // Usage method tabs
-        this.elements.methodOptions.forEach(option => {
-            option.addEventListener('click', () => this.handleMethodChange(option));
+      if (this.elements.lastUpdate) {
+        const date = new Date(freshness.plansUpdated);
+        // Include year in the date format
+        this.elements.lastUpdate.textContent = date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
         });
+      }
+    } catch (error) {
+      console.error('Error updating metrics:', error);
+    }
+  },
 
-        // Home size select - auto-calculate on change
-        if (this.elements.homeSize) {
-            this.elements.homeSize.addEventListener('change', (e) => {
-                this.state.homeSize = e.target.value;
-                this.triggerAutoCalculate();
-            });
+  handleZipInput(e) {
+    const value = e.target.value.replace(/\D/g, '').substring(0, 5);
+    e.target.value = value;
+
+    // Clear any pending validation
+    if (this.state.zipValidationTimer) {
+      clearTimeout(this.state.zipValidationTimer);
+      this.state.zipValidationTimer = null;
+    }
+
+    if (value.length === 5) {
+      // Show checking status immediately
+      this.elements.zipStatus.innerHTML = '<span class="zip-status-checking">Validating...</span>';
+
+      // Debounced auto-validation - no need for blur/enter
+      this.state.zipValidationTimer = setTimeout(() => {
+        this.validateZipCode(value);
+      }, this.ZIP_VALIDATION_DELAY);
+    } else if (value.length > 0) {
+      // Partial input
+      this.elements.zipStatus.innerHTML =
+        '<span class="zip-status-partial">' + (5 - value.length) + ' more digits</span>';
+      this.disableUsageSection();
+    } else {
+      // Empty
+      this.elements.zipStatus.textContent = '';
+      this.disableUsageSection();
+    }
+  },
+
+  /**
+   * Validate ZIP code and update TDU information
+   * Called automatically after debounce or on blur/enter
+   */
+  async validateZipCode(zipCode) {
+    if (!zipCode || zipCode.length !== 5) {
+      this.disableUsageSection();
+      return;
+    }
+
+    // Skip if already validated this ZIP
+    if (this.state.zipCode === zipCode && this.state.tdu) {
+      return;
+    }
+
+    this.state.zipCode = zipCode;
+
+    try {
+      const taxInfo = await API.getLocalTaxInfo(zipCode);
+
+      if (taxInfo.tdu) {
+        const tdu = await API.getTDUByCode(taxInfo.tdu);
+        if (tdu) {
+          this.state.tdu = tdu;
+          this.showTduInfo(tdu);
+          this.enableUsageSection();
+          this.elements.zipStatus.innerHTML = '<span class="zip-status-valid">Valid ZIP</span>';
+          return;
         }
+      }
 
-        // Average usage input - auto-calculate on input with debounce
-        if (this.elements.avgKwh) {
-            this.elements.avgKwh.addEventListener('input', (e) => {
-                this.state.avgUsage = parseFloat(e.target.value) || null;
-                this.debounceAutoCalculate();
-            });
+      // Fallback: detect by ZIP range
+      const tdus = await API.getAllTDUs();
+      const tdu = detectTDU(zipCode, tdus);
+
+      if (tdu) {
+        this.state.tdu = tdu;
+        this.showTduInfo(tdu);
+        this.enableUsageSection();
+        this.elements.zipStatus.innerHTML = '<span class="zip-status-valid">Valid ZIP</span>';
+      } else {
+        Toast.warning(
+          'This ZIP code may be in a non-deregulated area of Texas. Only deregulated areas can choose providers.',
+          8000,
+          'Unknown Service Area'
+        );
+        this.disableUsageSection();
+        this.elements.zipStatus.innerHTML = '<span class="zip-status-unknown">Unknown</span>';
+      }
+    } catch (error) {
+      Toast.error('Unable to verify service area. Please try again.', 6000, 'Lookup Failed');
+      console.error('ZIP detection error:', error);
+      this.disableUsageSection();
+    }
+  },
+
+  async handleZipBlur() {
+    // Clear pending validation timer and validate immediately on blur
+    if (this.state.zipValidationTimer) {
+      clearTimeout(this.state.zipValidationTimer);
+      this.state.zipValidationTimer = null;
+    }
+
+    const zipCode = this.elements.zipInput.value;
+    await this.validateZipCode(zipCode);
+  },
+
+  showTduInfo(tdu) {
+    if (!this.elements.tduDisplay) return;
+
+    this.elements.tduDisplay.hidden = false;
+    this.elements.tduName.textContent = tdu.name;
+    this.elements.tduBase.textContent = `$${tdu.monthly_base_charge.toFixed(2)}/mo`;
+    this.elements.tduRate.textContent = `${tdu.per_kwh_rate.toFixed(2)} cents/kWh`;
+    this.elements.tduArea.textContent = tdu.service_area;
+  },
+
+  enableUsageSection() {
+    if (this.elements.stepUsage) {
+      this.elements.stepUsage.classList.remove('calc-step-disabled');
+    }
+    this.updateCalculateButton();
+  },
+
+  disableUsageSection() {
+    if (this.elements.stepUsage) {
+      this.elements.stepUsage.classList.add('calc-step-disabled');
+    }
+    if (this.elements.tduDisplay) {
+      this.elements.tduDisplay.hidden = true;
+    }
+    this.state.tdu = null;
+    this.updateCalculateButton();
+  },
+
+  handleMethodChange(option) {
+    const method = option.dataset.method;
+    this.state.usageMethod = method;
+
+    // Update tab states
+    this.elements.methodOptions.forEach((opt) => {
+      opt.classList.remove('active');
+      opt.setAttribute('aria-selected', 'false');
+    });
+    option.classList.add('active');
+    option.setAttribute('aria-selected', 'true');
+
+    // Show correct panel
+    ['estimate', 'average', 'detailed'].forEach((m) => {
+      const panel = document.getElementById(`panel-${m}`);
+      if (panel) {
+        panel.hidden = m !== method;
+        panel.classList.toggle('active', m === method);
+      }
+    });
+
+    this.updateCalculateButton();
+  },
+
+  handleMonthlyInput() {
+    const monthInputs = document.querySelectorAll('[data-month]');
+    const values = Array.from(monthInputs).map((input) => parseFloat(input.value) || 0);
+    this.state.monthlyUsage = values;
+
+    const total = values.reduce((sum, v) => sum + v, 0);
+    const avg =
+      values.filter((v) => v > 0).length > 0 ? total / values.filter((v) => v > 0).length : 0;
+
+    if (this.elements.annualUsageTotal) {
+      this.elements.annualUsageTotal.textContent = `${total.toLocaleString()} kWh`;
+    }
+    if (this.elements.monthlyUsageAvg) {
+      this.elements.monthlyUsageAvg.textContent = `${Math.round(avg).toLocaleString()} kWh`;
+    }
+
+    this.updateCalculateButton();
+  },
+
+  updateCalculateButton() {
+    // Legacy method - now hidden but kept for compatibility
+    if (!this.elements.calculateBtn) return;
+    this.elements.calculateBtn.hidden = true;
+  },
+
+  /**
+   * Check if calculation input is valid
+   */
+  isInputValid() {
+    if (!this.state.tdu) return false;
+
+    switch (this.state.usageMethod) {
+      case 'estimate':
+        return !!(this.state.homeSize || this.elements.homeSize?.value);
+      case 'average':
+        return !!(this.state.avgUsage || parseFloat(this.elements.avgKwh?.value));
+      case 'detailed':
+        return this.state.monthlyUsage.some((v) => v > 0);
+      default:
+        return false;
+    }
+  },
+
+  /**
+   * Debounced auto-calculate trigger
+   */
+  debounceAutoCalculate() {
+    if (this.state.autoCalculateTimer) {
+      clearTimeout(this.state.autoCalculateTimer);
+    }
+
+    this.state.autoCalculateTimer = setTimeout(() => {
+      this.triggerAutoCalculate();
+    }, this.AUTO_CALCULATE_DELAY);
+  },
+
+  /**
+   * Trigger auto-calculation if input is valid
+   */
+  triggerAutoCalculate() {
+    if (this.state.autoCalculateTimer) {
+      clearTimeout(this.state.autoCalculateTimer);
+      this.state.autoCalculateTimer = null;
+    }
+
+    if (this.isInputValid() && !this.state.isLoading) {
+      this.handleCalculate();
+    }
+  },
+
+  async handleCalculate() {
+    if (this.state.isLoading) return;
+
+    if (!this.state.tdu) {
+      Toast.warning('Enter your 5-digit Texas ZIP code to begin.', 5000, 'ZIP Required');
+      return;
+    }
+
+    // Get usage pattern
+    let monthlyUsage;
+    switch (this.state.usageMethod) {
+      case 'estimate': {
+        const homeSize = this.elements.homeSize?.value || this.state.homeSize;
+        if (!homeSize) {
+          Toast.warning('Select your home size to estimate usage.', 5000, 'Selection Required');
+          return;
         }
-
-        // Monthly usage inputs - auto-calculate with debounce
-        const monthInputs = document.querySelectorAll('[data-month]');
-        monthInputs.forEach(input => {
-            input.addEventListener('input', () => {
-                this.handleMonthlyInput();
-                this.debounceAutoCalculate();
-            });
-        });
-
-        // Filters
-        if (this.elements.filterTerm) {
-            this.elements.filterTerm.addEventListener('change', () => this.applyFilters());
+        monthlyUsage = estimateUsagePattern(parseFloat(homeSize));
+        break;
+      }
+      case 'average': {
+        const avgKwh = parseFloat(this.elements.avgKwh?.value) || this.state.avgUsage;
+        if (!avgKwh) {
+          Toast.warning('Enter your average monthly kWh usage.', 5000, 'Usage Required');
+          return;
         }
-        if (this.elements.filterRenewable) {
-            this.elements.filterRenewable.addEventListener('change', () => this.applyFilters());
+        monthlyUsage = estimateUsagePattern(avgKwh);
+        break;
+      }
+      case 'detailed': {
+        if (!this.state.monthlyUsage.some((v) => v > 0)) {
+          Toast.warning('Enter usage for at least one month.', 5000, 'Usage Required');
+          return;
         }
+        monthlyUsage = [...this.state.monthlyUsage];
+        // Fill empty months with average of filled months
+        const filledMonths = monthlyUsage.filter((v) => v > 0);
+        const avgFilled = filledMonths.reduce((a, b) => a + b, 0) / filledMonths.length;
+        monthlyUsage = monthlyUsage.map((v) => v || avgFilled);
+        break;
+      }
+    }
 
-        // Modal
-        if (this.elements.modalBackdrop) {
-            this.elements.modalBackdrop.addEventListener('click', (e) => {
-                if (e.target === this.elements.modalBackdrop) this.closeModal();
-            });
-        }
-        if (this.elements.modalClose) {
-            this.elements.modalClose.addEventListener('click', () => this.closeModal());
-        }
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.closeModal();
-        });
-    },
+    this.state.isLoading = true;
+    this.showLoading();
 
-    async updateHeroMetrics() {
-        try {
-            const freshness = await API.getDataFreshness();
+    try {
+      const plansData = await API.loadPlans();
+      const tduPlans = plansData.plans.filter((p) => p.tdu_area === this.state.tdu.code);
 
-            if (this.elements.totalPlansCount) {
-                // Show unique plan count (after deduplication)
-                this.elements.totalPlansCount.textContent = freshness.totalPlans.toLocaleString();
+      if (tduPlans.length === 0) {
+        Toast.warning(
+          'No electricity plans currently available for your service area.',
+          6000,
+          'No Plans Found'
+        );
+        return;
+      }
 
-                // Add tooltip with full details
-                if (freshness.duplicateCount > 0) {
-                    this.elements.totalPlansCount.setAttribute(
-                        'title',
-                        `${freshness.originalPlanCount.toLocaleString()} total plans, ` +
-                        `${freshness.duplicateCount} duplicates removed`
-                    );
-                }
-            }
+      const rankedPlans = rankPlans(tduPlans, monthlyUsage, this.state.tdu);
+      this.state.rankedPlans = rankedPlans;
 
-            if (this.elements.lastUpdate) {
-                const date = new Date(freshness.plansUpdated);
-                // Include year in the date format
-                this.elements.lastUpdate.textContent = date.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                });
-            }
-        } catch (error) {
-            console.error('Error updating metrics:', error);
-        }
-    },
+      this.displayResults(rankedPlans, monthlyUsage);
 
-    handleZipInput(e) {
-        const value = e.target.value.replace(/\D/g, '').substring(0, 5);
-        e.target.value = value;
+      this.elements.resultsSection.hidden = false;
+      this.elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        // Clear any pending validation
-        if (this.state.zipValidationTimer) {
-            clearTimeout(this.state.zipValidationTimer);
-            this.state.zipValidationTimer = null;
-        }
+      const best = rankedPlans[0];
+      const savings =
+        rankedPlans.length > 1
+          ? rankedPlans[rankedPlans.length - 1].annualCost - best.annualCost
+          : 0;
+      Toast.success(
+        `Lowest cost plan: ${formatCurrency(best.annualCost)}/year. ` +
+          (savings > 0 ? `Save up to ${formatCurrency(savings)} vs other plans.` : ''),
+        6000,
+        `${rankedPlans.length} Plans Analyzed`
+      );
+    } catch (error) {
+      Toast.error('Unable to calculate costs. Please try again.', 8000, 'Calculation Error');
+      console.error('Calculation error:', error);
+    } finally {
+      this.state.isLoading = false;
+      this.hideLoading();
+    }
+  },
 
-        if (value.length === 5) {
-            // Show checking status immediately
-            this.elements.zipStatus.innerHTML = '<span class="zip-status-checking">Validating...</span>';
+  showLoading() {
+    // Update status indicator
+    if (this.elements.statusIdle) this.elements.statusIdle.hidden = true;
+    if (this.elements.statusLoading) this.elements.statusLoading.hidden = false;
+    if (this.elements.statusReady) this.elements.statusReady.hidden = true;
+  },
 
-            // Debounced auto-validation - no need for blur/enter
-            this.state.zipValidationTimer = setTimeout(() => {
-                this.validateZipCode(value);
-            }, this.ZIP_VALIDATION_DELAY);
-        } else if (value.length > 0) {
-            // Partial input
-            this.elements.zipStatus.innerHTML = '<span class="zip-status-partial">' + (5 - value.length) + ' more digits</span>';
-            this.disableUsageSection();
-        } else {
-            // Empty
-            this.elements.zipStatus.textContent = '';
-            this.disableUsageSection();
-        }
-    },
+  hideLoading() {
+    // Update status indicator to show ready
+    if (this.elements.statusIdle) this.elements.statusIdle.hidden = true;
+    if (this.elements.statusLoading) this.elements.statusLoading.hidden = true;
+    if (this.elements.statusReady) this.elements.statusReady.hidden = false;
+  },
 
-    /**
-     * Validate ZIP code and update TDU information
-     * Called automatically after debounce or on blur/enter
-     */
-    async validateZipCode(zipCode) {
-        if (!zipCode || zipCode.length !== 5) {
-            this.disableUsageSection();
-            return;
-        }
+  resetStatus() {
+    // Reset status indicator to idle state
+    if (this.elements.statusIdle) this.elements.statusIdle.hidden = false;
+    if (this.elements.statusLoading) this.elements.statusLoading.hidden = true;
+    if (this.elements.statusReady) this.elements.statusReady.hidden = true;
+  },
 
-        // Skip if already validated this ZIP
-        if (this.state.zipCode === zipCode && this.state.tdu) {
-            return;
-        }
+  displayResults(plans, monthlyUsage) {
+    this.displayUsageProfile(monthlyUsage);
+    this.displayTopPlans(plans.slice(0, 5));
+    this.displayWarningPlans(plans.filter((p) => p.isGimmick).slice(0, 3));
+    this.displayComparisonTable(plans);
 
-        this.state.zipCode = zipCode;
+    if (this.elements.resultsCount) {
+      this.elements.resultsCount.textContent = plans.length;
+    }
+  },
 
-        try {
-            const taxInfo = await API.getLocalTaxInfo(zipCode);
+  displayUsageProfile(monthlyUsage) {
+    const total = monthlyUsage.reduce((a, b) => a + b, 0);
+    const avg = total / 12;
+    const max = Math.max(...monthlyUsage);
+    const peakMonth = monthlyUsage.indexOf(max);
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
 
-            if (taxInfo.tdu) {
-                const tdu = await API.getTDUByCode(taxInfo.tdu);
-                if (tdu) {
-                    this.state.tdu = tdu;
-                    this.showTduInfo(tdu);
-                    this.enableUsageSection();
-                    this.elements.zipStatus.innerHTML = '<span class="zip-status-valid">Valid ZIP</span>';
-                    return;
-                }
-            }
+    if (this.elements.profileAnnual) {
+      this.elements.profileAnnual.textContent = `${total.toLocaleString()} kWh`;
+    }
+    if (this.elements.profileAvg) {
+      this.elements.profileAvg.textContent = `${Math.round(avg).toLocaleString()} kWh`;
+    }
+    if (this.elements.profilePeak) {
+      this.elements.profilePeak.textContent = `${monthNames[peakMonth]} (${Math.round(max).toLocaleString()} kWh)`;
+    }
 
-            // Fallback: detect by ZIP range
-            const tdus = await API.getAllTDUs();
-            const tdu = detectTDU(zipCode, tdus);
+    // Render chart
+    if (this.elements.usageChart) {
+      const maxHeight = 60;
+      this.elements.usageChart.innerHTML = monthlyUsage
+        .map((usage, i) => {
+          const height = max > 0 ? (usage / max) * maxHeight : 4;
+          const isPeak = i === peakMonth;
+          return `<div class="bar ${isPeak ? 'peak' : ''}" style="height: ${height}px" title="${monthNames[i]}: ${Math.round(usage)} kWh"></div>`;
+        })
+        .join('');
+    }
+  },
 
-            if (tdu) {
-                this.state.tdu = tdu;
-                this.showTduInfo(tdu);
-                this.enableUsageSection();
-                this.elements.zipStatus.innerHTML = '<span class="zip-status-valid">Valid ZIP</span>';
-            } else {
-                Toast.warning(
-                    'This ZIP code may be in a non-deregulated area of Texas. Only deregulated areas can choose providers.',
-                    8000,
-                    'Unknown Service Area'
-                );
-                this.disableUsageSection();
-                this.elements.zipStatus.innerHTML = '<span class="zip-status-unknown">Unknown</span>';
-            }
-        } catch (error) {
-            Toast.error(
-                'Unable to verify service area. Please try again.',
-                6000,
-                'Lookup Failed'
-            );
-            console.error('ZIP detection error:', error);
-            this.disableUsageSection();
-        }
-    },
+  displayTopPlans(plans) {
+    if (!this.elements.topPlans) return;
 
-    async handleZipBlur() {
-        // Clear pending validation timer and validate immediately on blur
-        if (this.state.zipValidationTimer) {
-            clearTimeout(this.state.zipValidationTimer);
-            this.state.zipValidationTimer = null;
-        }
+    this.elements.topPlans.innerHTML = plans
+      .map((plan, i) => {
+        const grade =
+          typeof getQualityGrade === 'function'
+            ? getQualityGrade(plan.qualityScore || 0)
+            : { letter: '-', description: 'N/A', class: 'grade-na' };
 
-        const zipCode = this.elements.zipInput.value;
-        await this.validateZipCode(zipCode);
-    },
+        const isNonFixed = plan.rate_type !== 'FIXED';
+        const nonFixedClass = isNonFixed ? 'plan-non-fixed' : '';
+        const termMonths = plan.term_months || 12;
+        const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
-    showTduInfo(tdu) {
-        if (!this.elements.tduDisplay) return;
-
-        this.elements.tduDisplay.hidden = false;
-        this.elements.tduName.textContent = tdu.name;
-        this.elements.tduBase.textContent = `$${tdu.monthly_base_charge.toFixed(2)}/mo`;
-        this.elements.tduRate.textContent = `${tdu.per_kwh_rate.toFixed(2)} cents/kWh`;
-        this.elements.tduArea.textContent = tdu.service_area;
-    },
-
-    enableUsageSection() {
-        if (this.elements.stepUsage) {
-            this.elements.stepUsage.classList.remove('calc-step-disabled');
-        }
-        this.updateCalculateButton();
-    },
-
-    disableUsageSection() {
-        if (this.elements.stepUsage) {
-            this.elements.stepUsage.classList.add('calc-step-disabled');
-        }
-        if (this.elements.tduDisplay) {
-            this.elements.tduDisplay.hidden = true;
-        }
-        this.state.tdu = null;
-        this.updateCalculateButton();
-    },
-
-    handleMethodChange(option) {
-        const method = option.dataset.method;
-        this.state.usageMethod = method;
-
-        // Update tab states
-        this.elements.methodOptions.forEach(opt => {
-            opt.classList.remove('active');
-            opt.setAttribute('aria-selected', 'false');
-        });
-        option.classList.add('active');
-        option.setAttribute('aria-selected', 'true');
-
-        // Show correct panel
-        ['estimate', 'average', 'detailed'].forEach(m => {
-            const panel = document.getElementById(`panel-${m}`);
-            if (panel) {
-                panel.hidden = (m !== method);
-                panel.classList.toggle('active', m === method);
-            }
-        });
-
-        this.updateCalculateButton();
-    },
-
-    handleMonthlyInput() {
-        const monthInputs = document.querySelectorAll('[data-month]');
-        const values = Array.from(monthInputs).map(input => parseFloat(input.value) || 0);
-        this.state.monthlyUsage = values;
-
-        const total = values.reduce((sum, v) => sum + v, 0);
-        const avg = values.filter(v => v > 0).length > 0
-            ? total / values.filter(v => v > 0).length
-            : 0;
-
-        if (this.elements.annualUsageTotal) {
-            this.elements.annualUsageTotal.textContent = `${total.toLocaleString()} kWh`;
-        }
-        if (this.elements.monthlyUsageAvg) {
-            this.elements.monthlyUsageAvg.textContent = `${Math.round(avg).toLocaleString()} kWh`;
-        }
-
-        this.updateCalculateButton();
-    },
-
-    updateCalculateButton() {
-        // Legacy method - now hidden but kept for compatibility
-        if (!this.elements.calculateBtn) return;
-        this.elements.calculateBtn.hidden = true;
-    },
-
-    /**
-     * Check if calculation input is valid
-     */
-    isInputValid() {
-        if (!this.state.tdu) return false;
-
-        switch (this.state.usageMethod) {
-            case 'estimate':
-                return !!(this.state.homeSize || this.elements.homeSize?.value);
-            case 'average':
-                return !!(this.state.avgUsage || parseFloat(this.elements.avgKwh?.value));
-            case 'detailed':
-                return this.state.monthlyUsage.some(v => v > 0);
-            default:
-                return false;
-        }
-    },
-
-    /**
-     * Debounced auto-calculate trigger
-     */
-    debounceAutoCalculate() {
-        if (this.state.autoCalculateTimer) {
-            clearTimeout(this.state.autoCalculateTimer);
-        }
-
-        this.state.autoCalculateTimer = setTimeout(() => {
-            this.triggerAutoCalculate();
-        }, this.AUTO_CALCULATE_DELAY);
-    },
-
-    /**
-     * Trigger auto-calculation if input is valid
-     */
-    triggerAutoCalculate() {
-        if (this.state.autoCalculateTimer) {
-            clearTimeout(this.state.autoCalculateTimer);
-            this.state.autoCalculateTimer = null;
-        }
-
-        if (this.isInputValid() && !this.state.isLoading) {
-            this.handleCalculate();
-        }
-    },
-
-    async handleCalculate() {
-        if (this.state.isLoading) return;
-
-        if (!this.state.tdu) {
-            Toast.warning(
-                'Enter your 5-digit Texas ZIP code to begin.',
-                5000,
-                'ZIP Required'
-            );
-            return;
-        }
-
-        // Get usage pattern
-        let monthlyUsage;
-        switch (this.state.usageMethod) {
-            case 'estimate':
-                const homeSize = this.elements.homeSize?.value || this.state.homeSize;
-                if (!homeSize) {
-                    Toast.warning(
-                        'Select your home size to estimate usage.',
-                        5000,
-                        'Selection Required'
-                    );
-                    return;
-                }
-                monthlyUsage = estimateUsagePattern(parseFloat(homeSize));
-                break;
-            case 'average':
-                const avgKwh = parseFloat(this.elements.avgKwh?.value) || this.state.avgUsage;
-                if (!avgKwh) {
-                    Toast.warning(
-                        'Enter your average monthly kWh usage.',
-                        5000,
-                        'Usage Required'
-                    );
-                    return;
-                }
-                monthlyUsage = estimateUsagePattern(avgKwh);
-                break;
-            case 'detailed':
-                if (!this.state.monthlyUsage.some(v => v > 0)) {
-                    Toast.warning(
-                        'Enter usage for at least one month.',
-                        5000,
-                        'Usage Required'
-                    );
-                    return;
-                }
-                monthlyUsage = [...this.state.monthlyUsage];
-                // Fill empty months with average of filled months
-                const filledMonths = monthlyUsage.filter(v => v > 0);
-                const avgFilled = filledMonths.reduce((a, b) => a + b, 0) / filledMonths.length;
-                monthlyUsage = monthlyUsage.map(v => v || avgFilled);
-                break;
-        }
-
-        this.state.isLoading = true;
-        this.showLoading();
-
-        try {
-            const plansData = await API.loadPlans();
-            const tduPlans = plansData.plans.filter(p => p.tdu_area === this.state.tdu.code);
-
-            if (tduPlans.length === 0) {
-                Toast.warning(
-                    'No electricity plans currently available for your service area.',
-                    6000,
-                    'No Plans Found'
-                );
-                return;
-            }
-
-            const rankedPlans = rankPlans(tduPlans, monthlyUsage, this.state.tdu);
-            this.state.rankedPlans = rankedPlans;
-
-            this.displayResults(rankedPlans, monthlyUsage);
-
-            this.elements.resultsSection.hidden = false;
-            this.elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            const best = rankedPlans[0];
-            const savings = rankedPlans.length > 1 ? rankedPlans[rankedPlans.length - 1].annualCost - best.annualCost : 0;
-            Toast.success(
-                `Lowest cost plan: ${formatCurrency(best.annualCost)}/year. ` +
-                (savings > 0 ? `Save up to ${formatCurrency(savings)} vs other plans.` : ''),
-                6000,
-                `${rankedPlans.length} Plans Analyzed`
-            );
-
-        } catch (error) {
-            Toast.error(
-                'Unable to calculate costs. Please try again.',
-                8000,
-                'Calculation Error'
-            );
-            console.error('Calculation error:', error);
-        } finally {
-            this.state.isLoading = false;
-            this.hideLoading();
-        }
-    },
-
-    showLoading() {
-        // Update status indicator
-        if (this.elements.statusIdle) this.elements.statusIdle.hidden = true;
-        if (this.elements.statusLoading) this.elements.statusLoading.hidden = false;
-        if (this.elements.statusReady) this.elements.statusReady.hidden = true;
-    },
-
-    hideLoading() {
-        // Update status indicator to show ready
-        if (this.elements.statusIdle) this.elements.statusIdle.hidden = true;
-        if (this.elements.statusLoading) this.elements.statusLoading.hidden = true;
-        if (this.elements.statusReady) this.elements.statusReady.hidden = false;
-    },
-
-    resetStatus() {
-        // Reset status indicator to idle state
-        if (this.elements.statusIdle) this.elements.statusIdle.hidden = false;
-        if (this.elements.statusLoading) this.elements.statusLoading.hidden = true;
-        if (this.elements.statusReady) this.elements.statusReady.hidden = true;
-    },
-
-    displayResults(plans, monthlyUsage) {
-        this.displayUsageProfile(monthlyUsage);
-        this.displayTopPlans(plans.slice(0, 5));
-        this.displayWarningPlans(plans.filter(p => p.isGimmick).slice(0, 3));
-        this.displayComparisonTable(plans);
-
-        if (this.elements.resultsCount) {
-            this.elements.resultsCount.textContent = plans.length;
-        }
-    },
-
-    displayUsageProfile(monthlyUsage) {
-        const total = monthlyUsage.reduce((a, b) => a + b, 0);
-        const avg = total / 12;
-        const max = Math.max(...monthlyUsage);
-        const peakMonth = monthlyUsage.indexOf(max);
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-        if (this.elements.profileAnnual) {
-            this.elements.profileAnnual.textContent = `${total.toLocaleString()} kWh`;
-        }
-        if (this.elements.profileAvg) {
-            this.elements.profileAvg.textContent = `${Math.round(avg).toLocaleString()} kWh`;
-        }
-        if (this.elements.profilePeak) {
-            this.elements.profilePeak.textContent = `${monthNames[peakMonth]} (${Math.round(max).toLocaleString()} kWh)`;
-        }
-
-        // Render chart
-        if (this.elements.usageChart) {
-            const maxHeight = 60;
-            this.elements.usageChart.innerHTML = monthlyUsage.map((usage, i) => {
-                const height = max > 0 ? (usage / max) * maxHeight : 4;
-                const isPeak = i === peakMonth;
-                return `<div class="bar ${isPeak ? 'peak' : ''}" style="height: ${height}px" title="${monthNames[i]}: ${Math.round(usage)} kWh"></div>`;
-            }).join('');
-        }
-    },
-
-    displayTopPlans(plans) {
-        if (!this.elements.topPlans) return;
-
-        this.elements.topPlans.innerHTML = plans.map((plan, i) => {
-            const grade = typeof getQualityGrade === 'function'
-                ? getQualityGrade(plan.qualityScore || 0)
-                : { letter: '-', description: 'N/A', class: 'grade-na' };
-
-            const isNonFixed = plan.rate_type !== 'FIXED';
-            const nonFixedClass = isNonFixed ? 'plan-non-fixed' : '';
-            const termMonths = plan.term_months || 12;
-            const contractTotalCost = plan.averageMonthlyCost * termMonths;
-
-            return `
+        return `
             <div class="plan-item ${nonFixedClass}">
                 <div class="plan-item-rank">
                     <span>Rank #${i + 1}</span>
                     <span class="plan-item-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="${grade.description} grade (${plan.qualityScore || 0} out of 100)">${grade.letter}</span>
                 </div>
-                ${isNonFixed ? `
+                ${
+                  isNonFixed
+                    ? `
                 <div class="non-fixed-warning">
                     <span class="non-fixed-warning-icon">!</span>
                     <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate:</strong> Price can change based on market conditions. Consider fixed-rate plans for budget certainty.</span>
-                </div>` : ''}
+                </div>`
+                    : ''
+                }
                 <div class="plan-item-header">
                     <div>
                         <div class="plan-item-name">${this.escapeHtml(plan.plan_name)}</div>
@@ -778,19 +784,22 @@ const UI = {
                 </div>
             </div>
             `;
-        }).join('');
-    },
+      })
+      .join('');
+  },
 
-    displayWarningPlans(plans) {
-        if (!this.elements.warningsSection || !this.elements.warningPlans) return;
+  displayWarningPlans(plans) {
+    if (!this.elements.warningsSection || !this.elements.warningPlans) return;
 
-        if (plans.length === 0) {
-            this.elements.warningsSection.hidden = true;
-            return;
-        }
+    if (plans.length === 0) {
+      this.elements.warningsSection.hidden = true;
+      return;
+    }
 
-        this.elements.warningsSection.hidden = false;
-        this.elements.warningPlans.innerHTML = plans.map(plan => `
+    this.elements.warningsSection.hidden = false;
+    this.elements.warningPlans.innerHTML = plans
+      .map(
+        (plan) => `
             <div class="warning-item">
                 <div class="warning-item-header">
                     <div>
@@ -803,26 +812,30 @@ const UI = {
                     </div>
                 </div>
                 <div class="warning-reasons">
-                    ${plan.warnings.map(w => `<div class="warning-reason">${this.escapeHtml(w)}</div>`).join('')}
+                    ${plan.warnings.map((w) => `<div class="warning-reason">${this.escapeHtml(w)}</div>`).join('')}
                 </div>
             </div>
-        `).join('');
-    },
+        `
+      )
+      .join('');
+  },
 
-    displayComparisonTable(plans) {
-        if (!this.elements.comparisonBody) return;
+  displayComparisonTable(plans) {
+    if (!this.elements.comparisonBody) return;
 
-        this.elements.comparisonBody.innerHTML = plans.map((plan, i) => {
-            const grade = typeof getQualityGrade === 'function'
-                ? getQualityGrade(plan.qualityScore || 0)
-                : { letter: '-', description: 'N/A', class: 'grade-na' };
+    this.elements.comparisonBody.innerHTML = plans
+      .map((plan, i) => {
+        const grade =
+          typeof getQualityGrade === 'function'
+            ? getQualityGrade(plan.qualityScore || 0)
+            : { letter: '-', description: 'N/A', class: 'grade-na' };
 
-            const isNonFixed = plan.rate_type !== 'FIXED';
-            const rowClass = plan.isGimmick ? 'row-caution' : (isNonFixed ? 'plan-non-fixed' : '');
-            const termMonths = plan.term_months || 12;
-            const contractTotalCost = plan.averageMonthlyCost * termMonths;
+        const isNonFixed = plan.rate_type !== 'FIXED';
+        const rowClass = plan.isGimmick ? 'row-caution' : isNonFixed ? 'plan-non-fixed' : '';
+        const termMonths = plan.term_months || 12;
+        const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
-            return `
+        return `
             <tr class="${rowClass}">
                 <td class="col-rank">${i + 1}</td>
                 <td class="col-grade">
@@ -848,62 +861,67 @@ const UI = {
                 <td><button class="btn-view" onclick="UI.showPlanModal('${plan.plan_id}')">View</button></td>
             </tr>
             `;
-        }).join('');
-    },
+      })
+      .join('');
+  },
 
-    applyFilters() {
-        if (!this.state.rankedPlans) return;
+  applyFilters() {
+    if (!this.state.rankedPlans) return;
 
-        let filtered = [...this.state.rankedPlans];
+    let filtered = [...this.state.rankedPlans];
 
-        const termFilter = this.elements.filterTerm?.value;
-        if (termFilter && termFilter !== 'all') {
-            switch (termFilter) {
-                case 'short':
-                    filtered = filtered.filter(p => p.term_months <= 6);
-                    break;
-                case 'medium':
-                    filtered = filtered.filter(p => p.term_months >= 10 && p.term_months <= 14);
-                    break;
-                case 'long':
-                    filtered = filtered.filter(p => p.term_months >= 24);
-                    break;
-            }
-        }
+    const termFilter = this.elements.filterTerm?.value;
+    if (termFilter && termFilter !== 'all') {
+      switch (termFilter) {
+        case 'short':
+          filtered = filtered.filter((p) => p.term_months <= 6);
+          break;
+        case 'medium':
+          filtered = filtered.filter((p) => p.term_months >= 10 && p.term_months <= 14);
+          break;
+        case 'long':
+          filtered = filtered.filter((p) => p.term_months >= 24);
+          break;
+      }
+    }
 
-        const renewableFilter = this.elements.filterRenewable?.value;
-        if (renewableFilter && renewableFilter !== 'all') {
-            const minPct = parseInt(renewableFilter, 10);
-            filtered = filtered.filter(p => (p.renewable_pct || 0) >= minPct);
-        }
+    const renewableFilter = this.elements.filterRenewable?.value;
+    if (renewableFilter && renewableFilter !== 'all') {
+      const minPct = parseInt(renewableFilter, 10);
+      filtered = filtered.filter((p) => (p.renewable_pct || 0) >= minPct);
+    }
 
-        this.displayComparisonTable(filtered);
-    },
+    this.displayComparisonTable(filtered);
+  },
 
-    showPlanModal(planId) {
-        const plan = this.state.rankedPlans?.find(p => p.plan_id === planId);
-        if (!plan) {
-            Toast.error('Plan not found');
-            return;
-        }
+  showPlanModal(planId) {
+    const plan = this.state.rankedPlans?.find((p) => p.plan_id === planId);
+    if (!plan) {
+      Toast.error('Plan not found');
+      return;
+    }
 
-        const isNonFixed = plan.rate_type !== 'FIXED';
-        const termMonths = plan.term_months || 12;
-        const contractTotalCost = plan.averageMonthlyCost * termMonths;
+    const isNonFixed = plan.rate_type !== 'FIXED';
+    const termMonths = plan.term_months || 12;
+    const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
-        this.elements.modalBody.innerHTML = `
+    this.elements.modalBody.innerHTML = `
             <h2 class="modal-title">${this.escapeHtml(plan.plan_name)}</h2>
             <p class="modal-provider">
                 ${this.escapeHtml(plan.rep_name)}
                 <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
             </p>
 
-            ${isNonFixed ? `
+            ${
+              isNonFixed
+                ? `
             <div class="non-fixed-warning" style="margin-bottom: var(--space-4);">
                 <span class="non-fixed-warning-icon">!</span>
                 <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly more during peak demand periods. Fixed-rate plans provide more budget certainty.</span>
             </div>
-            ` : ''}
+            `
+                : ''
+            }
 
             <div class="modal-section">
                 <h3 class="modal-section-title">Cost Summary</h3>
@@ -912,12 +930,16 @@ const UI = {
                         <span class="modal-stat-value highlight">${formatCurrency(plan.annualCost)}</span>
                         <span class="modal-stat-label">Annual Cost</span>
                     </div>
-                    ${termMonths !== 12 ? `
+                    ${
+                      termMonths !== 12
+                        ? `
                     <div class="modal-stat">
                         <span class="modal-stat-value">${formatCurrency(contractTotalCost)}</span>
                         <span class="modal-stat-label">${termMonths}-Month Contract Total</span>
                     </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
                     <div class="modal-stat">
                         <span class="modal-stat-value">${formatCurrency(plan.averageMonthlyCost)}</span>
                         <span class="modal-stat-label">Monthly Average</span>
@@ -969,14 +991,18 @@ const UI = {
                 </div>
             </div>
 
-            ${plan.warnings.length > 0 ? `
+            ${
+              plan.warnings.length > 0
+                ? `
                 <div class="modal-section">
                     <h3 class="modal-section-title">Warnings</h3>
                     <div class="modal-warnings">
-                        ${plan.warnings.map(w => `<div class="modal-warning">${this.escapeHtml(w)}</div>`).join('')}
+                        ${plan.warnings.map((w) => `<div class="modal-warning">${this.escapeHtml(w)}</div>`).join('')}
                     </div>
                 </div>
-            ` : ''}
+            `
+                : ''
+            }
 
             <div class="modal-actions">
                 ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn modal-btn-primary">View EFL</a>` : ''}
@@ -984,49 +1010,49 @@ const UI = {
             </div>
         `;
 
-        this.elements.modalBackdrop.hidden = false;
-        document.body.style.overflow = 'hidden';
-    },
+    this.elements.modalBackdrop.hidden = false;
+    document.body.style.overflow = 'hidden';
+  },
 
-    closeModal() {
-        if (this.elements.modalBackdrop) {
-            this.elements.modalBackdrop.hidden = true;
-            document.body.style.overflow = '';
-        }
-    },
-
-    escapeHtml(text) {
-        if (text === null || text === undefined) return '';
-        const div = document.createElement('div');
-        div.textContent = String(text);
-        return div.innerHTML;
-    },
-
-    /**
-     * Format ETF for display, handling per-month-remaining fees
-     */
-    formatETF(plan) {
-        if (typeof getETFDisplayInfo === 'function') {
-            const etfInfo = getETFDisplayInfo(plan);
-            return etfInfo.displayText;
-        }
-
-        // Fallback if function not available
-        if (!plan.early_termination_fee) return 'None';
-        return formatCurrency(plan.early_termination_fee);
+  closeModal() {
+    if (this.elements.modalBackdrop) {
+      this.elements.modalBackdrop.hidden = true;
+      document.body.style.overflow = '';
     }
+  },
+
+  escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+  },
+
+  /**
+   * Format ETF for display, handling per-month-remaining fees
+   */
+  formatETF(plan) {
+    if (typeof getETFDisplayInfo === 'function') {
+      const etfInfo = getETFDisplayInfo(plan);
+      return etfInfo.displayText;
+    }
+
+    // Fallback if function not available
+    if (!plan.early_termination_fee) return 'None';
+    return formatCurrency(plan.early_termination_fee);
+  }
 };
 
 // Initialize on DOM ready
 if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => UI.init());
-    } else {
-        UI.init();
-    }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => UI.init());
+  } else {
+    UI.init();
+  }
 }
 
 // Export for modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { UI, Toast };
+  module.exports = { UI, Toast };
 }
