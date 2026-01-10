@@ -16,6 +16,7 @@ import csv
 import json
 import os
 import random
+import re
 import sys
 import time
 from datetime import UTC, datetime
@@ -236,36 +237,59 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
     for row in reader:
         row_count += 1
         try:
-            # Filter to fixed-rate plans only as specified in requirements
-            rate_type = get_val(row, "RateType", "Rate Type", "Fixed", "rate_type").upper()
-            fixed_flag = get_val(row, "Fixed")
-
-            # Check if it's a fixed rate plan
-            is_fixed = "FIXED" in rate_type or fixed_flag == "1" or fixed_flag == "True"
-            if not is_fixed:
-                continue
-
             # Get TDU area and normalize it
-            tdu_raw = get_val(row, "TduCompanyName", "TDU", "TDU Area", "tdu_area")
+            tdu_raw = get_val(row, "TduCompanyName", "TduCompany", "TDU", "TDU Area", "tdu_area")
             tdu_area = normalize_tdu_name(tdu_raw)
 
             # Parse prices - Power to Choose now returns decimal rates (e.g., 0.1600)
             # Convert to cents if needed
             price_500_raw = get_val(
-                row, "kwh500", "Price/kWh: 500 kWh", "Price500", "price_kwh_500"
+                row, "kwh500", "Price/kWh 500", "Price/kWh: 500 kWh", "Price500", "price_kwh_500"
             )
             price_1000_raw = get_val(
-                row, "kwh1000", "Price/kWh: 1000 kWh", "Price1000", "price_kwh_1000"
+                row,
+                "kwh1000",
+                "Price/kWh 1000",
+                "Price/kWh: 1000 kWh",
+                "Price1000",
+                "price_kwh_1000",
             )
             price_2000_raw = get_val(
-                row, "kwh2000", "Price/kWh: 2000 kWh", "Price2000", "price_kwh_2000"
+                row,
+                "kwh2000",
+                "Price/kWh 2000",
+                "Price/kWh: 2000 kWh",
+                "Price2000",
+                "price_kwh_2000",
             )
 
             price_500 = parse_price(price_500_raw)
             price_1000 = parse_price(price_1000_raw)
             price_2000 = parse_price(price_2000_raw)
 
+            # Extract Cancellation Fee
+            cancel_fee_raw = get_val(
+                row, "CancelFee", "Cancellation Fee", "ETF", "early_termination_fee"
+            )
+            if not cancel_fee_raw:
+                # Try to extract from Pricing Details if CancelFee column is missing/empty
+                pricing_details = get_val(row, "Pricing Details")
+                if pricing_details:
+                    # Look for "Cancellation Fee: $XXX" pattern
+                    match = re.search(r"Cancellation Fee:\s*\$?([\d\.]+)", pricing_details)
+                    if match:
+                        cancel_fee_raw = match.group(1)
+
             # Parse plan data with validation
+
+            # Determine language
+            lang_raw = get_val(row, "Language", "Lang")
+            if not lang_raw:
+                # In exports where language isn't explicit but field exists as [Language], it's often populated.
+                # If completely missing, assume English or check plan triggers?
+                # For now default to 'English' if not mapped, but [Language] usually exists in offers.csv
+                lang_raw = "English"
+
             plan = {
                 "plan_id": sanitize_string(get_val(row, "idKey", "ID Plan", "Plan ID", "plan_id")),
                 "rep_name": sanitize_string(get_val(row, "RepCompany", "REP Name", "rep_name")),
@@ -279,39 +303,61 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
                 "term_months": parse_int(
                     get_val(row, "TermValue", "Term Value", "Term", "term_months")
                 ),
-                "rate_type": "FIXED",
+                "rate_type": sanitize_string(
+                    get_val(row, "RateType", "Rate Type", "rate_type") or "FIXED"
+                ).upper(),
                 "renewable_pct": parse_int(
-                    get_val(row, "Renewable", "Renewable Content", "renewable_pct") or "0"
+                    get_val(
+                        row, "Renewable", "Renewable Perc", "Renewable Content", "renewable_pct"
+                    )
+                    or "0"
                 ),
                 "is_prepaid": get_val(row, "PrePaid", "Prepaid", "is_prepaid").upper()
                 in ("TRUE", "YES", "1"),
-                "is_tou": get_val(row, "TimeOfUse", "Time of Use", "is_tou").upper()
+                "is_tou": get_val(row, "TimeOfUse", "Time Of Use", "Time of Use", "is_tou").upper()
                 in ("TRUE", "YES", "1"),
                 # Fees
-                "early_termination_fee": parse_float(
-                    get_val(row, "CancelFee", "Cancellation Fee", "ETF", "early_termination_fee")
-                    or "0"
-                ),
+                "early_termination_fee": parse_float(cancel_fee_raw or "0"),
                 "base_charge_monthly": parse_float(
                     get_val(row, "base_charge_monthly") or "0"
                 ),  # Support internal field
                 # URLs
                 "efl_url": sanitize_url(
                     get_val(
-                        row, "FactsURL", "Electricity Facts Label (EFL) URL", "EFL URL", "efl_url"
+                        row,
+                        "FactsURL",
+                        "Fact Sheet",
+                        "Electricity Facts Label (EFL) URL",
+                        "EFL URL",
+                        "efl_url",
                     )
                 ),
                 "enrollment_url": sanitize_url(
-                    get_val(row, "EnrollURL", "Enroll URL", "Enrollment URL", "enrollment_url")
+                    get_val(
+                        row,
+                        "EnrollURL",
+                        "Ordering Info",
+                        "Enroll URL",
+                        "Enrollment URL",
+                        "enrollment_url",
+                    )
                 ),
                 "terms_url": sanitize_url(
-                    get_val(row, "TermsURL", "Terms of Service (TOS) URL", "TOS URL", "terms_url")
+                    get_val(
+                        row,
+                        "TermsURL",
+                        "Terms of Service",
+                        "Terms of Service (TOS) URL",
+                        "TOS URL",
+                        "terms_url",
+                    )
                 ),
                 # Special features
                 "special_terms": sanitize_string(
                     get_val(
                         row,
                         "SpecialTerms",
+                        "Plan Details",
                         "Special terms and conditions",
                         "Special Terms",
                         "special_terms",
@@ -322,11 +368,12 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
                 ),
                 # Additional fields
                 "fees_credits": sanitize_string(
-                    get_val(row, "Fees/Credits", "MinUsageFeesCredits")
+                    get_val(row, "Fees/Credits", "MinUsageFeesCredits", "Min Usage Fees/Credits")
                 ),
                 "min_usage_fees": sanitize_string(
-                    get_val(row, "MinUsageFeesCredits", "Min Usage Fees")
+                    get_val(row, "MinUsageFeesCredits", "Min Usage Fees/Credits", "Min Usage Fees")
                 ),
+                "language": sanitize_string(lang_raw),
             }
 
             # Validation: Only include plans with valid pricing data
@@ -473,6 +520,7 @@ def parse_json_to_plans(json_text: str) -> list[dict[str, Any]]:
                 "terms_url": sanitize_url(item.get("tosUrl", item.get("terms", ""))),
                 "special_terms": sanitize_string(item.get("specialTerms", "")),
                 "promotion_details": sanitize_string(item.get("promotions", "")),
+                "language": sanitize_string(item.get("language", "English")),
             }
 
             if plan["price_kwh_1000"] and plan["price_kwh_1000"] > 0:
@@ -552,6 +600,7 @@ def deduplicate_plans(plans: list[dict[str, Any]]) -> list[dict[str, Any]]:
             plan["plan_name"].lower(),
             plan["tdu_area"],
             plan["term_months"],
+            plan.get("language", "English").lower(),
         )
 
         if key not in seen:
@@ -579,17 +628,20 @@ def save_plans(plans: list[dict[str, Any]], output_path: Path) -> None:
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-    print(f"Saved {len(plans)} fixed-rate plans to {output_path}")
+    print(f"Saved {len(plans)} plans to {output_path}")
 
 
 def print_summary(plans: list[dict[str, Any]]) -> None:
     """Print a summary of fetched plans."""
+    # Filter plans to match what was saved (deduplicated)
+    unique_plans = deduplicate_plans(plans)
+
     print("\nSummary:")
-    print(f"  Total fixed-rate plans: {len(plans)}")
+    print(f"  Total plans: {len(unique_plans)}")
 
     # Count plans by TDU
     tdu_counts: dict[str, int] = {}
-    for plan in plans:
+    for plan in unique_plans:
         tdu = plan.get("tdu_area", "UNKNOWN")
         tdu_counts[tdu] = tdu_counts.get(tdu, 0) + 1
 
@@ -598,7 +650,7 @@ def print_summary(plans: list[dict[str, Any]]) -> None:
         print(f"    {tdu}: {count}")
 
     # Show price range
-    prices = [p["price_kwh_1000"] for p in plans if p.get("price_kwh_1000")]
+    prices = [p["price_kwh_1000"] for p in unique_plans if p.get("price_kwh_1000")]
     if prices:
         print("\n  Price range at 1000 kWh:")
         print(f"    Lowest:  {min(prices):.2f}¢/kWh")
@@ -606,7 +658,7 @@ def print_summary(plans: list[dict[str, Any]]) -> None:
         print(f"    Average: {sum(prices) / len(prices):.2f}¢/kWh")
 
     # Show renewable options
-    renewable_100 = sum(1 for p in plans if p.get("renewable_pct", 0) == 100)
+    renewable_100 = sum(1 for p in unique_plans if p.get("renewable_pct", 0) == 100)
     print(f"\n  100% Renewable plans: {renewable_100}")
 
 
@@ -631,7 +683,7 @@ def main() -> None:
         plans = parse_json_to_plans(data_text)
 
     if not plans:
-        print("Warning: No fixed-rate plans found!", file=sys.stderr)
+        print("Warning: No plans found!", file=sys.stderr)
         print("This may indicate an issue with the data source.")
         sys.exit(1)
 

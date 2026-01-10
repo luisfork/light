@@ -1,6 +1,6 @@
 # Texas electricity plans: A complete guide for consumers and developers
 
-**Last Updated: January 2026**
+**January 2026**
 
 **The Texas deregulated electricity market offers significant savings—but only for those who understand its hidden complexity.** The difference between a well-chosen fixed-rate plan and a "gimmick" plan with bill credits can exceed **$1,072 annually** for the same household (EnergyBot 2025 study). This guide provides both practical shopping advice for consumers and complete technical specifications for developers building comparison tools.
 

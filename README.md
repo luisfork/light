@@ -281,6 +281,7 @@ light/
 │       ├── deploy.yml           # GitHub Pages deployment automation
 │       ├── lint.yml             # Code linting (Ruff, Biome, oxlint, typos)
 │       └── update-plans.yml     # Daily data updates + historical archival
+├── .other/                      # Archived research and debugging data
 ├── data/
 │   ├── plans.json               # Current electricity plans (updated daily)
 │   ├── tdu-rates.json           # TDU delivery charges (updated Mar/Sep)
