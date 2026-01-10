@@ -569,6 +569,4 @@ const CACHE_CONFIG = {
 
 ---
 
-**Document Version**: 2.0
 **Last Updated**: January 2026
-**Maintained By**: Light Project Contributors

@@ -576,6 +576,4 @@ These cities have vertically integrated municipal utilities and are NOT part of 
 
 ---
 
-**Document Version**: 2.0
 **Last Updated**: January 2026
-**Maintained By**: Light Project Contributors

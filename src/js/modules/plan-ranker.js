@@ -10,10 +10,11 @@
 
 const PlanRanker = {
   /**
-   * Rank plans by annual cost and identify gimmicks
+   * Rank plans by combined weighted score (85% cost + 15% quality)
    *
-   * Enhanced ranking system with quality scoring and penalties for bad plan features.
-   * Now includes non-fixed-rate plans with clear warnings.
+   * Enhanced ranking system with unified weighted scoring.
+   * 85% of score based on cost efficiency, 15% based on quality factors.
+   * No tie-breakers - single combined score determines ranking.
    *
    * @param {Object[]} plans - Array of plan objects
    * @param {number[]} userUsage - 12-month usage pattern
@@ -71,41 +72,32 @@ const PlanRanker = {
       return [];
     }
 
-    // Find best annual cost for quality scoring (from fixed-rate plans only for fair comparison)
-    const fixedRatePlans = filteredPlans.filter((p) => p.rate_type === 'FIXED');
-    const bestAnnualCost =
-      fixedRatePlans.length > 0
-        ? Math.min(...fixedRatePlans.map((p) => p.annualCost))
-        : Math.min(...filteredPlans.map((p) => p.annualCost));
+    // Find best and worst annual cost for normalization
+    const allCosts = filteredPlans.map((p) => p.annualCost);
+    const bestAnnualCost = Math.min(...allCosts);
+    const worstAnnualCost = Math.max(...allCosts);
+    const costRange = worstAnnualCost - bestAnnualCost || 1; // Avoid division by zero
 
     // Calculate quality scores with penalties for bad features
     filteredPlans.forEach((plan) => {
       plan.qualityScore = this.calculateQualityScore(plan, bestAnnualCost, options);
     });
 
-    // Sort by annual cost (primary), then quality score (tie-breaker)
-    filteredPlans.sort((a, b) => {
-      // Primary: Annual cost
-      const costDiff = a.annualCost - b.annualCost;
-      if (Math.abs(costDiff) > 1.0) {
-        return costDiff;
-      }
+    // Calculate combined weighted score: 85% cost + 15% quality
+    // Both metrics normalized to 0-100 scale where higher is better
+    filteredPlans.forEach((plan) => {
+      // Cost score: 100 for best cost, 0 for worst cost (inverted so lower cost = higher score)
+      const costScore = 100 - ((plan.annualCost - bestAnnualCost) / costRange) * 100;
 
-      // Tie-breaker 1: Quality score (higher is better)
-      const qualityDiff = b.qualityScore - a.qualityScore;
-      if (Math.abs(qualityDiff) > 2.0) {
-        return qualityDiff;
-      }
+      // Quality score already on 0-100 scale
+      const qualityScore = plan.qualityScore;
 
-      // Tie-breaker 2: Volatility (lower is better)
-      const volatilityDiff = a.volatility - b.volatility;
-      if (Math.abs(volatilityDiff) > 0.05) {
-        return volatilityDiff;
-      }
-
-      // Tie-breaker 3: Shorter term preferred for flexibility
-      return a.term_months - b.term_months;
+      // Combined weighted score: 85% cost efficiency + 15% quality
+      plan.combinedScore = Math.round(costScore * 0.85 + qualityScore * 0.15);
     });
+
+    // Sort by combined score (higher is better) - no tie-breakers
+    filteredPlans.sort((a, b) => b.combinedScore - a.combinedScore);
 
     return filteredPlans;
   },

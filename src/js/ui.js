@@ -835,11 +835,13 @@ const UI = {
         const termMonths = plan.term_months || 12;
         const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
-        // Rank display with medals for top 3
+        // Rank display with styled badges for top 3 (no emojis per design guidelines)
         let rankDisplay = `<span class="rank-number">#${i + 1}</span>`;
-        if (i === 0) rankDisplay = '<span class="rank-medal" title="Best Overall">🥇</span>';
-        else if (i === 1) rankDisplay = '<span class="rank-medal" title="2nd Place">🥈</span>';
-        else if (i === 2) rankDisplay = '<span class="rank-medal" title="3rd Place">🥉</span>';
+        if (i === 0) rankDisplay = '<span class="rank-badge rank-1" title="Best Overall">#1</span>';
+        else if (i === 1)
+          rankDisplay = '<span class="rank-badge rank-2" title="2nd Place">#2</span>';
+        else if (i === 2)
+          rankDisplay = '<span class="rank-badge rank-3" title="3rd Place">#3</span>';
 
         return `
             <tr class="${rowClass}">
@@ -873,6 +875,50 @@ const UI = {
             `;
       })
       .join('');
+
+    // Add click handlers for sortable column headers
+    this.attachTableSortHandlers();
+  },
+
+  // Current sort state
+  sortState: {
+    column: null,
+    direction: 'asc'
+  },
+
+  attachTableSortHandlers() {
+    const sortableHeaders = document.querySelectorAll('.comparison-table th.sortable');
+    sortableHeaders.forEach((header) => {
+      // Remove existing listeners to prevent duplicates
+      const newHeader = header.cloneNode(true);
+      header.parentNode.replaceChild(newHeader, header);
+
+      newHeader.addEventListener('click', () => {
+        const sortKey = newHeader.dataset.sort;
+        this.handleTableSort(sortKey, newHeader);
+      });
+    });
+  },
+
+  handleTableSort(sortKey, headerElement) {
+    if (!this.state.rankedPlans) return;
+
+    // Toggle direction if same column, otherwise default to ascending
+    if (this.sortState.column === sortKey) {
+      this.sortState.direction = this.sortState.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortState.column = sortKey;
+      this.sortState.direction = 'asc';
+    }
+
+    // Update header visual indicators
+    document.querySelectorAll('.comparison-table th.sortable').forEach((th) => {
+      th.classList.remove('sort-asc', 'sort-desc');
+    });
+    headerElement.classList.add(this.sortState.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+
+    // Apply filters (which will use the sort state)
+    this.applyFilters();
   },
 
   applyFilters() {
@@ -899,6 +945,35 @@ const UI = {
     if (renewableFilter && renewableFilter !== 'all') {
       const minPct = parseInt(renewableFilter, 10);
       filtered = filtered.filter((p) => (p.renewable_pct || 0) >= minPct);
+    }
+
+    // Apply sorting if a column is selected
+    if (this.sortState.column) {
+      const dir = this.sortState.direction === 'asc' ? 1 : -1;
+      filtered.sort((a, b) => {
+        let aVal, bVal;
+        switch (this.sortState.column) {
+          case 'annual':
+            aVal = a.annualCost || 0;
+            bVal = b.annualCost || 0;
+            break;
+          case 'rate':
+            aVal = a.effectiveRate || 0;
+            bVal = b.effectiveRate || 0;
+            break;
+          case 'quality':
+            aVal = a.qualityScore || 0;
+            bVal = b.qualityScore || 0;
+            break;
+          case 'term':
+            aVal = a.term_months || 0;
+            bVal = b.term_months || 0;
+            break;
+          default:
+            return 0;
+        }
+        return (aVal - bVal) * dir;
+      });
     }
 
     this.displayComparisonTable(filtered);

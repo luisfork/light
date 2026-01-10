@@ -210,7 +210,7 @@ function identifyWarnings(plan, userUsage, contractStartDate = null) {
 
   // ... existing warnings (bill credits, TOU, ETF, rate volatility)
 
-  // NEW: Contract expiration timing warning
+  // Contract expiration timing warning
   if (contractStartDate && plan.term_months) {
     const expirationAnalysis = calculateContractExpiration(
       contractStartDate,
@@ -547,3 +547,7 @@ The contract expiration timing feature represents a significant advancement in e
 The implementation is algorithmically sound, computationally efficient, and ready for UI integration. The modular design allows for future enhancements (historical data, ML predictions) without breaking changes.
 
 **Estimated User Impact:** Helping users avoid peak renewal periods could save an additional $100-300 annually beyond the $800 already saved through better plan selection. Total potential savings: $900-1,100 per year.
+
+---
+
+**Last Updated**: January 2026

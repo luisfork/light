@@ -320,3 +320,7 @@ Build tools that calculate costs across the full 300-3,000 kWh range, flag plans
 - [How New PUCT Rules are Sparking Legal Challenges - LawFuel](https://www.lawfuel.com/how-new-puct-rules-are-sparking-legal-challenges-in-the-texas-energy-market/)
 - [PUCT Subchapter R Customer Protection Rules §25.475](https://www.puc.texas.gov/agency/rulesnlaws/subrules/electric/25.475/25.475.pdf)
 - [Learn About Your Electricity Facts Label - Choose Texas Power](https://www.choosetexaspower.org/energy-resources/electricity-facts-label-guide/)
+
+---
+
+**Last Updated**: January 2026

@@ -70,11 +70,11 @@ Light calculates your true annual electricity cost using this algorithm:
 5. Add local sales tax
 6. Sum all 12 months for annual cost
 
-// Then rank plans by:
-- Annual cost (lowest first)
-- Quality score (0-100, considering cost, volatility, warnings, features)
-- Volatility score (simpler plans preferred)
-- Contract expiration timing (avoiding expensive renewal periods)
+// Then calculate combined score (85% cost + 15% quality):
+- Cost score: 100 for lowest cost, scaled down for higher costs
+- Quality score: 0-100 based on volatility, warnings, features
+- Combined score = (cost_score * 0.85) + (quality_score * 0.15)
+- Plans ranked by combined score (higher = better)
 ```
 
 ### Seasonal Usage Estimation
@@ -188,7 +188,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 - **Source:** PUCT tariff filings and TDU official websites
 - **Update Schedule:** Rates change March 1 and September 1 annually
-- **Current Rates (as of January 2026):**
+- **Current Rates (January 2026):**
 
 | TDU | Monthly Base | Per-kWh Rate | Effective Date |
 | --- | --- | --- | --- |
@@ -281,7 +281,6 @@ light/
 │       ├── deploy.yml           # GitHub Pages deployment automation
 │       ├── lint.yml             # Code linting (Ruff, Biome, oxlint, typos)
 │       └── update-plans.yml     # Daily data updates + historical archival
-├── .other/                      # Archived research and debugging data
 ├── data/
 │   ├── plans.json               # Current electricity plans (updated daily)
 │   ├── tdu-rates.json           # TDU delivery charges (updated Mar/Sep)
@@ -292,6 +291,7 @@ light/
 │   ├── api-response-schema.md   # API response formats and data structures
 │   ├── calculation-algorithm.md # Detailed algorithm walkthrough
 │   ├── tdu-service-areas.md     # TDU coverage mapping and rates
+│   ├── research.md              # Texas electricity market research
 │   └── data-schema-plans.md     # plans.json structure specification
 ├── src/
 │   ├── assets/
@@ -300,36 +300,35 @@ light/
 │   │       └── new_york/        # New York serif fonts
 │   ├── index.html               # Main application
 │   ├── css/
-│   │   ├── fonts.css            # @font-face declarations (SF Pro, SF Mono, New York)
+│   │   ├── fonts.css            # @font-face declarations
 │   │   └── styles.css           # Professional design system
 │   └── js/
 │       ├── modules/             # Modular JavaScript components
-│       │   ├── cache.js         # Cache management with TTL
-│       │   ├── data-loader.js   # Fetch with retry and timeout
-│       │   ├── deduplication.js # Plan fingerprinting and deduplication
-│       │   ├── tax-lookup.js    # ZIP code to tax rate mapping
+│       │   ├── cache.js               # Cache management with TTL
+│       │   ├── data-loader.js         # Fetch with retry and timeout
+│       │   ├── deduplication.js       # Plan fingerprinting and deduplication
+│       │   ├── tax-lookup.js          # ZIP code to tax rate mapping
 │       │   ├── provider-formatter.js  # Provider name cleanup
-│       │   ├── formatters.js    # Currency and rate formatting
-│       │   ├── usage-estimator.js     # Seasonal usage pattern estimation
-│       │   ├── cost-calculator.js     # Monthly/annual cost calculations
+│       │   ├── formatters.js          # Currency and rate formatting
+│       │   ├── usage-estimator.js     # Seasonal usage pattern Estimation
+│       │   ├── cost-calculator.js     # Monthly/Annual cost calculations
 │       │   ├── contract-analyzer.js   # Contract expiration timing analysis
 │       │   ├── etf-calculator.js      # Early termination fee calculations
-│       │   └── plan-ranker.js   # Plan ranking with quality scoring
+│       │   └── plan-ranker.js         # Plan ranking with quality scoring
 │       ├── api.js               # Data loading API facade
 │       ├── calculator.js        # Main calculator facade
 │       └── ui.js                # User interface logic
 ├── scripts/
 │   ├── fetch_plans.py           # Fetch from Power to Choose API
 │   ├── fetch_tdu_rates.py       # TDU rate management
+│   ├── archive_to_csv.py        # Archive plans.json to CSV format
 │   └── generate_sample_data.py  # Sample data generator
 ├── biome.json                   # Biome linter configuration
 ├── ruff.toml                    # Ruff Python linter configuration
 ├── _typos.toml                  # Typos spell checker configuration
-├── research.md                  # Texas electricity market research
-├── CONTRACT_EXPIRATION_FEATURE.md  # Contract timing analysis documentation
 ├── pyproject.toml               # Python dependencies
 ├── requirements.txt             # Python package requirements
-├── README.md                    # This file
+├── README.md                    # This file (hello!)
 └── LICENSE                      # MIT License
 ```
 
@@ -453,25 +452,25 @@ calculateETF(plan, monthsRemaining):
     return baseFee
 ```
 
-### 3. Quality Scoring System (NEW)
+### 3. Weighted Ranking System
 
-Comprehensive 0-100 scoring considering multiple factors:
+Plans are ranked by a combined score: **85% cost efficiency + 15% quality factors**.
 
 ```javascript
-calculateQualityScore(plan, bestAnnualCost):
+calculateCombinedScore(plan, bestCost, worstCost):
+  // Cost score (0-100, lower cost = higher score)
+  costScore = 100 - ((plan.annualCost - bestCost) / (worstCost - bestCost)) * 100
+
+  // Quality score (0-100, based on plan features)
+  qualityScore = calculateQualityScore(plan)
+
+  // Combined: 85% cost, 15% quality
+  return (costScore * 0.85) + (qualityScore * 0.15)
+
+calculateQualityScore(plan):
   score = 100
-
-  // Penalties
-  - Cost vs best plan: up to -40 points
-  - Volatility score: up to -25 points
-  - Warnings: -5 points each (max -25)
-  - High base charge (>$15/mo): up to -5 points
-  - Prepaid plan: -10 points
-
-  // Bonuses
-  + Renewable energy (50%+): up to +5 points
-  + Low rate variance (<10%): +5 points
-
+  // Penalties: volatility, warnings, high base charge, prepaid
+  // Bonuses: low rate variance
   return clamp(score, 0, 100)
 ```
 
@@ -483,7 +482,9 @@ calculateQualityScore(plan, bestAnnualCost):
 - 60-69: D (Caution - significant drawbacks)
 - 0-59: F (Avoid - high cost or high risk)
 
-### 4. Duplicate Plan Detection (NEW)
+**Table Sorting:** Click column headers (Grade, Term, Annual Cost, Effective Rate) to sort.
+
+### 4. Duplicate Plan Detection
 
 Automatically identifies and removes duplicate English/Spanish plan versions:
 
@@ -570,3 +571,7 @@ For questions, issues, or suggestions:
 
 - **GitHub Issues:** <https://github.com/luisfork/light/issues>
 - **Pull Requests:** <https://github.com/luisfork/light/pulls>
+
+---
+
+**Last Updated**: January 2026

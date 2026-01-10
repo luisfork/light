@@ -1,16 +1,16 @@
-# Power to Choose Data Formats
+# *Power to Choose* Data Formats
 
-This document describes the structure and differences between the various data sources used in this project, specifically the Power to Choose API and CSV exports. It provides a guide for future developers and LLM agents working on the project.
+This document describes the structure and differences between the various data sources used in this project, specifically the *Power to Choose* API and manually downloaded CSV exports (from the [*Power to Choose* website](https://www.powertochoose.org)). It provides a guide for future developers and LLM agents working on the project.
 
 ## Overview
 
-The "Light" project aggregates electricity plans from the official Power to Choose website (a service of the Public Utility Commission of Texas). The data is standardized into a JSON format (`data/plans.json`) for use by the frontend application.
+The "Light" project aggregates electricity plans from the official [*Power to Choose* website](https://www.powertochoose.org) (a service of the Public Utility Commission of Texas). The data is standardized into a JSON format (`data/plans.json`) for use by the frontend application.
 
 ## Data Sources
 
-### 1. Power to Choose API (Primary Source)
+### 1. *Power to Choose* API (Primary Source)
 
-The project primarily fetches data dynamically from the Power to Choose API endpoints. This ensures the plan data is up-to-date.
+The project primarily fetches data dynamically from the *Power to Choose* API endpoints. This ensures the plan data is up-to-date.
 
 * **Endpoints**: The script (`scripts/fetch_plans.py`) queries several known endpoints to retrieve the full catalog of available offers.
 * **Format**: The API returns data that resembles the "Offers Export" CSV format (headers in brackets).
@@ -18,7 +18,7 @@ The project primarily fetches data dynamically from the Power to Choose API endp
 
 ### 2. Debugging & Investigation Files (Archived)
 
-During the development and reverse-engineering of the Power to Choose data structure, two static CSV files were used. These have been moved to the `.other/` directory and are no longer used in production, but remain available for reference or local testing.
+During the development and reverse-engineering of the *Power to Choose* data structure, two static CSV files were used. These have been moved to the `.other/` directory and are no longer used in production, but remain available for reference or local testing.
 
 * **`power-to-choose-offers.csv`**: A bulk export of "Offers". This represents the raw data format often returned by the bulk API.
   * **Location**: `.other/power-to-choose-offers.csv`
@@ -60,7 +60,7 @@ The `fetch_plans.py` script performs significant normalization:
 4. **Fee Extraction**: If the `CancelFee` column is missing (common in Zip code exports), strictly parses the `Pricing Details` text using Regex to find "Cancellation Fee: $XXX".
 5. **Deduplication**: Removes duplicate entries based on `rep_name`, `plan_name`, `tdu_area`, `term_months`, and `language`.
 
-## Tips for LLM Agents
+## Tips
 
 * **Testing**: When testing the extraction logic, you can point the `fetch_plans.py` script to a local CSV using the `TEST_FILE` environment variable.
   * Example: `TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py`

@@ -115,14 +115,26 @@ const ETFCalculator = {
 
     const result = this.calculateEarlyTerminationFee(plan, monthsRemaining);
 
-    // Create display string
+    // Create display string with confirmation notice for uncertain cases
     let displayText;
+    let needsConfirmation = false;
+
     if (result.structure === 'none') {
-      displayText = 'None';
+      // Check if special_terms mentions cancellation/termination fees that we couldn't parse
+      if (plan.special_terms && /cancel|terminat|early|etf/i.test(plan.special_terms)) {
+        displayText = 'See EFL';
+        needsConfirmation = true;
+      } else {
+        displayText = 'None';
+      }
     } else if (result.structure === 'flat') {
       displayText = this.formatCurrency(result.total);
+    } else if (result.structure === 'per-month-inferred') {
+      // Inferred structure - add asterisk to indicate estimate
+      displayText = `$${result.perMonthRate}/mo*`;
+      needsConfirmation = true;
     } else {
-      // Per-month structure
+      // Per-month structure (explicitly detected)
       displayText = `$${result.perMonthRate}/mo remaining`;
     }
 
@@ -130,7 +142,8 @@ const ETFCalculator = {
       ...result,
       displayText: displayText,
       exampleTotal: result.total,
-      exampleMonths: monthsRemaining
+      exampleMonths: monthsRemaining,
+      needsConfirmation: needsConfirmation
     };
   },
 
