@@ -1,6 +1,6 @@
 [files]
 # Ignore lock files
-extend-exclude = ["*.lock"]
+extend-exclude = ["*.lock", "*.json", ".venv/", "node_modules/"]
 
 [default]
 # Don't check binary files
@@ -15,3 +15,10 @@ arg = "arg"
 args = "args"
 kwh = "kwh"
 kWh = "kWh"
+# Electricity domain terms
+tou = "tou"   # Time of Use
+Tou = "Tou"
+TOU = "TOU"
+RTO = "RTO"   # Regional Transmission Organization
+rto = "rto"
+IIF = "IIF"   # Company name (IIF US Holding)
