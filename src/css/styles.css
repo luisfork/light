@@ -144,6 +144,7 @@ h3,
 h4,
 h5,
 h6 {
+    font-family: var(--font-serif);
     font-weight: 600;
     line-height: 1.25;
     color: var(--color-ink);
@@ -162,6 +163,15 @@ a {
 
 a:hover {
     color: var(--color-accent-hover);
+}
+
+/* ... existing code ... */
+
+.copyright {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    margin-top: var(--space-2);
+    opacity: 0.8;
 }
 
 /* ============================================================================
@@ -2264,4 +2274,51 @@ tr.plan-non-fixed {
     .comparison-table {
         font-size: 10pt;
     }
+}
+
+/* ============================================================================
+   Enhanced UI Elements
+   ========================================================================= */
+
+.rank-medal {
+    font-size: 1.5rem;
+    line-height: 1;
+    display: inline-block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.rank-number {
+    font-weight: 700;
+    color: var(--color-ink-tertiary);
+}
+
+.provider-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.provider-name {
+    font-weight: 600;
+    color: var(--color-ink);
+}
+
+.plan-name-cell {
+    font-weight: 500;
+}
+
+.term-badge {
+    display: inline-flex;
+    padding: 2px 8px;
+    background: var(--color-surface-sunken);
+    border-radius: 12px;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-ink-secondary);
+}
+
+.renewable-100 {
+    color: var(--color-positive);
+    font-weight: 600;
 }

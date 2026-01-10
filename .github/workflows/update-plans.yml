@@ -46,6 +46,7 @@ jobs:
 
           # Archive CSV
           if [ -f data/plans.json ]; then
+            export TIMESTAMP="${TIMESTAMP}"
             python scripts/archive_to_csv.py
           fi
 

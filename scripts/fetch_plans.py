@@ -14,6 +14,7 @@ Features:
 
 import csv
 import json
+import os
 import random
 import sys
 import time
@@ -159,6 +160,16 @@ def fetch_plans_data() -> tuple[str, str]:
     """
     print("Fetching electricity plans from Power to Choose...")
 
+    # Check for test file override
+    test_file = os.environ.get("TEST_FILE")
+    if test_file:
+        print(f"Using test file: {test_file}")
+        if not os.path.exists(test_file):
+            print(f"Error: Test file {test_file} not found")
+            sys.exit(1)
+        with open(test_file, encoding="utf-8") as f:
+            return f.read(), "csv"
+
     errors = []
 
     for endpoint in ENDPOINTS:
@@ -226,7 +237,7 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
         row_count += 1
         try:
             # Filter to fixed-rate plans only as specified in requirements
-            rate_type = get_val(row, "RateType", "Rate Type", "Fixed").upper()
+            rate_type = get_val(row, "RateType", "Rate Type", "Fixed", "rate_type").upper()
             fixed_flag = get_val(row, "Fixed")
 
             # Check if it's a fixed rate plan
@@ -235,14 +246,20 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
                 continue
 
             # Get TDU area and normalize it
-            tdu_raw = get_val(row, "TduCompanyName", "TDU", "TDU Area")
+            tdu_raw = get_val(row, "TduCompanyName", "TDU", "TDU Area", "tdu_area")
             tdu_area = normalize_tdu_name(tdu_raw)
 
             # Parse prices - Power to Choose now returns decimal rates (e.g., 0.1600)
             # Convert to cents if needed
-            price_500_raw = get_val(row, "kwh500", "Price/kWh: 500 kWh", "Price500")
-            price_1000_raw = get_val(row, "kwh1000", "Price/kWh: 1000 kWh", "Price1000")
-            price_2000_raw = get_val(row, "kwh2000", "Price/kWh: 2000 kWh", "Price2000")
+            price_500_raw = get_val(
+                row, "kwh500", "Price/kWh: 500 kWh", "Price500", "price_kwh_500"
+            )
+            price_1000_raw = get_val(
+                row, "kwh1000", "Price/kWh: 1000 kWh", "Price1000", "price_kwh_1000"
+            )
+            price_2000_raw = get_val(
+                row, "kwh2000", "Price/kWh: 2000 kWh", "Price2000", "price_kwh_2000"
+            )
 
             price_500 = parse_price(price_500_raw)
             price_1000 = parse_price(price_1000_raw)
@@ -250,38 +267,55 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
 
             # Parse plan data with validation
             plan = {
-                "plan_id": sanitize_string(get_val(row, "idKey", "ID Plan", "Plan ID")),
-                "rep_name": sanitize_string(get_val(row, "RepCompany", "REP Name")),
-                "plan_name": sanitize_string(get_val(row, "Product", "Plan Name")),
+                "plan_id": sanitize_string(get_val(row, "idKey", "ID Plan", "Plan ID", "plan_id")),
+                "rep_name": sanitize_string(get_val(row, "RepCompany", "REP Name", "rep_name")),
+                "plan_name": sanitize_string(get_val(row, "Product", "Plan Name", "plan_name")),
                 "tdu_area": tdu_area,
                 # Prices at standard usage levels (in cents per kWh)
                 "price_kwh_500": price_500,
                 "price_kwh_1000": price_1000,
                 "price_kwh_2000": price_2000,
                 # Plan details
-                "term_months": parse_int(get_val(row, "TermValue", "Term Value", "Term")),
+                "term_months": parse_int(
+                    get_val(row, "TermValue", "Term Value", "Term", "term_months")
+                ),
                 "rate_type": "FIXED",
-                "renewable_pct": parse_int(get_val(row, "Renewable", "Renewable Content") or "0"),
-                "is_prepaid": get_val(row, "PrePaid", "Prepaid").upper() in ("TRUE", "YES", "1"),
-                "is_tou": get_val(row, "TimeOfUse", "Time of Use").upper() in ("TRUE", "YES", "1"),
+                "renewable_pct": parse_int(
+                    get_val(row, "Renewable", "Renewable Content", "renewable_pct") or "0"
+                ),
+                "is_prepaid": get_val(row, "PrePaid", "Prepaid", "is_prepaid").upper()
+                in ("TRUE", "YES", "1"),
+                "is_tou": get_val(row, "TimeOfUse", "Time of Use", "is_tou").upper()
+                in ("TRUE", "YES", "1"),
                 # Fees
                 "early_termination_fee": parse_float(
-                    get_val(row, "CancelFee", "Cancellation Fee", "ETF") or "0"
+                    get_val(row, "CancelFee", "Cancellation Fee", "ETF", "early_termination_fee")
+                    or "0"
                 ),
-                "base_charge_monthly": 0.0,  # Not directly provided in CSV
+                "base_charge_monthly": parse_float(
+                    get_val(row, "base_charge_monthly") or "0"
+                ),  # Support internal field
                 # URLs
                 "efl_url": sanitize_url(
-                    get_val(row, "FactsURL", "Electricity Facts Label (EFL) URL", "EFL URL")
+                    get_val(
+                        row, "FactsURL", "Electricity Facts Label (EFL) URL", "EFL URL", "efl_url"
+                    )
                 ),
                 "enrollment_url": sanitize_url(
-                    get_val(row, "EnrollURL", "Enroll URL", "Enrollment URL")
+                    get_val(row, "EnrollURL", "Enroll URL", "Enrollment URL", "enrollment_url")
                 ),
                 "terms_url": sanitize_url(
-                    get_val(row, "TermsURL", "Terms of Service (TOS) URL", "TOS URL")
+                    get_val(row, "TermsURL", "Terms of Service (TOS) URL", "TOS URL", "terms_url")
                 ),
                 # Special features
                 "special_terms": sanitize_string(
-                    get_val(row, "SpecialTerms", "Special terms and conditions", "Special Terms")
+                    get_val(
+                        row,
+                        "SpecialTerms",
+                        "Special terms and conditions",
+                        "Special Terms",
+                        "special_terms",
+                    )
                 ),
                 "promotion_details": sanitize_string(
                     get_val(row, "PromotionDesc", "Promotion", "Promotion details", "Promotions")

@@ -835,9 +835,15 @@ const UI = {
         const termMonths = plan.term_months || 12;
         const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
+        // Rank display with medals for top 3
+        let rankDisplay = `<span class="rank-number">#${i + 1}</span>`;
+        if (i === 0) rankDisplay = '<span class="rank-medal" title="Best Overall">🥇</span>';
+        else if (i === 1) rankDisplay = '<span class="rank-medal" title="2nd Place">🥈</span>';
+        else if (i === 2) rankDisplay = '<span class="rank-medal" title="3rd Place">🥉</span>';
+
         return `
             <tr class="${rowClass}">
-                <td class="col-rank">${i + 1}</td>
+                <td class="col-rank">${rankDisplay}</td>
                 <td class="col-grade">
                     <span class="quality-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="Quality grade ${grade.letter}: ${grade.description} (${plan.qualityScore || 0} out of 100)">
                         ${grade.letter}
@@ -845,18 +851,22 @@ const UI = {
                     <span class="quality-score">${plan.qualityScore || 0}</span>
                 </td>
                 <td>
-                    ${this.escapeHtml(plan.rep_name)}
-                    ${isNonFixed ? `<span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>` : ''}
+                    <div class="provider-cell">
+                        <span class="provider-name">${this.escapeHtml(plan.rep_name)}</span>
+                        ${isNonFixed ? `<span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>` : ''}
+                    </div>
                 </td>
-                <td>${this.escapeHtml(plan.plan_name)}</td>
-                <td>${plan.term_months} mo</td>
+                <td><span class="plan-name-cell">${this.escapeHtml(plan.plan_name)}</span></td>
+                <td><span class="term-badge">${plan.term_months} mo</span></td>
                 <td class="col-annual">
                     <span class="cost-value">${formatCurrency(plan.annualCost)}</span>
                     ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)}/${termMonths}mo</span>` : ''}
                 </td>
                 <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
                 <td class="col-rate"><span class="rate-value">${formatRate(plan.effectiveRate)}</span></td>
-                <td class="col-renewable">${plan.renewable_pct || 0}%</td>
+                <td class="col-renewable">
+                    ${(plan.renewable_pct || 0) >= 100 ? '<span class="renewable-100">100%</span>' : `${plan.renewable_pct || 0}%`}
+                </td>
                 <td class="col-etf">${this.formatETF(plan)}</td>
                 <td><button class="btn-view" onclick="UI.showPlanModal('${plan.plan_id}')">View</button></td>
             </tr>

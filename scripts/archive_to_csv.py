@@ -9,8 +9,7 @@ from datetime import datetime
 
 
 def archive_plans_to_csv(
-    json_path: str = "data/plans.json",
-    archive_dir: str = "data/archive-csv"
+    json_path: str = "data/plans.json", archive_dir: str = "data/archive-csv"
 ) -> int:
     """Convert plans.json to CSV and save to archive directory.
 
@@ -59,7 +58,9 @@ def archive_plans_to_csv(
     ]
 
     # Get timestamp from env or generate new one
-    timestamp = os.environ.get("TIMESTAMP", datetime.now().strftime("%Y%m%d_%H%M%S"))
+    timestamp = os.environ.get("TIMESTAMP")
+    if not timestamp:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Create output directory
     os.makedirs(archive_dir, exist_ok=True)

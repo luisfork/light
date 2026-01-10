@@ -380,6 +380,9 @@ light/
 # Fetch current plans from Power to Choose
 python scripts/fetch_plans.py
 
+# Fetch using local test file (simulated run)
+TEST_FILE=data/archive-csv/plans_2026-01-09.csv python scripts/fetch_plans.py
+
 # Manually update TDU rates (when PUCT publishes changes)
 python scripts/fetch_tdu_rates.py
 ```
@@ -390,6 +393,7 @@ python scripts/fetch_tdu_rates.py
 
 - Runs at 2 AM Central Time (7 AM UTC)
 - Archives current plans to `data/historical/` (unlimited retention)
+- Archives CSV to `data/archive-csv/` (daily snapshot)
 - Fetches latest plans from Power to Choose API
 - Removes duplicate English/Spanish plan versions
 - Commits and pushes if changes detected
