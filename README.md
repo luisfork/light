@@ -192,7 +192,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 | TDU | Monthly Base | Per-kWh Rate | Effective Date |
 | --- | --- | --- | --- |
-| CenterPoint Energy Houston | $4.90 | 6.0009¢ | Dec 7, 2025 |
+| CenterPoint Energy | $4.90 | 6.0009¢ | Dec 7, 2025 |
 | Oncor Electric Delivery | $4.23 | 5.5833¢ | Sep 1, 2025 |
 | AEP Texas Central | $5.49 | 5.6954¢ | Sep 1, 2025 |
 | AEP Texas North | $5.49 | 5.2971¢ | Sep 1, 2025 |
