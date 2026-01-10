@@ -138,6 +138,7 @@ const UI = {
         rankedPlans: null,
         isLoading: false,
         autoCalculateTimer: null,
+        zipValidationTimer: null,
         lastCalculation: null
     },
 
@@ -147,6 +148,11 @@ const UI = {
      * Auto-calculate debounce delay (ms)
      */
     AUTO_CALCULATE_DELAY: 500,
+
+    /**
+     * ZIP validation debounce delay (ms)
+     */
+    ZIP_VALIDATION_DELAY: 300,
 
     async init() {
         this.cacheElements();
@@ -325,18 +331,43 @@ const UI = {
         const value = e.target.value.replace(/\D/g, '').substring(0, 5);
         e.target.value = value;
 
+        // Clear any pending validation
+        if (this.state.zipValidationTimer) {
+            clearTimeout(this.state.zipValidationTimer);
+            this.state.zipValidationTimer = null;
+        }
+
         if (value.length === 5) {
-            this.elements.zipStatus.innerHTML = '<span style="color: var(--color-positive);">Checking...</span>';
+            // Show checking status immediately
+            this.elements.zipStatus.innerHTML = '<span class="zip-status-checking">Validating...</span>';
+
+            // Debounced auto-validation - no need for blur/enter
+            this.state.zipValidationTimer = setTimeout(() => {
+                this.validateZipCode(value);
+            }, this.ZIP_VALIDATION_DELAY);
+        } else if (value.length > 0) {
+            // Partial input
+            this.elements.zipStatus.innerHTML = '<span class="zip-status-partial">' + (5 - value.length) + ' more digits</span>';
+            this.disableUsageSection();
         } else {
+            // Empty
             this.elements.zipStatus.textContent = '';
+            this.disableUsageSection();
         }
     },
 
-    async handleZipBlur() {
-        const zipCode = this.elements.zipInput.value;
-
-        if (zipCode.length !== 5) {
+    /**
+     * Validate ZIP code and update TDU information
+     * Called automatically after debounce or on blur/enter
+     */
+    async validateZipCode(zipCode) {
+        if (!zipCode || zipCode.length !== 5) {
             this.disableUsageSection();
+            return;
+        }
+
+        // Skip if already validated this ZIP
+        if (this.state.zipCode === zipCode && this.state.tdu) {
             return;
         }
 
@@ -383,6 +414,17 @@ const UI = {
             console.error('ZIP detection error:', error);
             this.disableUsageSection();
         }
+    },
+
+    async handleZipBlur() {
+        // Clear pending validation timer and validate immediately on blur
+        if (this.state.zipValidationTimer) {
+            clearTimeout(this.state.zipValidationTimer);
+            this.state.zipValidationTimer = null;
+        }
+
+        const zipCode = this.elements.zipInput.value;
+        await this.validateZipCode(zipCode);
     },
 
     showTduInfo(tdu) {
@@ -678,19 +720,33 @@ const UI = {
                 ? getQualityGrade(plan.qualityScore || 0)
                 : { letter: '-', description: 'N/A', class: 'grade-na' };
 
+            const isNonFixed = plan.rate_type !== 'FIXED';
+            const nonFixedClass = isNonFixed ? 'plan-non-fixed' : '';
+            const termMonths = plan.term_months || 12;
+            const contractTotalCost = plan.averageMonthlyCost * termMonths;
+
             return `
-            <div class="plan-item">
+            <div class="plan-item ${nonFixedClass}">
                 <div class="plan-item-rank">
                     <span>Rank #${i + 1}</span>
                     <span class="plan-item-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="${grade.description} grade (${plan.qualityScore || 0} out of 100)">${grade.letter}</span>
                 </div>
+                ${isNonFixed ? `
+                <div class="non-fixed-warning">
+                    <span class="non-fixed-warning-icon">!</span>
+                    <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate:</strong> Price can change based on market conditions. Consider fixed-rate plans for budget certainty.</span>
+                </div>` : ''}
                 <div class="plan-item-header">
                     <div>
                         <div class="plan-item-name">${this.escapeHtml(plan.plan_name)}</div>
-                        <div class="plan-item-provider">${this.escapeHtml(plan.rep_name)}</div>
+                        <div class="plan-item-provider">
+                            ${this.escapeHtml(plan.rep_name)}
+                            <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
+                        </div>
                     </div>
                     <div class="plan-item-cost">
                         <div class="plan-item-annual">${formatCurrency(plan.annualCost)}/yr</div>
+                        ${termMonths !== 12 ? `<div class="plan-item-term-total">${formatCurrency(contractTotalCost)}/${termMonths}mo</div>` : ''}
                         <div class="plan-item-monthly">${formatCurrency(plan.averageMonthlyCost)}/mo avg</div>
                     </div>
                 </div>
@@ -761,8 +817,13 @@ const UI = {
                 ? getQualityGrade(plan.qualityScore || 0)
                 : { letter: '-', description: 'N/A', class: 'grade-na' };
 
+            const isNonFixed = plan.rate_type !== 'FIXED';
+            const rowClass = plan.isGimmick ? 'row-caution' : (isNonFixed ? 'plan-non-fixed' : '');
+            const termMonths = plan.term_months || 12;
+            const contractTotalCost = plan.averageMonthlyCost * termMonths;
+
             return `
-            <tr class="${plan.isGimmick ? 'row-caution' : ''}">
+            <tr class="${rowClass}">
                 <td class="col-rank">${i + 1}</td>
                 <td class="col-grade">
                     <span class="quality-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="Quality grade ${grade.letter}: ${grade.description} (${plan.qualityScore || 0} out of 100)">
@@ -770,10 +831,16 @@ const UI = {
                     </span>
                     <span class="quality-score">${plan.qualityScore || 0}</span>
                 </td>
-                <td>${this.escapeHtml(plan.rep_name)}</td>
+                <td>
+                    ${this.escapeHtml(plan.rep_name)}
+                    ${isNonFixed ? `<span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>` : ''}
+                </td>
                 <td>${this.escapeHtml(plan.plan_name)}</td>
                 <td>${plan.term_months} mo</td>
-                <td class="col-annual"><span class="cost-value">${formatCurrency(plan.annualCost)}</span></td>
+                <td class="col-annual">
+                    <span class="cost-value">${formatCurrency(plan.annualCost)}</span>
+                    ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)}/${termMonths}mo</span>` : ''}
+                </td>
                 <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
                 <td class="col-rate"><span class="rate-value">${formatRate(plan.effectiveRate)}</span></td>
                 <td class="col-renewable">${plan.renewable_pct || 0}%</td>
@@ -820,9 +887,23 @@ const UI = {
             return;
         }
 
+        const isNonFixed = plan.rate_type !== 'FIXED';
+        const termMonths = plan.term_months || 12;
+        const contractTotalCost = plan.averageMonthlyCost * termMonths;
+
         this.elements.modalBody.innerHTML = `
             <h2 class="modal-title">${this.escapeHtml(plan.plan_name)}</h2>
-            <p class="modal-provider">${this.escapeHtml(plan.rep_name)}</p>
+            <p class="modal-provider">
+                ${this.escapeHtml(plan.rep_name)}
+                <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
+            </p>
+
+            ${isNonFixed ? `
+            <div class="non-fixed-warning" style="margin-bottom: var(--space-4);">
+                <span class="non-fixed-warning-icon">!</span>
+                <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly more during peak demand periods. Fixed-rate plans provide more budget certainty.</span>
+            </div>
+            ` : ''}
 
             <div class="modal-section">
                 <h3 class="modal-section-title">Cost Summary</h3>
@@ -831,6 +912,12 @@ const UI = {
                         <span class="modal-stat-value highlight">${formatCurrency(plan.annualCost)}</span>
                         <span class="modal-stat-label">Annual Cost</span>
                     </div>
+                    ${termMonths !== 12 ? `
+                    <div class="modal-stat">
+                        <span class="modal-stat-value">${formatCurrency(contractTotalCost)}</span>
+                        <span class="modal-stat-label">${termMonths}-Month Contract Total</span>
+                    </div>
+                    ` : ''}
                     <div class="modal-stat">
                         <span class="modal-stat-value">${formatCurrency(plan.averageMonthlyCost)}</span>
                         <span class="modal-stat-label">Monthly Average</span>

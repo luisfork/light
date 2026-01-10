@@ -279,29 +279,50 @@ light/
 ├── .github/
 │   └── workflows/
 │       ├── deploy.yml           # GitHub Pages deployment automation
+│       ├── lint.yml             # Code linting (Ruff, Biome, oxlint, typos)
 │       └── update-plans.yml     # Daily data updates + historical archival
 ├── data/
 │   ├── plans.json               # Current electricity plans (updated daily)
 │   ├── tdu-rates.json           # TDU delivery charges (updated Mar/Sep)
 │   ├── local-taxes.json         # Texas local tax rates
-│   └── historical/              # Unlimited archive of historical plan snapshots
+│   ├── historical/              # Unlimited archive of historical plan snapshots
+│   └── archive-csv/             # Daily CSV exports of plan data
 ├── docs/                        # Comprehensive technical documentation
 │   ├── api-response-schema.md   # API response formats and data structures
 │   ├── calculation-algorithm.md # Detailed algorithm walkthrough
 │   ├── tdu-service-areas.md     # TDU coverage mapping and rates
 │   └── data-schema-plans.md     # plans.json structure specification
+├── fonts/
+│   ├── san_francisco/           # SF Pro, SF Compact, SF Mono fonts
+│   └── new_york/                # New York serif fonts
 ├── src/
 │   ├── index.html               # Main application
 │   ├── css/
-│   │   └── styles.css           # Professional design system (1,748 lines)
+│   │   ├── fonts.css            # @font-face declarations (SF Pro, SF Mono, New York)
+│   │   └── styles.css           # Professional design system
 │   └── js/
-│       ├── api.js               # Data loading + provider name formatting
-│       ├── calculator.js        # Cost calculation + expiration analysis
+│       ├── modules/             # Modular JavaScript components
+│       │   ├── cache.js         # Cache management with TTL
+│       │   ├── data-loader.js   # Fetch with retry and timeout
+│       │   ├── deduplication.js # Plan fingerprinting and deduplication
+│       │   ├── tax-lookup.js    # ZIP code to tax rate mapping
+│       │   ├── provider-formatter.js  # Provider name cleanup
+│       │   ├── formatters.js    # Currency and rate formatting
+│       │   ├── usage-estimator.js     # Seasonal usage pattern estimation
+│       │   ├── cost-calculator.js     # Monthly/annual cost calculations
+│       │   ├── contract-analyzer.js   # Contract expiration timing analysis
+│       │   ├── etf-calculator.js      # Early termination fee calculations
+│       │   └── plan-ranker.js   # Plan ranking with quality scoring
+│       ├── api.js               # Data loading API facade
+│       ├── calculator.js        # Main calculator facade
 │       └── ui.js                # User interface logic
 ├── scripts/
 │   ├── fetch_plans.py           # Fetch from Power to Choose API
 │   ├── fetch_tdu_rates.py       # TDU rate management
 │   └── generate_sample_data.py  # Sample data generator
+├── biome.json                   # Biome linter configuration
+├── ruff.toml                    # Ruff Python linter configuration
+├── _typos.toml                  # Typos spell checker configuration
 ├── research.md                  # Texas electricity market research
 ├── CONTRACT_EXPIRATION_FEATURE.md  # Contract timing analysis documentation
 ├── pyproject.toml               # Python dependencies

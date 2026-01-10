@@ -11,8 +11,6 @@
     <meta name="author" content="Light Project">
     <title>Light - Texas Electricity Cost Calculator</title>
     <link rel="stylesheet" href="./css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 
 <body>
@@ -78,11 +76,11 @@
                     <div class="step-content">
                         <div class="field-group">
                             <label for="zip-code" class="field-label">Texas ZIP Code</label>
-                            <div class="input-wrapper">
+                            <div class="zip-input-container">
                                 <input type="text" id="zip-code" class="field-input field-input-zip" placeholder="75001"
                                     maxlength="5" pattern="[0-9]{5}" inputmode="numeric" autocomplete="postal-code"
                                     required>
-                                <span class="input-status" id="zip-status"></span>
+                                <div class="zip-status-container" id="zip-status"></div>
                             </div>
                         </div>
                         <div class="tdu-display" id="tdu-display" hidden>
@@ -488,7 +486,20 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-    <!-- Scripts -->
+    <!-- Scripts: Load modules first, then main files -->
+    <!-- Modules -->
+    <script src="./js/modules/formatters.js"></script>
+    <script src="./js/modules/cache.js"></script>
+    <script src="./js/modules/data-loader.js"></script>
+    <script src="./js/modules/provider-formatter.js"></script>
+    <script src="./js/modules/deduplication.js"></script>
+    <script src="./js/modules/tax-lookup.js"></script>
+    <script src="./js/modules/usage-estimator.js"></script>
+    <script src="./js/modules/cost-calculator.js"></script>
+    <script src="./js/modules/contract-analyzer.js"></script>
+    <script src="./js/modules/etf-calculator.js"></script>
+    <script src="./js/modules/plan-ranker.js"></script>
+    <!-- Main application files -->
     <script src="./js/calculator.js"></script>
     <script src="./js/api.js"></script>
     <script src="./js/ui.js"></script>

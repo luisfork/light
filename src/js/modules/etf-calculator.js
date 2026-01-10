@@ -1,0 +1,158 @@
+/**
+ * Light - ETF Calculator Module
+ *
+ * Calculates early termination fees, properly handling
+ * per-month-remaining fee structures.
+ */
+
+const ETFCalculator = {
+  /**
+   * Calculate early termination fee based on remaining contract months
+   *
+   * Properly calculates ETF for contracts with per-month-remaining fees.
+   * Many plans charge $10-$20 per month remaining instead of a flat fee.
+   *
+   * @param {Object} plan - Plan object
+   * @param {number} monthsRemaining - Months remaining in contract
+   * @returns {Object} ETF calculation result with total and structure type
+   */
+  calculateEarlyTerminationFee(plan, monthsRemaining) {
+    // Parse the ETF value - handle various formats
+    let etfValue = 0;
+    let etfStructure = 'flat';
+    let perMonthRate = 0;
+
+    // First check special_terms for per-month patterns
+    if (plan.special_terms) {
+      const terms = plan.special_terms.toLowerCase();
+
+      // Pattern 1: "$X per month remaining" or "$X/month remaining"
+      const perMonthMatch = terms.match(
+        /\$(\d+(?:\.\d{2})?)\s*(?:per|\/)\s*(?:each\s+)?(?:month|mo)(?:nth)?\s*(?:remaining|left)/i
+      );
+      if (perMonthMatch) {
+        perMonthRate = parseFloat(perMonthMatch[1]);
+        etfStructure = 'per-month';
+      }
+
+      // Pattern 2: "$X times remaining months" or "$X x months remaining"
+      if (!perMonthRate) {
+        const timesMatch = terms.match(
+          /\$(\d+(?:\.\d{2})?)\s*(?:times|x|×)\s*(?:remaining\s+)?months/i
+        );
+        if (timesMatch) {
+          perMonthRate = parseFloat(timesMatch[1]);
+          etfStructure = 'per-month';
+        }
+      }
+
+      // Pattern 3: "per remaining month" without explicit dollar amount
+      if (
+        !perMonthRate &&
+        (terms.includes('per remaining month') ||
+          terms.includes('per month remaining') ||
+          terms.includes('each remaining month') ||
+          terms.includes('multiplied by months remaining') ||
+          terms.includes('times months remaining'))
+      ) {
+        // ETF value is the per-month rate
+        if (plan.early_termination_fee && plan.early_termination_fee <= 50) {
+          perMonthRate = plan.early_termination_fee;
+          etfStructure = 'per-month';
+        }
+      }
+    }
+
+    // If we found a per-month pattern, calculate total ETF
+    if (etfStructure === 'per-month' && perMonthRate > 0) {
+      etfValue = perMonthRate * monthsRemaining;
+      return {
+        total: etfValue,
+        structure: 'per-month',
+        perMonthRate: perMonthRate,
+        monthsRemaining: monthsRemaining
+      };
+    }
+
+    // Handle the base ETF value
+    if (!plan.early_termination_fee) {
+      return { total: 0, structure: 'none', perMonthRate: 0, monthsRemaining: monthsRemaining };
+    }
+
+    etfValue = plan.early_termination_fee;
+
+    // Heuristic: If ETF is small ($50 or less) and contract is long (12+ months),
+    // it's likely a per-month fee even if not explicitly stated
+    if (etfValue <= 50 && plan.term_months >= 12) {
+      return {
+        total: etfValue * monthsRemaining,
+        structure: 'per-month-inferred',
+        perMonthRate: etfValue,
+        monthsRemaining: monthsRemaining
+      };
+    }
+
+    // Otherwise, it's a flat fee
+    return {
+      total: etfValue,
+      structure: 'flat',
+      perMonthRate: 0,
+      monthsRemaining: monthsRemaining
+    };
+  },
+
+  /**
+   * Get the display value for early termination fee
+   *
+   * @param {Object} plan - Plan object
+   * @param {number} monthsRemaining - Optional, defaults to contract midpoint
+   * @returns {Object} Display information for ETF
+   */
+  getETFDisplayInfo(plan, monthsRemaining = null) {
+    if (monthsRemaining === null) {
+      monthsRemaining = Math.floor((plan.term_months || 12) / 2);
+    }
+
+    const result = this.calculateEarlyTerminationFee(plan, monthsRemaining);
+
+    // Create display string
+    let displayText;
+    if (result.structure === 'none') {
+      displayText = 'None';
+    } else if (result.structure === 'flat') {
+      displayText = this.formatCurrency(result.total);
+    } else {
+      // Per-month structure
+      displayText = `$${result.perMonthRate}/mo remaining`;
+    }
+
+    return {
+      ...result,
+      displayText: displayText,
+      exampleTotal: result.total,
+      exampleMonths: monthsRemaining
+    };
+  },
+
+  /**
+   * Simple currency formatter
+   *
+   * @param {number} amount - Dollar amount
+   * @returns {string} Formatted string
+   */
+  formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  }
+};
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ETFCalculator;
+}
+
+// Also export individual functions for backwards compatibility
+const calculateEarlyTerminationFee = ETFCalculator.calculateEarlyTerminationFee.bind(ETFCalculator);
+const getETFDisplayInfo = ETFCalculator.getETFDisplayInfo.bind(ETFCalculator);

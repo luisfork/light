@@ -7,9 +7,14 @@
 
 const API = {
     /**
-     * Base path for data files (relative to site root)
+     * Base path for data files
+     * Dynamically determined based on current location:
+     * - Local dev from repo root: /data
+     * - Deployed site: ./data
      */
-    basePath: './data',
+    basePath: window.location.pathname.includes('/src/')
+        ? '../data'
+        : './data',
 
     /**
      * Cache configuration
