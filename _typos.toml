@@ -1,6 +1,6 @@
 [files]
 # Ignore lock files
-extend-exclude = ["*.lock", "*.json", ".venv/", "node_modules/"]
+extend-exclude = ["*.lock", "*.json", ".venv/", "node_modules/", "data/"]
 
 [default]
 # Don't check binary files
