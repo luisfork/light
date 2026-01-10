@@ -65,10 +65,11 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet data/plans.json; then
-            echo "changes=false" >> $GITHUB_OUTPUT
-          else
+          # Check for changes in data directory (JSON or CSV)
+          if [ -n "$(git status --porcelain data/)" ]; then
             echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Verify historical data directory
@@ -83,6 +84,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add data/plans.json data/historical/ data/archive-csv/
           git commit -m "Update electricity plans data - $(date +'%Y-%m-%d')"
+          git pull --rebase --autostash
           git push
 
       - name: Create summary
