@@ -292,10 +292,11 @@ light/
 │   ├── calculation-algorithm.md # Detailed algorithm walkthrough
 │   ├── tdu-service-areas.md     # TDU coverage mapping and rates
 │   └── data-schema-plans.md     # plans.json structure specification
-├── fonts/
-│   ├── san_francisco/           # SF Pro, SF Compact, SF Mono fonts
-│   └── new_york/                # New York serif fonts
 ├── src/
+│   ├── assets/
+│   │   └── fonts/
+│   │       ├── san_francisco/   # SF Pro, SF Compact, SF Mono fonts
+│   │       └── new_york/        # New York serif fonts
 │   ├── index.html               # Main application
 │   ├── css/
 │   │   ├── fonts.css            # @font-face declarations (SF Pro, SF Mono, New York)
@@ -529,7 +530,7 @@ Unlike competitors, Light maintains 90-day historical archive:
 - **NO bento grids**: Clear, hierarchical layout
 - **NO shadcn/ui aesthetic**: Custom Apple-inspired design system
 - **Sophisticated neutral palette**: Ink grays, ambient light effects
-- **Typography-focused**: System fonts, clear hierarchy
+- **Typography-focused**: San Francisco & New York fonts, clear hierarchy
 - **Functional depth**: Rich calculations, transparent methodology
 
 ### Performance
