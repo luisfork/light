@@ -715,23 +715,59 @@ const UI = {
   displayTopPlans(plans) {
     if (!this.elements.topPlans) return;
 
+    // Get total plans count for ranking context
+    const totalPlans = this.state.rankedPlans?.length || plans.length;
+    const bestPlan = plans[0];
+
     this.elements.topPlans.innerHTML = plans
       .map((plan, i) => {
         const grade =
           typeof getQualityGrade === 'function'
             ? getQualityGrade(plan.qualityScore || 0)
-            : { letter: '-', description: 'N/A', class: 'grade-na' };
+            : { letter: '-', description: 'N/A', class: 'grade-na', tooltip: '', shortDesc: '' };
+
+        // Get score explanation for tooltip
+        const scoreExplanation =
+          typeof getScoreExplanation === 'function' && plan.scoreBreakdown
+            ? getScoreExplanation(plan)
+            : `Quality score: ${plan.qualityScore || 0}/100`;
+
+        // Get rank description
+        const rankDesc =
+          typeof getRankDescription === 'function'
+            ? getRankDescription(i + 1, totalPlans)
+            : { label: `Rank ${i + 1}`, description: '' };
+
+        // Calculate savings vs worst plan in top 5
+        const savingsVsLast =
+          i === 0 && plans.length > 1
+            ? plans[plans.length - 1].annualCost - plan.annualCost
+            : null;
+
+        // Calculate difference from #1
+        const diffFromBest = i > 0 ? plan.annualCost - bestPlan.annualCost : 0;
 
         const isNonFixed = plan.rate_type !== 'FIXED';
         const nonFixedClass = isNonFixed ? 'plan-non-fixed' : '';
         const termMonths = plan.term_months || 12;
         const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
+        // Determine rank badge style
+        const rankBadgeClass =
+          i === 0 ? 'rank-badge-first' : i <= 2 ? 'rank-badge-top3' : 'rank-badge-top5';
+
         return `
             <div class="plan-item ${nonFixedClass}">
                 <div class="plan-item-rank">
-                    <span>Rank #${i + 1}</span>
-                    <span class="plan-item-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="${grade.description} grade (${plan.qualityScore || 0} out of 100)">${grade.letter}</span>
+                    <div class="rank-info">
+                        <span class="rank-badge ${rankBadgeClass}">${rankDesc.label}</span>
+                        ${i === 0 && savingsVsLast ? `<span class="rank-savings">Save up to ${formatCurrency(savingsVsLast)}/yr</span>` : ''}
+                        ${diffFromBest > 0 ? `<span class="rank-diff">+${formatCurrency(diffFromBest)}/yr vs #1</span>` : ''}
+                    </div>
+                    <div class="grade-info" title="${scoreExplanation}">
+                        <span class="plan-item-grade ${grade.class}" aria-label="${grade.description} grade (${plan.qualityScore || 0} out of 100)">${grade.letter}</span>
+                        <span class="grade-desc">${grade.shortDesc || grade.description}</span>
+                    </div>
                 </div>
                 ${
                   isNonFixed
@@ -757,27 +793,32 @@ const UI = {
                     </div>
                 </div>
                 <div class="plan-item-details">
-                    <span class="plan-detail-item">
+                    <span class="plan-detail-item" title="Quality score considers cost efficiency, rate stability, fees, and risk factors">
                         <span class="plan-detail-label">Quality:</span>
-                        <span class="plan-detail-value">${plan.qualityScore || 0}/100</span>
+                        <span class="plan-detail-value quality-score-${this.getQualityTier(plan.qualityScore)}">${plan.qualityScore || 0}/100</span>
                     </span>
-                    <span class="plan-detail-item">
+                    <span class="plan-detail-item" title="Contract duration - longer terms may offer lower rates but less flexibility">
                         <span class="plan-detail-label">Term:</span>
                         <span class="plan-detail-value">${plan.term_months} mo</span>
                     </span>
-                    <span class="plan-detail-item">
-                        <span class="plan-detail-label">Rate:</span>
+                    <span class="plan-detail-item" title="Your effective rate based on your usage pattern">
+                        <span class="plan-detail-label">Effective Rate:</span>
                         <span class="plan-detail-value">${formatRate(plan.effectiveRate)}</span>
                     </span>
-                    <span class="plan-detail-item">
+                    <span class="plan-detail-item" title="Percentage of electricity from renewable sources">
                         <span class="plan-detail-label">Renewable:</span>
-                        <span class="plan-detail-value">${plan.renewable_pct || 0}%</span>
+                        <span class="plan-detail-value ${(plan.renewable_pct || 0) >= 100 ? 'renewable-100' : ''}">${plan.renewable_pct || 0}%</span>
                     </span>
-                    <span class="plan-detail-item">
+                    <span class="plan-detail-item" title="Early termination fee if you cancel before contract ends">
                         <span class="plan-detail-label">Cancel Fee:</span>
                         <span class="plan-detail-value">${this.formatETF(plan)}</span>
                     </span>
                 </div>
+                ${plan.warnings && plan.warnings.length > 0 && !isNonFixed ? `
+                <div class="plan-item-warnings">
+                    <span class="warnings-label">Note:</span>
+                    <span class="warnings-text">${plan.warnings.length} consideration${plan.warnings.length > 1 ? 's' : ''} - view details</span>
+                </div>` : ''}
                 <div class="plan-item-actions">
                     <button class="btn-plan-action btn-plan-details" onclick="UI.showPlanModal('${plan.plan_id}')">View Details</button>
                     ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-plan-action btn-plan-efl">View EFL</a>` : ''}
@@ -786,6 +827,15 @@ const UI = {
             `;
       })
       .join('');
+  },
+
+  /**
+   * Get quality tier for styling (high, medium, low)
+   */
+  getQualityTier(score) {
+    if (score >= 80) return 'high';
+    if (score >= 60) return 'medium';
+    return 'low';
   },
 
   displayWarningPlans(plans) {
@@ -823,25 +873,40 @@ const UI = {
   displayComparisonTable(plans) {
     if (!this.elements.comparisonBody) return;
 
+    // Calculate best values for highlighting
+    const bestValues = this.calculateBestValues(plans);
+
     this.elements.comparisonBody.innerHTML = plans
       .map((plan, i) => {
         const grade =
           typeof getQualityGrade === 'function'
             ? getQualityGrade(plan.qualityScore || 0)
-            : { letter: '-', description: 'N/A', class: 'grade-na' };
+            : { letter: '-', description: 'N/A', class: 'grade-na', tooltip: '' };
+
+        // Get score explanation for tooltip
+        const scoreExplanation =
+          typeof getScoreExplanation === 'function' && plan.scoreBreakdown
+            ? getScoreExplanation(plan)
+            : `Quality score: ${plan.qualityScore || 0}/100`;
 
         const isNonFixed = plan.rate_type !== 'FIXED';
         const rowClass = plan.isGimmick ? 'row-caution' : isNonFixed ? 'plan-non-fixed' : '';
         const termMonths = plan.term_months || 12;
         const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
+        // Check if this plan has best values
+        const isBestCost = plan.annualCost === bestValues.lowestCost;
+        const isBestRate = plan.effectiveRate === bestValues.lowestRate;
+        const isBestQuality = plan.qualityScore === bestValues.highestQuality;
+        const isLowestFee = plan.early_termination_fee === bestValues.lowestFee;
+
         return `
-            <tr class="${rowClass}">
+            <tr class="${rowClass}" data-plan-id="${plan.plan_id}">
                 <td class="col-grade">
-                    <span class="quality-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="Quality grade ${grade.letter}: ${grade.description} (${plan.qualityScore || 0} out of 100)">
+                    <span class="quality-grade ${grade.class}" title="${scoreExplanation}" aria-label="Quality grade ${grade.letter}: ${grade.description} (${plan.qualityScore || 0} out of 100)">
                         ${grade.letter}
                     </span>
-                    <span class="quality-score">${plan.qualityScore || 0}</span>
+                    <span class="quality-score ${isBestQuality ? 'best-value' : ''}">${plan.qualityScore || 0}</span>
                 </td>
                 <td>
                     <div class="provider-cell">
@@ -858,15 +923,16 @@ const UI = {
                 </td>
                 <td><span class="term-badge">${plan.term_months} mo</span></td>
                 <td class="col-annual">
-                    <span class="cost-value">${formatCurrency(plan.annualCost)}</span>
+                    <span class="cost-value ${isBestCost ? 'best-value' : ''}">${formatCurrency(plan.annualCost)}</span>
+                    ${isBestCost ? '<span class="best-indicator">Lowest</span>' : ''}
                     ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)}/${termMonths}mo</span>` : ''}
                 </td>
                 <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
-                <td class="col-rate"><span class="rate-value">${formatRate(plan.effectiveRate)}</span></td>
+                <td class="col-rate"><span class="rate-value ${isBestRate ? 'best-value' : ''}">${formatRate(plan.effectiveRate)}</span></td>
                 <td class="col-renewable">
                     ${(plan.renewable_pct || 0) >= 100 ? '<span class="renewable-100">100%</span>' : `${plan.renewable_pct || 0}%`}
                 </td>
-                <td class="col-etf">${this.formatETF(plan)}</td>
+                <td class="col-etf ${isLowestFee ? 'best-value' : ''}">${this.formatETF(plan)}</td>
                 <td><button class="btn-view" onclick="UI.showPlanModal('${plan.plan_id}')">View</button></td>
             </tr>
             `;
@@ -875,6 +941,27 @@ const UI = {
 
     // Add click handlers for sortable column headers
     this.attachTableSortHandlers();
+  },
+
+  /**
+   * Calculate best values across all plans for highlighting
+   */
+  calculateBestValues(plans) {
+    if (!plans || plans.length === 0) {
+      return {
+        lowestCost: 0,
+        lowestRate: 0,
+        highestQuality: 0,
+        lowestFee: 0
+      };
+    }
+
+    return {
+      lowestCost: Math.min(...plans.map((p) => p.annualCost || Infinity)),
+      lowestRate: Math.min(...plans.map((p) => p.effectiveRate || Infinity)),
+      highestQuality: Math.max(...plans.map((p) => p.qualityScore || 0)),
+      lowestFee: Math.min(...plans.map((p) => p.early_termination_fee || 0))
+    };
   },
 
   // Current sort state

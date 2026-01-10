@@ -6,9 +6,41 @@
  *
  * IMPORTANT: Now includes non-fixed-rate plans (Variable, Indexed)
  * with significant penalties and clear warnings.
+ *
+ * Quality Scoring System:
+ * - Base score: 100 points
+ * - Automatic F (0): Non-fixed rates, prepaid, time-of-use
+ * - Cost penalty: Up to -40 points (expensive vs best)
+ * - Volatility penalty: Up to -25 points (unpredictable costs)
+ * - Warning penalty: -5 per warning, max -25 points
+ * - Base charge penalty: Up to -5 points (high monthly fees)
+ * - Rate consistency bonus: Up to +5 points (stable pricing)
+ * - Renewable bonus: Up to +3 points (100% renewable)
+ * - Contract flexibility: Up to +2 points (shorter terms)
  */
 
 const PlanRanker = {
+  /**
+   * Scoring weight configuration
+   */
+  SCORING_WEIGHTS: {
+    costEfficiency: 0.85, // 85% weight on cost
+    quality: 0.15 // 15% weight on quality
+  },
+
+  /**
+   * Quality score breakdown categories
+   */
+  QUALITY_FACTORS: {
+    costPenalty: { max: 40, label: 'Cost Efficiency' },
+    volatilityPenalty: { max: 25, label: 'Price Stability' },
+    warningPenalty: { max: 25, perItem: 5, label: 'Risk Factors' },
+    baseChargePenalty: { max: 5, threshold: 15, label: 'Fee Structure' },
+    rateConsistencyBonus: { max: 5, label: 'Rate Consistency' },
+    renewableBonus: { max: 3, label: 'Renewable Energy' },
+    flexibilityBonus: { max: 2, label: 'Contract Flexibility' }
+  },
+
   /**
    * Rank plans by combined weighted score (85% cost + 15% quality)
    *
@@ -135,47 +167,70 @@ const PlanRanker = {
    * @returns {number} Quality score (0-100)
    */
   calculateQualityScore(plan, bestAnnualCost, options = {}) {
+    // Initialize score breakdown for transparency
+    const breakdown = {
+      baseScore: 100,
+      costPenalty: 0,
+      volatilityPenalty: 0,
+      warningPenalty: 0,
+      baseChargePenalty: 0,
+      rateConsistencyBonus: 0,
+      renewableBonus: 0,
+      flexibilityBonus: 0,
+      automaticF: false,
+      automaticFReason: null
+    };
+
     // Automatic F (0) for problematic plan types
     // These plan types are considered unsuitable for most consumers
     if (plan.rate_type !== 'FIXED') {
-      return 0; // Non-fixed rate plans (VARIABLE, INDEXED) get automatic F
+      breakdown.automaticF = true;
+      breakdown.automaticFReason = `${plan.rate_type} rate - price can change unpredictably`;
+      plan.scoreBreakdown = breakdown;
+      return 0;
     }
     if (plan.is_prepaid) {
-      return 0; // Prepaid plans get automatic F
+      breakdown.automaticF = true;
+      breakdown.automaticFReason = 'Prepaid plan - requires upfront payment and credit monitoring';
+      plan.scoreBreakdown = breakdown;
+      return 0;
     }
     if (plan.is_tou) {
-      return 0; // Time of Use plans get automatic F
+      breakdown.automaticF = true;
+      breakdown.automaticFReason = 'Time-of-use plan - rates vary by time of day';
+      plan.scoreBreakdown = breakdown;
+      return 0;
     }
 
     let score = 100;
 
     // Penalty 1: Cost penalty (0-40 points)
     // Plans more expensive than the best lose up to 40 points
-    if (plan.annualCost > bestAnnualCost) {
+    if (plan.annualCost > bestAnnualCost && bestAnnualCost > 0) {
       const costDiffPercent = (plan.annualCost - bestAnnualCost) / bestAnnualCost;
-      const costPenalty = Math.min(40, costDiffPercent * 100);
-      score -= costPenalty;
+      breakdown.costPenalty = Math.min(40, Math.round(costDiffPercent * 100));
+      score -= breakdown.costPenalty;
     }
 
     // Penalty 2: Volatility penalty (0-25 points)
     // High volatility plans lose up to 25 points
-    const volatilityPenalty = plan.volatility * 25;
-    score -= volatilityPenalty;
+    breakdown.volatilityPenalty = Math.round(plan.volatility * 25);
+    score -= breakdown.volatilityPenalty;
 
     // Penalty 3: Warning penalty (5 points per warning, max 25)
     // Don't double-count the non-fixed warning
-    const nonFixedWarnings = plan.isNonFixed ? plan.warnings.length - 1 : plan.warnings.length;
-    const warningPenalty = Math.min(25, nonFixedWarnings * 5);
-    score -= warningPenalty;
+    const warningCount = plan.isNonFixed ? plan.warnings.length - 1 : plan.warnings.length;
+    breakdown.warningPenalty = Math.min(25, warningCount * 5);
+    score -= breakdown.warningPenalty;
 
     // Penalty 4: High base charge penalty (0-5 points)
     // Base charges over $15/month are penalized
     if (plan.base_charge_monthly > 15) {
-      const baseChargePenalty = Math.min(5, (plan.base_charge_monthly - 15) / 3);
-      score -= baseChargePenalty;
+      breakdown.baseChargePenalty = Math.min(5, Math.round((plan.base_charge_monthly - 15) / 3));
+      score -= breakdown.baseChargePenalty;
     }
 
-    // Bonus: Low rate variance bonus (0-5 points)
+    // Bonus 1: Low rate variance bonus (0-5 points)
     // Plans with consistent rates across usage levels get bonus
     const rate500 = plan.price_kwh_500;
     const rate1000 = plan.price_kwh_1000;
@@ -185,15 +240,79 @@ const PlanRanker = {
       Math.abs(rate2000 - rate1000) / rate1000
     );
     if (maxVariance < 0.1) {
-      // Less than 10% variance
-      score += 5;
+      breakdown.rateConsistencyBonus = 5;
     } else if (maxVariance < 0.2) {
-      // Less than 20% variance
-      score += 2;
+      breakdown.rateConsistencyBonus = 2;
     }
+    score += breakdown.rateConsistencyBonus;
+
+    // Bonus 2: Renewable energy bonus (0-3 points)
+    // 100% renewable plans get full bonus
+    if (plan.renewable_pct >= 100) {
+      breakdown.renewableBonus = 3;
+    } else if (plan.renewable_pct >= 50) {
+      breakdown.renewableBonus = 1;
+    }
+    score += breakdown.renewableBonus;
+
+    // Bonus 3: Contract flexibility bonus (0-2 points)
+    // Shorter contracts offer more flexibility
+    if (plan.term_months && plan.term_months <= 6) {
+      breakdown.flexibilityBonus = 2;
+    } else if (plan.term_months && plan.term_months <= 12) {
+      breakdown.flexibilityBonus = 1;
+    }
+    score += breakdown.flexibilityBonus;
+
+    // Store breakdown on plan for UI display
+    plan.scoreBreakdown = breakdown;
 
     // Ensure score stays in 0-100 range
     return Math.max(0, Math.min(100, Math.round(score)));
+  },
+
+  /**
+   * Generate human-readable score explanation
+   *
+   * @param {Object} plan - Plan with scoreBreakdown
+   * @returns {string} Formatted explanation of the score
+   */
+  getScoreExplanation(plan) {
+    if (!plan.scoreBreakdown) {
+      return 'Score details unavailable';
+    }
+
+    const b = plan.scoreBreakdown;
+
+    if (b.automaticF) {
+      return `Automatic F grade: ${b.automaticFReason}`;
+    }
+
+    const parts = [`Base: ${b.baseScore}`];
+
+    if (b.costPenalty > 0) {
+      parts.push(`Cost: -${b.costPenalty}`);
+    }
+    if (b.volatilityPenalty > 0) {
+      parts.push(`Volatility: -${b.volatilityPenalty}`);
+    }
+    if (b.warningPenalty > 0) {
+      parts.push(`Warnings: -${b.warningPenalty}`);
+    }
+    if (b.baseChargePenalty > 0) {
+      parts.push(`Base fee: -${b.baseChargePenalty}`);
+    }
+    if (b.rateConsistencyBonus > 0) {
+      parts.push(`Consistent rates: +${b.rateConsistencyBonus}`);
+    }
+    if (b.renewableBonus > 0) {
+      parts.push(`Renewable: +${b.renewableBonus}`);
+    }
+    if (b.flexibilityBonus > 0) {
+      parts.push(`Flexibility: +${b.flexibilityBonus}`);
+    }
+
+    return parts.join(' | ');
   },
 
   /**
@@ -461,41 +580,121 @@ const PlanRanker = {
   },
 
   /**
-   * Convert quality score to letter grade
+   * Convert quality score to letter grade with detailed descriptions
    *
    * @param {number} score - Quality score (0-100)
-   * @returns {Object} Grade object with letter and description
+   * @returns {Object} Grade object with letter, description, class, and tooltip
    */
   getQualityGrade(score) {
     if (score >= 90) {
       return {
         letter: 'A',
         description: 'Excellent',
+        shortDesc: 'Highly recommended',
+        tooltip: 'Top-tier plan with competitive pricing, stable rates, and minimal risk factors.',
         class: 'grade-a'
       };
     } else if (score >= 80) {
       return {
         letter: 'B',
         description: 'Good',
+        shortDesc: 'Solid choice',
+        tooltip: 'Good overall value with reasonable pricing and acceptable risk level.',
         class: 'grade-b'
       };
     } else if (score >= 70) {
       return {
         letter: 'C',
         description: 'Acceptable',
+        shortDesc: 'Consider carefully',
+        tooltip: 'Moderate value with some concerns. Review details before enrolling.',
         class: 'grade-c'
       };
     } else if (score >= 60) {
       return {
         letter: 'D',
         description: 'Caution',
+        shortDesc: 'Significant concerns',
+        tooltip: 'Below-average value with notable drawbacks. Compare with better options.',
         class: 'grade-d'
       };
     } else {
       return {
         letter: 'F',
         description: 'Avoid',
+        shortDesc: 'Not recommended',
+        tooltip: 'High risk or poor value. Variable rates, prepaid, or time-of-use plans fall here.',
         class: 'grade-f'
+      };
+    }
+  },
+
+  /**
+   * Get comparison summary between two plans
+   *
+   * @param {Object} planA - First plan to compare
+   * @param {Object} planB - Second plan to compare
+   * @returns {Object} Comparison summary with savings and differences
+   */
+  comparePlans(planA, planB) {
+    const annualSavings = planB.annualCost - planA.annualCost;
+    const monthlySavings = annualSavings / 12;
+    const percentSavings = (annualSavings / planB.annualCost) * 100;
+
+    return {
+      annualSavings: annualSavings,
+      monthlySavings: monthlySavings,
+      percentSavings: percentSavings,
+      betterQuality: planA.qualityScore > planB.qualityScore,
+      qualityDiff: planA.qualityScore - planB.qualityScore,
+      summary:
+        annualSavings > 0
+          ? `Saves $${Math.abs(annualSavings).toFixed(0)}/year vs this plan`
+          : annualSavings < 0
+            ? `Costs $${Math.abs(annualSavings).toFixed(0)}/year more`
+            : 'Same annual cost'
+    };
+  },
+
+  /**
+   * Get ranking position description
+   *
+   * @param {number} rank - Plan rank (1-based)
+   * @param {number} totalPlans - Total number of plans
+   * @returns {Object} Ranking description
+   */
+  getRankDescription(rank, totalPlans) {
+    const percentile = ((totalPlans - rank + 1) / totalPlans) * 100;
+
+    if (rank === 1) {
+      return {
+        label: 'Best Value',
+        description: 'Lowest cost plan for your usage',
+        percentile: 100
+      };
+    } else if (rank <= 3) {
+      return {
+        label: 'Top 3',
+        description: 'Among the best options available',
+        percentile: Math.round(percentile)
+      };
+    } else if (rank <= 5) {
+      return {
+        label: 'Top 5',
+        description: 'Competitive pricing',
+        percentile: Math.round(percentile)
+      };
+    } else if (percentile >= 75) {
+      return {
+        label: `Top ${100 - Math.round(percentile)}%`,
+        description: 'Above average value',
+        percentile: Math.round(percentile)
+      };
+    } else {
+      return {
+        label: `Rank ${rank}`,
+        description: 'Other options may offer better value',
+        percentile: Math.round(percentile)
       };
     }
   }
@@ -509,3 +708,6 @@ if (typeof module !== 'undefined' && module.exports) {
 // Also export individual functions for backwards compatibility
 const rankPlans = PlanRanker.rankPlans.bind(PlanRanker);
 const getQualityGrade = PlanRanker.getQualityGrade.bind(PlanRanker);
+const getScoreExplanation = PlanRanker.getScoreExplanation.bind(PlanRanker);
+const comparePlans = PlanRanker.comparePlans.bind(PlanRanker);
+const getRankDescription = PlanRanker.getRankDescription.bind(PlanRanker);

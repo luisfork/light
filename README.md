@@ -40,7 +40,9 @@ Light calculates true costs by:
 - **Provider Name Formatting**: All provider names displayed in clean, professional uppercase format
 - **ETF Calculation**: Properly handles per-month-remaining early termination fees
 - **Duplicate Plan Detection**: Automatically removes duplicate English/Spanish versions of same plan
-- **Quality Scoring System**: 0-100 scoring system with penalties for bad plan features
+- **Enhanced Quality Scoring System**: 0-100 scoring with penalties and bonuses for plan features, transparent score breakdowns on hover
+- **Best Value Indicators**: Visual highlighting of lowest cost, best rate, and highest quality plans in comparison table
+- **Interactive Grade Legend**: Expanded grade guide with descriptions explaining what each grade means
 - **Clean, Professional UI**: Beautiful design, mobile-first, accessible, NO emojis, NO bento grids
 - **100% Free & Unbiased**: No commissions, no ads, no hidden costs
 
@@ -461,7 +463,7 @@ calculateETF(plan, monthsRemaining):
     return baseFee
 ```
 
-### 3. Weighted Ranking System
+### 3. Enhanced Quality Scoring System
 
 Plans are ranked by a combined score: **85% cost efficiency + 15% quality factors**.
 
@@ -475,30 +477,49 @@ calculateCombinedScore(plan, bestCost, worstCost):
 
   // Combined: 85% cost, 15% quality
   return (costScore * 0.85) + (qualityScore * 0.15)
-
-calculateQualityScore(plan):
-  // Automatic F (0) for problematic plan types
-  if (plan.rate_type !== 'FIXED') return 0       // Non-fixed rate (VARIABLE, INDEXED)
-  if (plan.is_prepaid) return 0                   // Prepaid plans
-  if (plan.is_tou) return 0                       // Time of Use plans
-
-  score = 100
-  // Penalties: volatility, warnings, high base charge
-  // Bonuses: low rate variance
-  return clamp(score, 0, 100)
 ```
+
+**Quality Score Components:**
+
+The quality score (0-100) is calculated from multiple factors:
+
+| Factor | Max Impact | Description |
+|--------|-----------|-------------|
+| Base Score | 100 | Starting point for all fixed-rate plans |
+| Cost Penalty | -40 | Deducted for plans more expensive than best |
+| Volatility Penalty | -25 | Deducted for unpredictable costs |
+| Warning Penalty | -25 | Deducted for risk factors (5 per warning) |
+| Base Charge Penalty | -5 | Deducted for high monthly fees (>$15) |
+| Rate Consistency Bonus | +5 | Added for stable pricing across usage levels |
+| Renewable Bonus | +3 | Added for 100% renewable energy |
+| Flexibility Bonus | +2 | Added for shorter contract terms |
+
+**Automatic F Grade (Score = 0):**
+
+- Non-fixed rate plans (VARIABLE, INDEXED): Price can change unpredictably
+- Prepaid plans: Require upfront payment and credit monitoring
+- Time-of-use plans: Rates vary by time of day, impractical for most users
 
 **Quality Grades:**
 
-- 90-100: A (Excellent - highly recommended)
-- 80-89: B (Good - solid choice)
-- 70-79: C (Acceptable - minor issues)
-- 60-69: D (Caution - significant drawbacks)
-- 0-59: F (Avoid - high cost or high risk)
+| Score | Grade | Description | Meaning |
+|-------|-------|-------------|---------|
+| 90-100 | A | Excellent | Top-tier plan with competitive pricing, stable rates |
+| 80-89 | B | Good | Good overall value with reasonable pricing |
+| 70-79 | C | Acceptable | Moderate value; review details carefully |
+| 60-69 | D | Caution | Below-average with notable drawbacks |
+| 0-59 | F | Avoid | High risk or variable rates |
+
+**Score Transparency:** Hover over any quality grade to see a detailed breakdown of how the score was calculated (e.g., "Base: 100 | Cost: -5 | Consistent rates: +5").
 
 **Warning Badges:** Plans with non-fixed rates, prepaid requirements, or time-of-use restrictions display warning badges (VARIABLE, PREPAID, TIME OF USE) and automatically receive an F grade.
 
-**Table Sorting:** Click any column header to sort (Grade, Provider, Plan Name, Term, Annual Cost, Monthly Avg, Effective Rate, Renewable, Cancel Fee).
+**Table Features:**
+
+- Click any column header to sort (Grade, Provider, Plan, Term, Cost, Rate, etc.)
+- Best values highlighted in green (lowest cost, lowest rate, best quality)
+- "Lowest" indicator badge on the most affordable plan
+- Tooltips on column headers explaining each metric
 
 ### 4. Duplicate Plan Detection
 
