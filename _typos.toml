@@ -30,3 +30,5 @@ ETF = "ETF"
 etf = "etf"
 EFL = "EFL"
 efl = "efl"
+# Partial regex patterns
+terminat = "terminat"  # Used in regex to match termination/terminate
