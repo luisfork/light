@@ -477,8 +477,13 @@ calculateCombinedScore(plan, bestCost, worstCost):
   return (costScore * 0.85) + (qualityScore * 0.15)
 
 calculateQualityScore(plan):
+  // Automatic F (0) for problematic plan types
+  if (plan.rate_type !== 'FIXED') return 0       // Non-fixed rate (VARIABLE, INDEXED)
+  if (plan.is_prepaid) return 0                   // Prepaid plans
+  if (plan.is_tou) return 0                       // Time of Use plans
+
   score = 100
-  // Penalties: volatility, warnings, high base charge, prepaid
+  // Penalties: volatility, warnings, high base charge
   // Bonuses: low rate variance
   return clamp(score, 0, 100)
 ```
@@ -491,7 +496,9 @@ calculateQualityScore(plan):
 - 60-69: D (Caution - significant drawbacks)
 - 0-59: F (Avoid - high cost or high risk)
 
-**Table Sorting:** Click column headers (Grade, Term, Annual Cost, Effective Rate) to sort.
+**Warning Badges:** Plans with non-fixed rates, prepaid requirements, or time-of-use restrictions display warning badges (VARIABLE, PREPAID, TIME OF USE) and automatically receive an F grade.
+
+**Table Sorting:** Click any column header to sort (Grade, Provider, Plan Name, Term, Annual Cost, Monthly Avg, Effective Rate, Renewable, Cancel Fee).
 
 ### 4. Duplicate Plan Detection
 

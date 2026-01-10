@@ -28,7 +28,7 @@ const ETFCalculator = {
 
       // Pattern 1: "$X per month remaining" or "$X/month remaining"
       const perMonthMatch = terms.match(
-        /\$(\d+(?:\.\d{2})?)\s*(?:per|\/)\s*(?:each\s+)?(?:month|mo)(?:nth)?\s*(?:remaining|left)/i
+        /\$(\d+(?:\.\d{2})?)\s*(?:per|\/)\s*(?:each\s+)?(?:month|mo)(?:nth)?\s*(?:remaining|left|of\s+(?:the\s+)?(?:contract|term))/i
       );
       if (perMonthMatch) {
         perMonthRate = parseFloat(perMonthMatch[1]);
@@ -38,7 +38,7 @@ const ETFCalculator = {
       // Pattern 2: "$X times remaining months" or "$X x months remaining"
       if (!perMonthRate) {
         const timesMatch = terms.match(
-          /\$(\d+(?:\.\d{2})?)\s*(?:times|x|×)\s*(?:remaining\s+)?months/i
+          /\$(\d+(?:\.\d{2})?)\s*(?:times|x|×|\*)\s*(?:the\s+)?(?:number\s+of\s+)?(?:remaining\s+)?months?\s*(?:remaining|left|in\s+(?:the\s+)?(?:contract|term))?/i
         );
         if (timesMatch) {
           perMonthRate = parseFloat(timesMatch[1]);
@@ -46,7 +46,22 @@ const ETFCalculator = {
         }
       }
 
-      // Pattern 3: "per remaining month" without explicit dollar amount
+      // Pattern 3: "months remaining" followed by "$X" or "$X" followed by "months remaining"
+      if (!perMonthRate) {
+        const monthsFirstMatch = terms.match(
+          /(?:months?\s+(?:remaining|left)).*?\$(\d+(?:\.\d{2})?)|(?:\$(\d+(?:\.\d{2})?)).*?(?:months?\s+(?:remaining|left))/i
+        );
+        if (monthsFirstMatch) {
+          const rate = parseFloat(monthsFirstMatch[1] || monthsFirstMatch[2]);
+          // Only treat as per-month if the value is reasonably small (≤$50)
+          if (rate <= 50) {
+            perMonthRate = rate;
+            etfStructure = 'per-month';
+          }
+        }
+      }
+
+      // Pattern 4: "per remaining month" without explicit dollar amount
       if (
         !perMonthRate &&
         (terms.includes('per remaining month') ||

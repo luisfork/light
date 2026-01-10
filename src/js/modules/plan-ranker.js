@@ -135,13 +135,19 @@ const PlanRanker = {
    * @returns {number} Quality score (0-100)
    */
   calculateQualityScore(plan, bestAnnualCost, options = {}) {
-    let score = 100;
-
-    // MAJOR PENALTY: Non-fixed rate plans (25 points)
-    // This results in D/F grades for most non-fixed plans
+    // Automatic F (0) for problematic plan types
+    // These plan types are considered unsuitable for most consumers
     if (plan.rate_type !== 'FIXED') {
-      score -= 25;
+      return 0; // Non-fixed rate plans (VARIABLE, INDEXED) get automatic F
     }
+    if (plan.is_prepaid) {
+      return 0; // Prepaid plans get automatic F
+    }
+    if (plan.is_tou) {
+      return 0; // Time of Use plans get automatic F
+    }
+
+    let score = 100;
 
     // Penalty 1: Cost penalty (0-40 points)
     // Plans more expensive than the best lose up to 40 points
@@ -167,12 +173,6 @@ const PlanRanker = {
     if (plan.base_charge_monthly > 15) {
       const baseChargePenalty = Math.min(5, (plan.base_charge_monthly - 15) / 3);
       score -= baseChargePenalty;
-    }
-
-    // Penalty 5: Prepaid penalty (10 points)
-    // Prepaid plans are less convenient for most users
-    if (plan.is_prepaid) {
-      score -= 10;
     }
 
     // Bonus: Low rate variance bonus (0-5 points)
