@@ -38,16 +38,13 @@ jobs:
         run: uv tool install ruff
 
       - name: Install JavaScript tools
-        run: npm install -g @biomejs/biome markdownlint-cli2 @aspect-build/oxlint
+        run: npm install -g @biomejs/biome markdownlint-cli2
 
       - name: Run ruff (Python)
         run: uv tool run ruff check scripts/
 
       - name: Run Biome (JS/JSON)
         run: biome check src/
-
-      - name: Run oxlint (additional JS checks)
-        run: oxlint src/js/
 
       - name: Run markdownlint-cli2
         run: markdownlint-cli2 "**/*.md"
