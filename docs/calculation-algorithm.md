@@ -971,6 +971,18 @@ Where:
 
 ```javascript
 function calculateQualityScore(plan, volatility, warnings, bestAnnualCost) {
+    // Automatic F (0) for problematic plan types
+    // These plan types are considered unsuitable for most consumers
+    if (plan.rate_type !== 'FIXED') {
+        return 0; // Non-fixed rate plans (VARIABLE, INDEXED) get automatic F
+    }
+    if (plan.is_prepaid) {
+        return 0; // Prepaid plans get automatic F
+    }
+    if (plan.is_tou) {
+        return 0; // Time of Use plans get automatic F
+    }
+
     // Cost penalty (0-50 points)
     const costPenalty = plan.annualCost > bestAnnualCost
         ? ((plan.annualCost - bestAnnualCost) / bestAnnualCost) * 50
@@ -1039,13 +1051,25 @@ function calculateQualityScore(plan, volatility, warnings, bestAnnualCost) {
 
 **Solution:** Treat as valid ($0 base is legitimate).
 
-### 7. Prepaid Plans
+### 7. Non-Fixed Rate Plans (Variable/Indexed)
 
-**Issue:** Different payment structure, not comparable.
+**Issue:** Rates can change monthly based on market conditions, creating unpredictable costs.
 
-**Solution:** Filter out entirely (only fixed-rate post-paid plans).
+**Solution:** Included in results but automatically receive quality score of 0 (F grade) and display rate type warning badge (VARIABLE, INDEXED). These plans are considered unsuitable for most consumers due to cost unpredictability.
 
-### 8. Duplicate Plans (English/Spanish)
+### 8. Time-of-Use Plans
+
+**Issue:** Require shifting electricity usage to off-peak hours, which is impractical for most consumers.
+
+**Solution:** Included in results but automatically receive quality score of 0 (F grade) and display "TIME OF USE" warning badge. These plans require behavior changes most users cannot achieve.
+
+### 9. Prepaid Plans
+
+**Issue:** Different payment structure with prepayment requirements and potential service interruptions.
+
+**Solution:** Included in results but automatically receive quality score of 0 (F grade) and display "PREPAID" warning badge. Users can still view these plans in the complete comparison table if they specifically want prepaid options.
+
+### 10. Duplicate Plans (English/Spanish)
 
 **Issue:** Same plan listed twice with different names.
 

@@ -835,17 +835,8 @@ const UI = {
         const termMonths = plan.term_months || 12;
         const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
-        // Rank display with styled badges for top 3 (no emojis per design guidelines)
-        let rankDisplay = `<span class="rank-number">#${i + 1}</span>`;
-        if (i === 0) rankDisplay = '<span class="rank-badge rank-1" title="Best Overall">#1</span>';
-        else if (i === 1)
-          rankDisplay = '<span class="rank-badge rank-2" title="2nd Place">#2</span>';
-        else if (i === 2)
-          rankDisplay = '<span class="rank-badge rank-3" title="3rd Place">#3</span>';
-
         return `
             <tr class="${rowClass}">
-                <td class="col-rank">${rankDisplay}</td>
                 <td class="col-grade">
                     <span class="quality-grade ${grade.class}" title="${grade.description} (${plan.qualityScore || 0}/100)" aria-label="Quality grade ${grade.letter}: ${grade.description} (${plan.qualityScore || 0} out of 100)">
                         ${grade.letter}
@@ -858,7 +849,13 @@ const UI = {
                         ${isNonFixed ? `<span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>` : ''}
                     </div>
                 </td>
-                <td><span class="plan-name-cell">${this.escapeHtml(plan.plan_name)}</span></td>
+                <td>
+                    <div class="plan-name-cell">
+                        <span>${this.escapeHtml(plan.plan_name)}</span>
+                        ${plan.is_prepaid ? '<span class="rate-type-badge rate-type-badge-prepaid">PREPAID</span>' : ''}
+                        ${plan.is_tou ? '<span class="rate-type-badge rate-type-badge-tou">TIME OF USE</span>' : ''}
+                    </div>
+                </td>
                 <td><span class="term-badge">${plan.term_months} mo</span></td>
                 <td class="col-annual">
                     <span class="cost-value">${formatCurrency(plan.annualCost)}</span>
@@ -968,6 +965,27 @@ const UI = {
           case 'term':
             aVal = a.term_months || 0;
             bVal = b.term_months || 0;
+            break;
+          case 'monthly':
+            aVal = a.averageMonthlyCost || 0;
+            bVal = b.averageMonthlyCost || 0;
+            break;
+          case 'renewable':
+            aVal = a.renewable_pct || 0;
+            bVal = b.renewable_pct || 0;
+            break;
+          case 'provider':
+            aVal = (a.rep_name || '').toLowerCase();
+            bVal = (b.rep_name || '').toLowerCase();
+            return aVal < bVal ? -dir : aVal > bVal ? dir : 0;
+          case 'plan':
+            aVal = (a.plan_name || '').toLowerCase();
+            bVal = (b.plan_name || '').toLowerCase();
+            return aVal < bVal ? -dir : aVal > bVal ? dir : 0;
+          case 'cancelFee':
+            // Sort by ETF amount, treating 'None' as 0
+            aVal = a.early_termination_fee || 0;
+            bVal = b.early_termination_fee || 0;
             break;
           default:
             return 0;
