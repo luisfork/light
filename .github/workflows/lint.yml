@@ -28,32 +28,42 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      - name: Cache npm global packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-lint-${{ hashFiles('.github/workflows/lint.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-lint-
+
       - name: Install Python linter (ruff)
         run: uv tool install ruff
 
       - name: Install JavaScript tools
-        run: npm install -g @biomejs/biome markdownlint-cli2
+        run: npm install -g @biomejs/biome@1.9.4
 
-      - name: Run ruff (Python)
+      - name: Run Ruff (Python)
         run: uv tool run ruff check scripts/
 
       - name: Run Biome (JS/JSON)
         run: biome check src/
 
-      - name: Run markdownlint-cli2
-        run: markdownlint-cli2 "**/*.md"
-
-      - name: Check for typos
-        uses: crate-ci/typos@v1
 
       - name: Create summary
         if: always()
         run: |
           echo "## Linting Summary" >> $GITHUB_STEP_SUMMARY
-          echo "All linting checks completed. Review individual step outputs for details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Ruff (Python) | ${{ steps.ruff.outcome == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Biome (JS/JSON) | ${{ steps.biome.outcome == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+

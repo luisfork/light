@@ -279,7 +279,7 @@ light/
 ├── .github/
 │   └── workflows/
 │       ├── deploy.yml           # GitHub Pages deployment automation
-│       ├── lint.yml             # Code linting (Ruff, Biome, oxlint, typos)
+│       ├── lint.yml             # Code linting (Ruff, Biome)
 │       └── update-plans.yml     # Daily data updates + historical archival
 ├── data/
 │   ├── plans.json               # Current electricity plans (updated daily)
@@ -323,11 +323,9 @@ light/
 │   ├── fetch_tdu_rates.py       # TDU rate management
 │   ├── archive_to_csv.py        # Archive plans.json to CSV format
 │   └── generate_sample_data.py  # Sample data generator
-├── biome.json                   # Biome linter configuration
-├── ruff.toml                    # Ruff Python linter configuration
-├── _typos.toml                  # Typos spell checker configuration
-├── pyproject.toml               # Python dependencies
-├── requirements.txt             # Python package requirements
+├── biome.json                   # Biome linter configuration (JS/JSON)
+
+├── pyproject.toml               # Python deps + Ruff linter config
 ├── README.md                    # This file (hello!)
 └── LICENSE                      # MIT License
 ```
@@ -361,32 +359,43 @@ light/
    pip install requests beautifulsoup4 lxml
    ```
 
-3. **Generate sample data** (for development)
+3. **Populate test data**
+
+   The app requires plan data in `data/plans.json`. Generate it from cached test CSV:
 
    ```bash
-   python scripts/generate_sample_data.py
+   # Generate from cached Power to Choose CSV (recommended for local dev)
+   TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py
    ```
 
 4. **Serve locally**
 
+   > **Important:** Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
+
    ```bash
-   cd src
+   # Start local server (from project root)
    python -m http.server 8000
-   # Open http://localhost:8000 in your browser
+
+   # Open http://localhost:8000/src/ in your browser
    ```
 
-### Fetching Latest Data
+### Fetching Data
 
 ```bash
-# Fetch current plans from Power to Choose
-python scripts/fetch_plans.py
+# For local development: Use cached test CSV
+TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py
 
-# Fetch using local test file (simulated run)
-TEST_FILE=data/archive-csv/plans_2026-01-09.csv python scripts/fetch_plans.py
+# For production/fresh data: Fetch from Power to Choose API
+uv run python scripts/fetch_plans.py
 
 # Manually update TDU rates (when PUCT publishes changes)
-python scripts/fetch_tdu_rates.py
+uv run python scripts/fetch_tdu_rates.py
 ```
+
+**Note:** The `TEST_FILE` environment variable controls the data source:
+
+- **Set**: Uses the specified local CSV file (fast, offline-capable)
+- **Not set**: Fetches fresh data from Power to Choose API
 
 ### GitHub Actions Workflows
 
