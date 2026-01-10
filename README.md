@@ -4,22 +4,22 @@
 
 Light is a high-performance static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, seasonal variations, and contract expiration timing—not deceptive advertised rates.
 
-Live Site: <https://luisfork.github.io/light/> (deployed automatically via GitHub Actions)
+Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 ---
 
 ## Why Light?
 
-Most Texans overpay $816-$1,072 annually (EnergyBot 2025 study) by choosing plans with deceptive bill credits that look cheap at 1,000 kWh but cost dramatically more throughout the year. Additionally, many users inadvertently renew contracts during expensive summer months, compounding long-term costs.
+Many Texans overpay $816 to $1,072 annually (EnergyBot 2025 study) by choosing plans with deceptive bill credits that look cheap at 1,000 kWh but cost dramatically more throughout the year. Additionally, many users inadvertently renew contracts during expensive summer months, compounding long-term costs.
 
 Light calculates true costs by:
 
-- **Including ALL fees** - Energy charges, TDU delivery, base fees, and taxes
-- **Accounting for seasonal usage** - Texas summers use 40-80% more electricity than shoulder months
-- **Revealing bill credit traps** - Shows how many months you'll miss those credits
-- **Ranking by annual cost** - Not misleading "advertised rates"
-- **Analyzing contract expiration timing** - Warns when renewals fall during expensive peak seasons
-- **Properly calculating early termination fees** - Accounts for per-month-remaining ETF structures
+- **Including ALL fees**: Energy charges, TDU delivery, base fees, and taxes
+- **Accounting for seasonal usage**: Texas summers use 40-80% more electricity than shoulder months
+- **Revealing bill credit traps**: Shows how many months you'll miss those credits
+- **Ranking by annual cost**: Not misleading "advertised rates"
+- **Analyzing contract expiration timing**: Warns when renewals fall during expensive peak seasons
+- **Properly calculating early termination fees**: Accounts for per-month-remaining ETF structures
 
 **Core Principle:** Empowering Texans to make informed electricity decisions by calculating true monthly and annual costs based on actual usage patterns and optimal contract timing.
 
@@ -29,29 +29,29 @@ Light calculates true costs by:
 
 ### For Users
 
-- **ZIP Code Detection** - Automatically identifies your TDU service area
+- **ZIP Code Detection**: Automatically identifies your TDU service area
 - **Three Usage Input Methods**
   - Quick estimate by home size
   - Average monthly usage
   - Detailed 12-month pattern for maximum accuracy
-- **Accurate Cost Calculation** - Includes energy, TDU delivery, base charges, and local taxes
-- **Contract Expiration Analysis** - NEW: Identifies when contracts expire during expensive renewal periods and suggests optimal contract lengths
-- **Gimmick Detection** - Identifies and warns about bill credit traps and time-of-use plans
-- **Provider Name Formatting** - All provider names displayed in clean, professional uppercase format
-- **Enhanced ETF Calculation** - Properly handles per-month-remaining early termination fees
-- **Duplicate Plan Detection** - Automatically removes duplicate English/Spanish versions of same plan
-- **Quality Scoring System** - NEW: 0-100 scoring system with penalties for bad plan features
-- **Clean, Professional UI** - Beautiful design, mobile-first, accessible, NO emojis, NO bento grids
-- **100% Free & Unbiased** - No commissions, no ads, no hidden costs
+- **Accurate Cost Calculation**: Includes energy, TDU delivery, base charges, and local taxes
+- **Contract Expiration Analysis**: NEW: Identifies when contracts expire during expensive renewal periods and suggests optimal contract lengths
+- **Gimmick Detection**: Identifies and warns about bill credit traps and time-of-use plans
+- **Provider Name Formatting**: All provider names displayed in clean, professional uppercase format
+- **ETF Calculation**: Properly handles per-month-remaining early termination fees
+- **Duplicate Plan Detection**: Automatically removes duplicate English/Spanish versions of same plan
+- **Quality Scoring System**: 0-100 scoring system with penalties for bad plan features
+- **Clean, Professional UI**: Beautiful design, mobile-first, accessible, NO emojis, NO bento grids
+- **100% Free & Unbiased**: No commissions, no ads, no hidden costs
 
 ### Technical
 
-- **Static Site** - Zero hosting cost via GitHub Pages
-- **Daily Data Updates** - GitHub Actions automatically fetches latest plans at 2 AM CT
-- **Historical Data Storage** - Maintains unlimited archive of plan data in `data/historical/` for trend analysis
-- **Transparent Calculations** - All formulas visible in open-source code
-- **Fast Performance** - Pre-fetched data, no external API calls during use
-- **Cross-Browser Compatible** - Works on all modern browsers and platforms
+- **Static Site**: Zero hosting cost via GitHub Pages
+- **Daily Data Updates**: GitHub Actions automatically fetches latest plans at 2 AM CT
+- **Historical Data Storage**: Maintains unlimited archive of plan data in `data/historical/` for trend analysis
+- **Transparent Calculations**: All formulas visible in open-source code
+- **Fast Performance**: Pre-fetched data, no external API calls during use
+- **Cross-Browser Compatible**: Works on all modern browsers and platforms
 
 ---
 
@@ -97,7 +97,7 @@ Light now analyzes when your electricity contract will expire and warns if renew
 
 Example: A 12-month contract starting in July expires in July (expensive). Light recommends a 9-month or 15-month contract to shift expiration to April or October.
 
-### Early Termination Fee Calculation (ENHANCED)
+### Early Termination Fee Calculation
 
 Many plans charge $10-20 per month remaining instead of flat fees. Light properly calculates:
 
@@ -124,10 +124,10 @@ This ensures consistent, professional presentation across all plans.
 
 ### Electricity Plans
 
-**Source:** Power to Choose (official PUCT platform)
-**API Endpoint:** `http://api.powertochoose.org/api/PowerToChoose/plans`
-**Update Frequency:** Daily at 2 AM Central Time
-**Coverage:** All deregulated Texas markets (Oncor, CenterPoint, AEP Central, AEP North, TNMP, Lubbock P&L)
+- **Source:** Power to Choose (official PUCT platform)
+- **API Endpoint:** `http://api.powertochoose.org/api/PowerToChoose/plans`
+- **Update Frequency:** Daily at 2 AM Central Time
+- **Coverage:** All deregulated Texas markets (Oncor, CenterPoint, AEP Central, AEP North, TNMP, Lubbock P&L)
 
 #### Power to Choose API Details
 
@@ -186,12 +186,12 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 ### TDU Delivery Rates
 
-**Source:** PUCT tariff filings and TDU official websites
-**Update Schedule:** Rates change March 1 and September 1 annually
-**Current Rates (as of January 2026):**
+- **Source:** PUCT tariff filings and TDU official websites
+- **Update Schedule:** Rates change March 1 and September 1 annually
+- **Current Rates (as of January 2026):**
 
 | TDU | Monthly Base | Per-kWh Rate | Effective Date |
-| --- | ------------ | ------------ | -------------- |
+| --- | --- | --- | --- |
 | CenterPoint Energy Houston | $4.90 | 6.0009¢ | Dec 7, 2025 |
 | Oncor Electric Delivery | $4.23 | 5.5833¢ | Sep 1, 2025 |
 | AEP Texas Central | $5.49 | 5.6954¢ | Sep 1, 2025 |
@@ -203,9 +203,9 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 ### Local Tax Rates
 
-**Source:** Texas Comptroller data
-**Coverage:** City and county sales tax on residential electricity
-**Implementation:** ZIP code mapping to local tax rates in `data/local-taxes.json`
+- **Source:** Texas Comptroller data
+- **Coverage:** City and county sales tax on residential electricity
+- **Implementation:** ZIP code mapping to local tax rates in `data/local-taxes.json`
 
 ### Historical Data Archive
 
@@ -302,7 +302,7 @@ light/
 │   ├── fetch_plans.py           # Fetch from Power to Choose API
 │   ├── fetch_tdu_rates.py       # TDU rate management
 │   └── generate_sample_data.py  # Sample data generator
-├── research.md                  # Texas electricity market research (updated Jan 2026)
+├── research.md                  # Texas electricity market research
 ├── CONTRACT_EXPIRATION_FEATURE.md  # Contract timing analysis documentation
 ├── pyproject.toml               # Python dependencies
 ├── requirements.txt             # Python package requirements
@@ -406,7 +406,7 @@ If expiration score ≥ 0.8: "High Risk" warning
   → Suggest alternative terms shifting to score < 0.5
 ```
 
-### 2. Enhanced ETF Calculation
+### 2. ETF Calculation
 
 Many comparison tools incorrectly display per-month ETFs as flat fees. Light properly calculates:
 
@@ -500,19 +500,19 @@ Unlike competitors, Light maintains 90-day historical archive:
 
 ### Professional Aesthetic
 
-- **NO emojis** - Professional text-only communication
-- **NO bento grids** - Clear, hierarchical layout
-- **NO shadcn/ui aesthetic** - Custom Apple-inspired design system
-- **Sophisticated neutral palette** - Ink grays, ambient light effects
-- **Typography-focused** - System fonts, clear hierarchy
-- **Functional depth** - Rich calculations, transparent methodology
+- **NO emojis**: Professional text-only communication
+- **NO bento grids**: Clear, hierarchical layout
+- **NO shadcn/ui aesthetic**: Custom Apple-inspired design system
+- **Sophisticated neutral palette**: Ink grays, ambient light effects
+- **Typography-focused**: System fonts, clear hierarchy
+- **Functional depth**: Rich calculations, transparent methodology
 
 ### Performance
 
-- **Static architecture** - Zero backend, instant loading
-- **Pre-fetched data** - No API calls during use
-- **Minimal dependencies** - Vanilla JavaScript, custom CSS
-- **Optimized caching** - 5-minute browser cache with retry logic
+- **Static architecture**: Zero backend, instant loading
+- **Pre-fetched data**: No API calls during use
+- **Minimal dependencies**: Vanilla JavaScript, custom CSS
+- **Optimized caching**: 5-minute browser cache with retry logic
 
 ### Accessibility
 
@@ -532,8 +532,8 @@ MIT License - See LICENSE file for details
 
 ## Acknowledgments
 
-- **Power to Choose** - Official PUCT data source
-- **Texas Public Utility Commission** - Regulatory oversight and consumer protection
+- **Power to Choose**: Official PUCT data source
+- **Texas Public Utility Commission**: Regulatory oversight and consumer protection
 
 ---
 
