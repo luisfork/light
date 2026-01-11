@@ -15,13 +15,13 @@ Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 Many Texans overpay between **$816** [^1] and **$1,072** [^2] annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage [^3]. This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms [^4].
 
-[^1]: EnergyBot. "The Truth About Texas Bill Credit Electricity Plans." *EnergyBot*, 15 Jan. 2025, <www.energybot.com/blog/bill-credit-electricity-plans.html>.
+[^1]: EnergyBot. "The Truth About Texas Bill Credit Electricity Plans." *EnergyBot*, 15 Jan. 2025, [www.energybot.com/blog/bill-credit-electricity-plans.html](https://www.energybot.com/blog/bill-credit-electricity-plans.html).
 
-[^2]: EnergyBot. "The Truth About Texas Free Nights Electricity Plans." *EnergyBot*, 20 Jan. 2025, <www.energybot.com/blog/truth-about-texas-free-nights-electricity-plans.html>.
+[^2]: EnergyBot. "The Truth About Texas Free Nights Electricity Plans." *EnergyBot*, 20 Jan. 2025, [www.energybot.com/blog/truth-about-texas-free-nights-electricity-plans.html](https://www.energybot.com/blog/truth-about-texas-free-nights-electricity-plans.html).
 
-[^3]: EnergyBot. "Texas Electricity Plan Study." *EnergyBot*, Jan. 2025, <www.energybot.com/electricity-plan-study.html>.
+[^3]: EnergyBot. "Texas Electricity Plan Study." *EnergyBot*, Jan. 2025, [www.energybot.com/electricity-plan-study.html](https://www.energybot.com/electricity-plan-study.html).
 
-[^4]: Hobby School of Public Affairs and Barbara Jordan-Mickey Leland School of Public Affairs. *Texas Trends 2025: Energy*. University of Houston and Texas Southern University, 2025, <www.uh.edu/hobby/txtrends/2025>.
+[^4]: Hobby School of Public Affairs and Barbara Jordan-Mickey Leland School of Public Affairs. *Texas Trends 2025: Energy*. University of Houston and Texas Southern University, 2025, [www.uh.edu/hobby/txtrends/2025](https://www.uh.edu/hobby/txtrends/2025/).
 
 *Light* calculates true costs by:
 
