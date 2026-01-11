@@ -22,3 +22,13 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "DTZ", "T10", "RUF"]
 ignore = []
+
+[tool.djlint]
+profile = "html"
+indent = 2
+max_line_length = 120
+format_attribute_template_tags = true
+ignore = "H006,H030,H031"
+# H006: img tag height/width (not always needed)
+# H030: meta description (not applicable)
+# H031: meta keywords (obsolete SEO)

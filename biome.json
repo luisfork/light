@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
+    "include": [
       "**/src/**/*.js",
       "**/src/**/*.json",
       "**/*.json",
@@ -34,12 +34,11 @@
         "useConst": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "off",
-        "noVar": "warn"
+        "noExplicitAny": "off"
       }
     }
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assists": { "actions": { "source": { "organizeImports": "on" } } },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
