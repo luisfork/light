@@ -93,8 +93,8 @@ jobs:
              [[ "${{ steps.biome.outcome }}" == "failure" ]] || \
              [[ "${{ steps.djlint.outcome }}" == "failure" ]] || \
              [[ "${{ steps.actionlint.outcome }}" == "failure" ]]; then
-            echo "❌ Some linting checks failed"
+            echo "✗ Some linting checks failed"
             exit 1
           else
-            echo "✅ All linting checks passed"
+            echo "✓ All linting checks passed"
           fi
