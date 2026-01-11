@@ -6,19 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "include": [
-      "src/**/*.js",
-      "src/**/*.json",
-      "*.json"
-    ],
-    "ignore": [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/build/**",
-      "**/_site/**",
-      "**/*.lock",
-      "data/**"
-    ]
+    "ignoreUnknown": true
   },
   "formatter": {
     "enabled": true,

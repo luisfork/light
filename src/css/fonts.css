@@ -9,215 +9,215 @@
 /* SF Pro - Primary Text Font */
 
 @font-face {
-    font-family: 'SF Pro';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Text-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Text-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Text-Medium.otf') format('opentype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Text-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Text-Semibold.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Text-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Text-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Text-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Text-Light.otf') format('opentype');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Text-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Text-RegularItalic.otf') format('opentype');
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
+  font-family: "SF Pro";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Text-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Text-BoldItalic.otf') format('opentype');
-    font-weight: 700;
-    font-style: italic;
-    font-display: swap;
+  font-family: "SF Pro";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Text-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* SF Pro Display - For larger headings */
 @font-face {
-    font-family: 'SF Pro Display';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Display-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro Display";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Display-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro Display';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Display-Medium.otf') format('opentype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro Display";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Display-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro Display';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Display-Semibold.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro Display";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Display-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro Display';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Display-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro Display";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Display-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Pro Display';
-    src: url('../assets/fonts/san_francisco/SF-Pro-Display-Heavy.otf') format('opentype');
-    font-weight: 800;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Pro Display";
+  src: url("../assets/fonts/san_francisco/SF-Pro-Display-Heavy.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* SF Mono - Monospace Font */
 
 @font-face {
-    font-family: 'SF Mono';
-    src: url('../assets/fonts/san_francisco/SF-Mono-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Mono";
+  src: url("../assets/fonts/san_francisco/SF-Mono-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Mono';
-    src: url('../assets/fonts/san_francisco/SF-Mono-Medium.otf') format('opentype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Mono";
+  src: url("../assets/fonts/san_francisco/SF-Mono-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Mono';
-    src: url('../assets/fonts/san_francisco/SF-Mono-Semibold.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Mono";
+  src: url("../assets/fonts/san_francisco/SF-Mono-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Mono';
-    src: url('../assets/fonts/san_francisco/SF-Mono-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Mono";
+  src: url("../assets/fonts/san_francisco/SF-Mono-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Mono';
-    src: url('../assets/fonts/san_francisco/SF-Mono-Light.otf') format('opentype');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
+  font-family: "SF Mono";
+  src: url("../assets/fonts/san_francisco/SF-Mono-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'SF Mono';
-    src: url('../assets/fonts/san_francisco/SF-Mono-RegularItalic.otf') format('opentype');
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
+  font-family: "SF Mono";
+  src: url("../assets/fonts/san_francisco/SF-Mono-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* New York - Serif Font */
 
 @font-face {
-    font-family: 'New York';
-    src: url('../assets/fonts/new_york/NewYorkMedium-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "New York";
+  src: url("../assets/fonts/new_york/NewYorkMedium-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'New York';
-    src: url('../assets/fonts/new_york/NewYorkMedium-Medium.otf') format('opentype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
+  font-family: "New York";
+  src: url("../assets/fonts/new_york/NewYorkMedium-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'New York';
-    src: url('../assets/fonts/new_york/NewYorkMedium-Semibold.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
+  font-family: "New York";
+  src: url("../assets/fonts/new_york/NewYorkMedium-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'New York';
-    src: url('../assets/fonts/new_york/NewYorkMedium-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "New York";
+  src: url("../assets/fonts/new_york/NewYorkMedium-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'New York';
-    src: url('../assets/fonts/new_york/NewYorkMedium-RegularItalic.otf') format('opentype');
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
+  font-family: "New York";
+  src: url("../assets/fonts/new_york/NewYorkMedium-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'New York';
-    src: url('../assets/fonts/new_york/NewYorkMedium-BoldItalic.otf') format('opentype');
-    font-weight: 700;
-    font-style: italic;
-    font-display: swap;
+  font-family: "New York";
+  src: url("../assets/fonts/new_york/NewYorkMedium-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* New York Large - For larger display sizes */
 @font-face {
-    font-family: 'New York Large';
-    src: url('../assets/fonts/new_york/NewYorkLarge-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "New York Large";
+  src: url("../assets/fonts/new_york/NewYorkLarge-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'New York Large';
-    src: url('../assets/fonts/new_york/NewYorkLarge-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "New York Large";
+  src: url("../assets/fonts/new_york/NewYorkLarge-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
