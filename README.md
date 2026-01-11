@@ -389,8 +389,8 @@ light/
    # Open http://localhost:8000/src/ in your browser
    ```
 
-   > [!IMPORTANT]
-   > Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
+> [!IMPORTANT]
+> Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
 
 ### Fetching Data
 
