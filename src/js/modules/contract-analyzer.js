@@ -175,7 +175,7 @@ const ContractAnalyzer = {
           expirationMonthName: this.getMonthName(altMonth),
           seasonalityScore: altScore,
           riskLevel: altRiskLevel,
-          improvement: Math.round(Math.max(0, improvement)) + '% better timing'
+          improvement: `${Math.round(Math.max(0, improvement))}% better timing`
         });
       }
     }
