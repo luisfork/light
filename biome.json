@@ -7,14 +7,17 @@
   },
   "files": {
     "include": [
-      "**/src/**/*.js",
-      "**/src/**/*.json",
-      "**/*.json",
-      "!**/node_modules/",
-      "!**/dist/",
-      "!**/build/",
-      "!**/_site/",
-      "!**/*.lock"
+      "src/**/*.js",
+      "src/**/*.json",
+      "*.json"
+    ],
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/_site/**",
+      "**/*.lock",
+      "data/**"
     ]
   },
   "formatter": {
