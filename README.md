@@ -1,6 +1,9 @@
+<!-- markdownlint-disable MD053 -->
+
 # ***Light*** — Texas Electricity Plan Finder
 
-**Find the best and most affordable Texas electricity plan. Free, unbiased, and accurate.**
+> Find the best and most affordable Texas electricity plan.
+> **Free, unbiased, and accurate.**
 
 *Light* is a high-performance static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, seasonal variations, and contract expiration timing—not deceptive advertised rates.
 
@@ -10,7 +13,15 @@ Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 ## Why *Light*?
 
-Many Texans overpay $816 to $1,072 annually (EnergyBot 2025 study) by choosing plans with deceptive bill credits that look cheap at 1,000 kWh but cost dramatically more throughout the year. Additionally, many users inadvertently renew contracts during expensive summer months, compounding long-term costs.
+Many Texans overpay between **$816** [^1] and **$1,072** [^2] annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage [^3]. This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms [^4].
+
+[^1]: EnergyBot. "The Truth About Texas Bill Credit Electricity Plans." *EnergyBot*, 15 Jan. 2025, <www.energybot.com/blog/bill-credit-electricity-plans.html>.
+
+[^2]: EnergyBot. "The Truth About Texas Free Nights Electricity Plans." *EnergyBot*, 20 Jan. 2025, <www.energybot.com/blog/truth-about-texas-free-nights-electricity-plans.html>.
+
+[^3]: EnergyBot. "Texas Electricity Plan Study." *EnergyBot*, Jan. 2025, <www.energybot.com/electricity-plan-study.html>.
+
+[^4]: Hobby School of Public Affairs and Barbara Jordan-Mickey Leland School of Public Affairs. *Texas Trends 2025: Energy*. University of Houston and Texas Southern University, 2025, <www.uh.edu/hobby/txtrends/2025>.
 
 *Light* calculates true costs by:
 
@@ -19,7 +30,7 @@ Many Texans overpay $816 to $1,072 annually (EnergyBot 2025 study) by choosing p
 - **Revealing bill credit traps**: Shows how many months you'll miss those credits
 - **Ranking by annual cost**: Not misleading "advertised rates"
 - **Analyzing contract expiration timing**: Warns when renewals fall during expensive peak seasons
-- **Properly calculating early termination fees**: Accounts for per-month-remaining ETF structures
+- **Properly calculating early termination fees (ETF)**: Accounts for per-month-remaining ETF structures
 
 **Core Principle:** Empowering Texans to make informed electricity decisions by calculating true monthly and annual costs based on actual usage patterns and optimal contract timing.
 
@@ -38,17 +49,16 @@ Many Texans overpay $816 to $1,072 annually (EnergyBot 2025 study) by choosing p
 - **Contract Expiration Analysis**: Identifies when contracts expire during expensive renewal periods and suggests optimal contract lengths
 - **Gimmick Detection**: Identifies and warns about bill credit traps and time-of-use plans
 - **Provider Name Formatting**: All provider names displayed in clean, professional uppercase format
-- **ETF Calculation**: Properly handles per-month-remaining early termination fees
+- **Early Termination Fee (ETF) Calculation**: Properly handles per-month-remaining early termination fees (ETF)
 - **Duplicate Plan Detection**: Fingerprint-based deduplication automatically removes duplicate English/Spanish versions of same plan
 - **Quality Scoring System**: 0-100 scoring with penalties and bonuses for plan features, transparent score breakdowns on hover
 - **Best Value Indicators**: Visual highlighting of lowest cost, best rate, and highest quality plans in comparison table
 - **Interactive Grade Legend**: Expanded grade guide with descriptions explaining what each grade means
-- **Clean, Professional UI**: Beautiful design, mobile-first, accessible, NO emojis, NO bento grids
 - **100% Free & Unbiased**: No commissions, no ads, no hidden costs
 
 ### Technical
 
-- **Static Site**: Zero hosting cost via GitHub Pages
+- **Static Site**: Hosting via GitHub Pages
 - **Daily Data Updates**: GitHub Actions automatically fetches latest plans at 2 AM CT
 - **Historical Data Storage**: Maintains unlimited archive of plan data in `data/json-archive/` and `data/csv-archive/` for trend analysis
 - **Transparent Calculations**: All formulas visible in open-source code
@@ -57,7 +67,7 @@ Many Texans overpay $816 to $1,072 annually (EnergyBot 2025 study) by choosing p
 
 ---
 
-## How It Works
+## Implementation Details
 
 ### Cost Calculation Algorithm
 
@@ -99,7 +109,7 @@ This reflects real Texas usage patterns where summer AC dominates annual consump
 
 Example: A 12-month contract starting in July expires in July (expensive). *Light* recommends a 9-month or 15-month contract to shift expiration to April or October.
 
-### Early Termination Fee Calculation
+### Early Termination Fee (ETF) Calculation
 
 Many plans charge $10-20 per month remaining instead of flat fees. *Light* properly calculates:
 
@@ -116,7 +126,7 @@ Total ETF = Base Fee × Months Remaining
 All provider names are displayed in professional uppercase format with legal suffixes removed:
 
 - Original: "TXU Energy Retail Company LLC"
-- Displayed: "TXU ENERGY RETAIL"
+- Displayed: "TXU ENERGY"
 
 This ensures consistent, professional presentation across all plans.
 
@@ -129,7 +139,7 @@ This ensures consistent, professional presentation across all plans.
 - **Source:** Power to Choose (official PUCT platform)
 - **API Endpoint:** `http://api.powertochoose.org/api/PowerToChoose/plans`
 - **Update Frequency:** Daily at 2 AM Central Time
-- **Coverage:** All deregulated Texas markets (Oncor, CenterPoint, AEP Central, AEP North, TNMP, Lubbock P&L)
+- **Coverage:** All deregulated Texas markets *(Oncor, CenterPoint, AEP Central, AEP North, TNMP, Lubbock P&L)*
 
 #### Power to Choose API Details
 
@@ -165,7 +175,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 - Rate type (Fixed, Variable, Indexed)
 - Renewable energy percentage
 - Prepaid/Time-of-use indicators
-- Early termination fee
+- Early termination fee (ETF)
 - EFL (Electricity Facts Label) URL
 - Enrollment URL
 - Promotional details and special terms
@@ -316,7 +326,7 @@ light/
 │       │   ├── usage-estimator.js     # Seasonal usage pattern Estimation
 │       │   ├── cost-calculator.js     # Monthly/Annual cost calculations
 │       │   ├── contract-analyzer.js   # Contract expiration timing analysis
-│       │   ├── etf-calculator.js      # Early termination fee calculations
+│       │   ├── etf-calculator.js      # Early termination fee (ETF) calculations
 │       │   └── plan-ranker.js         # Plan ranking with quality scoring
 │       ├── api.js               # Data loading API facade
 │       ├── calculator.js        # Main calculator facade
@@ -372,7 +382,8 @@ light/
 
 4. **Serve locally**
 
-   > **Important:** Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
+   > [!IMPORTANT]
+   Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
 
    ```bash
    # Start local server (from project root)
@@ -394,10 +405,11 @@ uv run python scripts/fetch_plans.py
 uv run python scripts/fetch_tdu_rates.py
 ```
 
-**Note:** The `TEST_FILE` environment variable controls the data source:
-
-- **Set**: Uses the specified local CSV file (fast, offline-capable)
-- **Not set**: Fetches fresh data from Power to Choose API
+> [!NOTE]
+> The `TEST_FILE` environment variable controls the data source:
+>
+> - **Set**: Uses the specified local CSV file (fast, offline-capable)
+> - **Not set**: Fetches fresh data from Power to Choose API
 
 ### GitHub Actions Workflows
 
@@ -405,7 +417,7 @@ uv run python scripts/fetch_tdu_rates.py
 
 - Runs at 2 AM Central Time (7 AM UTC)
 - Archives current plans to `data/json-archive/` (unlimited retention)
-- Archives CSV to `data/csv-archive/` (daily snapshot with enhanced columns)
+- Archives CSV to `data/csv-archive/` (daily snapshot with columns)
 - Verifies archive integrity (JSON validation, CSV line count)
 - Fetches latest plans from Power to Choose API
 - Removes duplicate English/Spanish plan versions using fingerprint-based deduplication
@@ -453,13 +465,13 @@ If expiration score ≥ 0.8: "High Risk" warning
   → Suggest alternative terms shifting to score < 0.5
 ```
 
-### 2. ETF Calculation with Verification
+### 2. Early Termination Fee (ETF) Calculation with Verification
 
 Many comparison tools incorrectly display per-month ETFs as flat fees. *Light* properly calculates ETFs and alerts users when verification is needed:
 
 ```javascript
 detectETFStructure(plan):
-  // Enhanced detection with multiple regex patterns
+  // Detection with multiple regex patterns
   if special_terms matches "per month remaining|multiplied by|for each month":
     return "per-month-remaining"
   if fee ≤ $50 AND term ≥ 12 months:
@@ -474,7 +486,7 @@ calculateETF(plan, monthsRemaining):
     return baseFee
 ```
 
-**User Verification Feature:** When ETF structure is automatically detected (not explicitly stated), *Light* displays an info icon (ⓘ) that opens a verification modal reminding users to check the official Electricity Facts Label (EFL), Terms of Service (TOS), and "Your Rights as a Customer" documents for exact cancellation terms.
+**User Verification Feature:** When ETF structure is automatically detected (not explicitly stated), *Light* displays an info icon that opens a verification modal reminding users to check the official Electricity Facts Label (EFL), Terms of Service (TOS), and "Your Rights as a Customer" documents for exact cancellation terms.
 
 ### 3. Quality Scoring System
 
@@ -521,8 +533,10 @@ The quality score (0-100) is calculated from multiple factors:
 | 60-69 | D | Caution | Below-average with notable drawbacks |
 | 0-59 | F | Avoid | High risk or variable rates |
 
+> [!TIP]
 **Score Transparency:** Hover over any quality grade to see a detailed breakdown of how the score was calculated (e.g., "Base: 100 | Cost: -5 | Consistent rates: +5").
 
+> [!NOTE]
 **Warning Badges:** Plans with non-fixed rates, prepaid requirements, or time-of-use restrictions display warning badges (VARIABLE, PREPAID, TIME OF USE) and automatically receive an F grade.
 
 **Table Features:**
@@ -557,10 +571,10 @@ Ensures professional, consistent display:
 ```javascript
 formatProviderName(name):
   1. Convert to uppercase
-  2. Remove trailing: LLC, INC, LP, & CO, (TX), (TEXAS), COMPANY
+  2. Remove trailing: LLC, INC, LP, & CO, (TX), (TEXAS), COMPANY, RETAIL, SERVICES
   3. Trim whitespace and punctuation
 
-Example: "Reliant Energy Retail Services, LLC" → "RELIANT ENERGY RETAIL SERVICES"
+Example: "Reliant Energy Retail Services, LLC" → "RELIANT ENERGY RETAIL SERVICES" → "RELIANT ENERGY"
 ```
 
 ### 6. Historical Data Tracking

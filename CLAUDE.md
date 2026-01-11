@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with code in this repository.
 
 ## Project Overview
 
-**Light** is a static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, seasonal variations, and contract expiration timing. The app is hosted on GitHub Pages with zero backend infrastructure.
+*Light* is a static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, seasonal variations, and contract expiration timing. The app is hosted on GitHub Pages with zero backend infrastructure.
 
 **Core Principle:** Calculate true monthly and annual costs—not deceptive advertised rates—by including ALL fees (energy, TDU delivery, base charges, taxes) and accounting for seasonal usage patterns and contract timing.
 
