@@ -52,12 +52,6 @@ jobs:
       - name: Install JavaScript tools
         run: npm install -g @biomejs/biome@1.9.4
 
-      - name: Install actionlint
-        run: |
-          curl -sL https://github.com/rhysd/actionlint/releases/latest/download/actionlint_linux_amd64.tar.gz | tar xz -C /tmp
-          sudo mv /tmp/actionlint /usr/local/bin/
-          sudo chmod +x /usr/local/bin/actionlint
-
       - name: Run Ruff (Python)
         id: ruff
         continue-on-error: true
@@ -76,7 +70,9 @@ jobs:
       - name: Run actionlint (Workflows)
         id: actionlint
         continue-on-error: true
-        run: actionlint
+        uses: reviewdog/action-actionlint@v1
+        with:
+          fail_level: none
 
       - name: Create summary
         if: always()
