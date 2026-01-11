@@ -1,5 +1,5 @@
 /**
- * Light - Texas Electricity Cost Calculator
+ * Texas Electricity Cost Calculator
  *
  * Core calculation engine for comparing electricity plans
  * based on actual usage patterns and true annual costs.
@@ -261,7 +261,7 @@ function detectTDU(zipCode, tduList) {
 /**
  * Rank plans by annual cost and identify gimmicks
  *
- * Enhanced ranking system with quality scoring and penalties for bad plan features
+ * Ranking system with quality scoring and penalties for bad plan features
  *
  * @param {Object[]} plans - Array of plan objects
  * @param {number[]} userUsage - 12-month usage pattern
@@ -573,7 +573,7 @@ function formatRate(rate) {
  * - Highest: July, August, January (peak demand months)
  * - Lowest: April, May, October, November (shoulder months)
  *
- * Enhanced version with robust date handling and better recommendations.
+ * Version with robust date handling and better recommendations.
  *
  * @param {Date|string|null} startDate - Contract start date (defaults to today)
  * @param {number} termMonths - Contract length in months

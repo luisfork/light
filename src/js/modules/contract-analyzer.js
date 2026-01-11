@@ -1,5 +1,5 @@
 /**
- * Light - Contract Analyzer Module
+ * Contract Analyzer Module
  *
  * Analyzes contract expiration timing to help users
  * avoid expensive renewal periods.

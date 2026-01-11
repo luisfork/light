@@ -670,7 +670,7 @@ def main() -> None:
     output_path = project_root / "data" / "plans.json"
 
     print("=" * 70)
-    print("Light - Texas Electricity Plan Fetcher")
+    print("Texas Electricity Plan Fetcher")
     print("=" * 70)
 
     # Fetch data

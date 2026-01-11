@@ -1,5 +1,5 @@
 /**
- * Light - Plan Deduplication Module
+ * Plan Deduplication Module
  *
  * Detects and removes duplicate electricity plans
  * (e.g., English/Spanish versions of the same plan).

@@ -1,18 +1,18 @@
-# Light - Texas Electricity Plan Finder
+# *Light* — Texas Electricity Plan Finder
 
 **Find the best and most affordable Texas electricity plan. Free, unbiased, and accurate.**
 
-Light is a high-performance static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, seasonal variations, and contract expiration timing—not deceptive advertised rates.
+*Light* is a high-performance static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, seasonal variations, and contract expiration timing—not deceptive advertised rates.
 
 Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 ---
 
-## Why Light?
+## Why *Light*?
 
 Many Texans overpay $816 to $1,072 annually (EnergyBot 2025 study) by choosing plans with deceptive bill credits that look cheap at 1,000 kWh but cost dramatically more throughout the year. Additionally, many users inadvertently renew contracts during expensive summer months, compounding long-term costs.
 
-Light calculates true costs by:
+*Light* calculates true costs by:
 
 - **Including ALL fees**: Energy charges, TDU delivery, base fees, and taxes
 - **Accounting for seasonal usage**: Texas summers use 40-80% more electricity than shoulder months
@@ -35,12 +35,12 @@ Light calculates true costs by:
   - Average monthly usage
   - Detailed 12-month pattern for maximum accuracy
 - **Accurate Cost Calculation**: Includes energy, TDU delivery, base charges, and local taxes
-- **Contract Expiration Analysis**: NEW: Identifies when contracts expire during expensive renewal periods and suggests optimal contract lengths
+- **Contract Expiration Analysis**: Identifies when contracts expire during expensive renewal periods and suggests optimal contract lengths
 - **Gimmick Detection**: Identifies and warns about bill credit traps and time-of-use plans
 - **Provider Name Formatting**: All provider names displayed in clean, professional uppercase format
 - **ETF Calculation**: Properly handles per-month-remaining early termination fees
 - **Duplicate Plan Detection**: Automatically removes duplicate English/Spanish versions of same plan
-- **Enhanced Quality Scoring System**: 0-100 scoring with penalties and bonuses for plan features, transparent score breakdowns on hover
+- **Quality Scoring System**: 0-100 scoring with penalties and bonuses for plan features, transparent score breakdowns on hover
 - **Best Value Indicators**: Visual highlighting of lowest cost, best rate, and highest quality plans in comparison table
 - **Interactive Grade Legend**: Expanded grade guide with descriptions explaining what each grade means
 - **Clean, Professional UI**: Beautiful design, mobile-first, accessible, NO emojis, NO bento grids
@@ -61,7 +61,7 @@ Light calculates true costs by:
 
 ### Cost Calculation Algorithm
 
-Light calculates your true annual electricity cost using this algorithm:
+*Light* calculates your true annual electricity cost using this algorithm:
 
 ```javascript
 // For each month of the year:
@@ -91,17 +91,17 @@ This reflects real Texas usage patterns where summer AC dominates annual consump
 
 ### Contract Expiration Timing Analysis
 
-Light now analyzes when your electricity contract will expire and warns if renewal falls during expensive months:
+*Light* now analyzes when your electricity contract will expire and warns if renewal falls during expensive months:
 
 - **Best renewal months:** April, May, October, November (rates typically 15-25% lower)
 - **Worst renewal months:** July, August, January (peak demand = highest rates)
 - **Recommendations:** Suggests alternative contract lengths to shift renewal to optimal months
 
-Example: A 12-month contract starting in July expires in July (expensive). Light recommends a 9-month or 15-month contract to shift expiration to April or October.
+Example: A 12-month contract starting in July expires in July (expensive). *Light* recommends a 9-month or 15-month contract to shift expiration to April or October.
 
 ### Early Termination Fee Calculation
 
-Many plans charge $10-20 per month remaining instead of flat fees. Light properly calculates:
+Many plans charge $10-20 per month remaining instead of flat fees. *Light* properly calculates:
 
 ```javascript
 // Per-month-remaining ETF (common for 12-36 month contracts):
@@ -211,7 +211,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 ### Historical Data Archive
 
-Light maintains a growing archive of electricity plan data for trend analysis and research.
+*Light* maintains a growing archive of electricity plan data for trend analysis and research.
 
 #### JSON Archive
 
@@ -323,8 +323,7 @@ light/
 ├── scripts/
 │   ├── fetch_plans.py           # Fetch from Power to Choose API
 │   ├── fetch_tdu_rates.py       # TDU rate management
-│   ├── archive_to_csv.py        # Archive plans.json to CSV format
-│   └── generate_sample_data.py  # Sample data generator
+│   └── archive_to_csv.py        # Archive plans.json to CSV format
 ├── biome.json                   # Biome linter configuration (JS/JSON)
 ├── _typos.toml                  # Typos spell checker configuration
 ├── pyproject.toml               # Python deps + Ruff linter config
@@ -423,7 +422,7 @@ uv run python scripts/fetch_tdu_rates.py
 
 ### 1. Contract Expiration Timing Analysis
 
-Based on research showing Texans often renew during expensive months, Light implements sophisticated timing analysis:
+Based on research showing Texans often renew during expensive months, *Light* implements sophisticated timing analysis:
 
 - Calculates exact contract expiration date
 - Scores renewal month seasonality (0.0 = best, 1.0 = worst)
@@ -445,7 +444,7 @@ If expiration score ≥ 0.8: "High Risk" warning
 
 ### 2. ETF Calculation
 
-Many comparison tools incorrectly display per-month ETFs as flat fees. Light properly calculates:
+Many comparison tools incorrectly display per-month ETFs as flat fees. *Light* properly calculates:
 
 ```javascript
 detectETFStructure(plan):
@@ -463,7 +462,7 @@ calculateETF(plan, monthsRemaining):
     return baseFee
 ```
 
-### 3. Enhanced Quality Scoring System
+### 3. Quality Scoring System
 
 Plans are ranked by a combined score: **85% cost efficiency + 15% quality factors**.
 
@@ -484,7 +483,7 @@ calculateCombinedScore(plan, bestCost, worstCost):
 The quality score (0-100) is calculated from multiple factors:
 
 | Factor | Max Impact | Description |
-|--------|-----------|-------------|
+| --- | --- | --- |
 | Base Score | 100 | Starting point for all fixed-rate plans |
 | Cost Penalty | -40 | Deducted for plans more expensive than best |
 | Volatility Penalty | -25 | Deducted for unpredictable costs |
@@ -503,7 +502,7 @@ The quality score (0-100) is calculated from multiple factors:
 **Quality Grades:**
 
 | Score | Grade | Description | Meaning |
-|-------|-------|-------------|---------|
+| --- | --- | --- | --- |
 | 90-100 | A | Excellent | Top-tier plan with competitive pricing, stable rates |
 | 80-89 | B | Good | Good overall value with reasonable pricing |
 | 70-79 | C | Acceptable | Moderate value; review details carefully |
@@ -535,7 +534,7 @@ deduplicatePlans(plans):
   return { deduplicated, duplicateCount }
 ```
 
-Some providers list the same plan twice (e.g., "Truly Simple 12" and "Verdaderamente Simple 12") with identical pricing. Light detects these and shows only one version.
+Some providers list the same plan twice (e.g., "Truly Simple 12" and "Verdaderamente Simple 12") with identical pricing. *Light* detects these and shows only one version.
 
 ### 5. Provider Name Formatting
 
@@ -552,7 +551,7 @@ Example: "Reliant Energy Retail Services, LLC" → "RELIANT ENERGY RETAIL SERVIC
 
 ### 6. Historical Data Tracking
 
-Unlike competitors, Light maintains 90-day historical archive:
+Unlike competitors, *Light* maintains 90-day historical archive:
 
 - Daily snapshots before data refresh
 - Enables rate trend analysis

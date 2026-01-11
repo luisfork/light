@@ -1,5 +1,5 @@
 /**
- * Light - Currency and Rate Formatters Module
+ * Currency and Rate Formatters Module
  *
  * Provides consistent formatting for currency amounts,
  * electricity rates, and date/time values.

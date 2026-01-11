@@ -1,5 +1,5 @@
 /**
- * Light - Plan Ranker Module
+ * Plan Ranker Module
  *
  * Ranks electricity plans by annual cost and quality score,
  * with comprehensive penalty system for risky plan features.
@@ -44,7 +44,7 @@ const PlanRanker = {
   /**
    * Rank plans by combined weighted score (85% cost + 15% quality)
    *
-   * Enhanced ranking system with unified weighted scoring.
+   * Ranking system with unified weighted scoring.
    * 85% of score based on cost efficiency, 15% based on quality factors.
    * No tie-breakers - single combined score determines ranking.
    *
@@ -532,7 +532,7 @@ const PlanRanker = {
    */
   calculateContractExpiration(startDate, termMonths) {
     let start = startDate instanceof Date ? startDate : new Date(startDate);
-    if (isNaN(start.getTime())) {
+    if (Number.isNaN(start.getTime())) {
       start = new Date();
     }
 
@@ -623,7 +623,8 @@ const PlanRanker = {
         letter: 'F',
         description: 'Avoid',
         shortDesc: 'Not recommended',
-        tooltip: 'High risk or poor value. Variable rates, prepaid, or time-of-use plans fall here.',
+        tooltip:
+          'High risk or poor value. Variable rates, prepaid, or time-of-use plans fall here.',
         class: 'grade-f'
       };
     }

@@ -66,7 +66,7 @@ Returns array of electricity plans from all REPs in Texas deregulated markets.
 **Field Descriptions:**
 
 | Field | Type | Description | Notes |
-|-------|------|-------------|-------|
+| --- | --- | --- | --- | --- |
 | `ID` | String | Unique plan identifier | Provider-assigned, may change on plan updates |
 | `REP` | String | Retail Electric Provider name | Legal entity name (e.g., "TXU Energy Retail Company LLC") |
 | `Product` | String | Marketing name of plan | May include version numbers or promotional text |
@@ -195,7 +195,7 @@ Processed and normalized plan data used by the calculator.
 **Field Specifications:**
 
 | Field | Required | Default | Validation |
-|-------|----------|---------|------------|
+| --- | --- | --- | --- |
 | `plan_id` | Yes | N/A | Non-empty string, unique |
 | `rep_name` | Yes | N/A | UPPERCASE, 2-50 chars |
 | `plan_name` | Yes | N/A | 5-200 chars |
@@ -245,7 +245,7 @@ TDU delivery charges updated semi-annually (March 1, September 1).
 **Current Rates (January 2026):**
 
 | Code | Name | Base | Per-kWh | Effective |
-|------|------|------|---------|-----------|
+| --- | --- | --- | --- | --- |
 | CENTERPOINT | CenterPoint Energy Houston Electric | $4.90 | 6.0009¢ | 2025-12-07 |
 | ONCOR | Oncor Electric Delivery | $4.23 | 5.5833¢ | 2025-09-01 |
 | AEP_CENTRAL | AEP Texas Central | $5.49 | 5.6954¢ | 2025-09-01 |
@@ -355,7 +355,7 @@ ZIP code to TDU mapping and local tax rates.
       "High early termination fee: $270 if cancelled at month 18"
     ],
     isGimmick: false,               // True if warnings or volatility > 0.3
-    qualityScore: 92.5              // NEW: Overall quality metric 0-100
+    qualityScore: 92.5              // Overall quality metric 0-100
   }
   // ... more plans, sorted by annualCost ascending
 ]
@@ -391,7 +391,7 @@ ZIP code to TDU mapping and local tax rates.
 **Seasonality Scores by Month:**
 
 | Month | Score | Description |
-|-------|-------|-------------|
+| --- | --- | --- |
 | January | 0.7 | Expensive (winter peak demand) |
 | February | 0.5 | Moderate |
 | March | 0.2 | Good |
@@ -446,7 +446,7 @@ calculateEarlyTerminationFee(plan, 18) → 150.00
 **Common Error Codes:**
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+| --- | --- | --- | --- |
 | `INVALID_ZIP` | 400 | ZIP code not in deregulated Texas | Verify ZIP is 5 digits, in ERCOT service area |
 | `NO_PLANS_FOUND` | 404 | No plans available for criteria | Broaden search filters, check TDU area |
 | `RATE_LIMIT_EXCEEDED` | 429 | Too many requests | Implement exponential backoff, respect 100 req/min |
@@ -540,7 +540,7 @@ const CACHE_CONFIG = {
 ### Version 2.0 (January 2026)
 
 - Added contract expiration analysis fields to rankPlans response
-- Enhanced ETF calculation to detect per-month-remaining structures
+- ETF calculation to detect per-month-remaining structures
 - Added `qualityScore` field to ranked plans (0-100 scale)
 - Provider name formatting now uppercase with suffixes removed
 - Added duplicate plan detection for English/Spanish versions
@@ -548,7 +548,7 @@ const CACHE_CONFIG = {
 ### Version 1.5 (December 2025)
 
 - Added CenterPoint rate update (Dec 7, 2025 effective date)
-- Enhanced volatility calculation algorithm
+- Quality scoring system improvements
 - Improved bill credit parsing for complex threshold rules
 
 ### Version 1.0 (September 2025)

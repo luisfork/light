@@ -1,5 +1,5 @@
 /**
- * Light - Provider Formatter Module
+ * Provider Formatter Module
  *
  * Formats electricity provider names for consistent,
  * professional display.

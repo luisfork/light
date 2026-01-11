@@ -1,5 +1,5 @@
 /**
- * Light - Tax Lookup Module
+ * Tax Lookup Module
  *
  * Provides local tax rate lookups by ZIP code
  * for Texas electricity billing.

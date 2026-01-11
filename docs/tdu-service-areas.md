@@ -327,7 +327,7 @@ TDU Percentage = 50%
 ### Comprehensive ZIP Code Table
 
 | ZIP Range | TDU | Primary Region |
-|-----------|-----|----------------|
+| --- | --- | --- |
 | 73301-73399 | Oncor | Waco area |
 | 75001-75999 | Oncor | Dallas-Fort Worth |
 | 76001-76699 | Oncor | Fort Worth, Tarrant County |
@@ -354,7 +354,7 @@ TDU Percentage = 50%
 
 - Some ZIP codes span multiple TDU territories (especially in overlapping service areas)
 - Exact address or meter number required for 100% accurate TDU identification
-- Light app uses ZIP code mapping with 95%+ accuracy for initial TDU detection
+- *Light* uses ZIP code mapping with 95%+ accuracy for initial TDU detection
 
 ### TDU Detection Algorithm
 
@@ -529,7 +529,7 @@ These cities have vertically integrated municipal utilities and are NOT part of 
 ### Reliability Metrics (2024 Data)
 
 | TDU | SAIFI | SAIDI | CAIDI | Outage Events |
-|-----|-------|-------|-------|---------------|
+| --- | --- | --- | --- | --- |
 | Oncor | 0.98 | 98 min | 100 min | 0.98/customer/year |
 | CenterPoint | 1.45 | 142 min | 98 min | 1.45/customer/year |
 | AEP Central | 1.20 | 125 min | 104 min | 1.20/customer/year |
@@ -553,7 +553,7 @@ These cities have vertically integrated municipal utilities and are NOT part of 
 ### 10-Year TDU Rate Growth (2015-2025)
 
 | TDU | 2015 Total | 2025 Total | % Change | CAGR |
-|-----|-----------|-----------|----------|------|
+| --- | --- | --- | --- | --- |
 | Oncor | $52.15 | $60.06 | +15.2% | +1.4% |
 | CenterPoint | $56.80 | $64.91 | +14.3% | +1.3% |
 | AEP Central | $54.20 | $62.44 | +15.2% | +1.4% |

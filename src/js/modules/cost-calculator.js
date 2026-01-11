@@ -1,5 +1,5 @@
 /**
- * Light - Cost Calculator Module
+ * Cost Calculator Module
  *
  * Core electricity cost calculation engine for computing
  * monthly and annual costs based on usage and plan details.

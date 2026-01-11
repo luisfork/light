@@ -63,17 +63,13 @@ def display_current_rates(rates_data: dict) -> None:
     print("\n" + "=" * 90)
     print("Current TDU Delivery Rates")
     print("=" * 90)
-    print(
-        f"{'TDU':<20} {'Base Charge':<15} {'Per kWh':<15} {'Effective Date':<15}"
-    )
+    print(f"{'TDU':<20} {'Base Charge':<15} {'Per kWh':<15} {'Effective Date':<15}")
     print("-" * 90)
 
     for tdu in rates_data.get("tdus", []):
         base = f"${tdu['monthly_base_charge']:.2f}/mo"
         per_kwh = f"{tdu['per_kwh_rate']:.2f}¢/kWh"
-        print(
-            f"{tdu['name']:<20} {base:<15} {per_kwh:<15} {tdu['effective_date']:<15}"
-        )
+        print(f"{tdu['name']:<20} {base:<15} {per_kwh:<15} {tdu['effective_date']:<15}")
 
     print("=" * 90)
     print(f"\nLast updated: {rates_data.get('last_updated', 'Unknown')}")
@@ -88,7 +84,7 @@ def main() -> None:
     rates_file = project_root / "data" / "tdu-rates.json"
 
     print("=" * 90)
-    print("Light - TDU Rate Management Tool")
+    print("TDU Rate Management Tool")
     print("=" * 90)
 
     # Load current rates

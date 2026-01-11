@@ -413,7 +413,7 @@ function calculateAnnualCost(monthlyUsageArray, plan, tduRates, localTaxRate = 0
 
 **Inputs:**
 
-- Monthly usage: [1000, 900, 800, 750, 900, 1400, 1800, 2000, 1500, 950, 850, 1100]
+- Monthly usage: \[1000, 900, 800, 750, 900, 1400, 1800, 2000, 1500, 950, 850, 1100]
 - Plan: Same as previous example
 - TDU: Oncor
 - Tax: 2%
@@ -421,7 +421,7 @@ function calculateAnnualCost(monthlyUsageArray, plan, tduRates, localTaxRate = 0
 **Calculations:**
 
 | Month | Usage | Energy | TDU | Base | Tax | Total |
-|-------|-------|--------|-----|------|-----|-------|
+| --- | --- | --- | --- | --- | --- | --- |
 | Jan | 1000 | $100.00 | $60.01 | $9.95 | $3.40 | $173.36 |
 | Feb | 900 | $89.10 | $54.45 | $9.95 | $3.07 | $156.57 |
 | Mar | 800 | $79.20 | $48.87 | $9.95 | $2.76 | $140.78 |
@@ -607,7 +607,7 @@ function calculateVolatility(plan, userUsage) {
 ### Volatility Interpretation
 
 | Score | Category | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | 0.0-0.1 | Very Low | Simple fixed-rate, no gimmicks |
 | 0.1-0.3 | Low | Straightforward plan, minor complexity |
 | 0.3-0.5 | Moderate | Some conditional features, manageable |
@@ -908,7 +908,7 @@ Result: $15 × 18 = $270
 Texas electricity rates follow seasonal patterns:
 
 | Month | Score | Reason |
-|-------|-------|--------|
+| --- | --- | --- |
 | Jan | 0.7 | Winter peak demand |
 | Feb | 0.5 | Moderate |
 | Mar | 0.2 | Transition, rates falling |
@@ -961,7 +961,7 @@ Holistic 0-100 score combining cost, volatility, warnings, and plan features for
 The quality score is calculated from multiple factors:
 
 | Factor | Max Impact | Description |
-|--------|-----------|-------------|
+| --- | --- | --- |
 | Base Score | 100 | Starting point for all fixed-rate plans |
 | Cost Penalty | -40 | Deducted for plans more expensive than best |
 | Volatility Penalty | -25 | Deducted for unpredictable costs |
@@ -1118,7 +1118,7 @@ function getScoreExplanation(plan) {
 ### Grade Interpretation
 
 | Score | Grade | Description | Tooltip |
-|-------|-------|-------------|---------|
+| --- | --- | --- | --- |
 | 90-100 | A | Excellent | Top-tier plan with competitive pricing, stable rates, and minimal risk |
 | 80-89 | B | Good | Good overall value with reasonable pricing and acceptable risk |
 | 70-79 | C | Acceptable | Moderate value with some concerns; review details before enrolling |

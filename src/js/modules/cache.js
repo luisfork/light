@@ -1,5 +1,5 @@
 /**
- * Light - Cache Manager Module
+ * Cache Manager Module
  *
  * Provides caching functionality with configurable max age,
  * loading state management, and cache invalidation.

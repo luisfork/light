@@ -1,6 +1,6 @@
 # *Power to Choose* Data Formats
 
-This document describes the structure and differences between the various data sources used in this project, specifically the *Power to Choose* API and manually downloaded CSV exports (from the [*Power to Choose* website](https://www.powertochoose.org)). It provides a guide for future developers and LLM agents working on the project.
+This document describes the structure and differences between the various data sources used in this project, specifically the *Power to Choose* API and manually downloaded CSV exports (from the [*Power to Choose* website](https://www.powertochoose.org)). It provides a guide for future developers working on the project.
 
 ## Overview
 

@@ -1,5 +1,5 @@
 /**
- * Light - Usage Estimator Module
+ * Usage Estimator Module
  *
  * Estimates monthly electricity usage patterns based on
  * average usage or home size, applying Texas seasonal multipliers.

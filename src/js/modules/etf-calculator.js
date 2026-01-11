@@ -1,5 +1,5 @@
 /**
- * Light - ETF Calculator Module
+ * ETF Calculator Module
  *
  * Calculates early termination fees, properly handling
  * per-month-remaining fee structures.

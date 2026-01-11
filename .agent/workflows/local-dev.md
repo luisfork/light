@@ -45,7 +45,7 @@ open http://localhost:8000/src/
 ## Test Data Files
 
 | File | Purpose |
-|------|---------|
+| --- | --- |
 | `.other/power-to-choose-offers.csv` | Full Power to Choose CSV export (cached for testing) |
 | `.other/plans_YYYY-MM-DD.csv` | Date-stamped CSV snapshots |
 | `data/plans.json` | Active plan data used by the app |

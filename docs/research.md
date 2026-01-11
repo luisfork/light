@@ -95,10 +95,10 @@ The holdover rate trap catches many Texans: if you do nothing when your contract
 
 The **Public Utility Commission of Texas (PUCT)** enforces protections under the Public Utility Regulatory Act. Core rights include: clear information via standardized EFLs, protection from unauthorized switching (slamming) and charges (cramming), privacy of customer-specific information, and the right to switch providers within 14 days of contract expiration without penalty.
 
-**2026 Enhanced EFL Requirements:** The PUCT has implemented significant new consumer protections:
+**2026 EFL Requirements:** The PUCT has implemented significant new consumer protections:
 
 - **Mandatory Plain-Language Summaries**: EFLs must now include a simple, top-box summary of key terms with average prices at different usage levels
-- **Enhanced Fee Transparency**: All potential non-recurring fees (disconnection, payment processing, etc.) must be clearly disclosed upfront; hidden fees are now punishable violations
+- **Fee Transparency**: All potential non-recurring fees (disconnection, payment processing, etc.) must be clearly disclosed upfront; hidden fees are now punishable violations
 - **Strengthened Notification Requirements**: Providers face stricter requirements for notifying customers about contract expirations and plan changes
 - **Two-Page Format Requirement**: EFLs must be printable in no more than two pages (PUCT Rule §25.475)
 
@@ -112,7 +112,7 @@ These rules represent the most significant regulatory change since market incept
 
 ## Implementation guide for developers
 
-The following technical specifications enable LLM agents or developers to build Texas electricity comparison tools.
+The following technical specifications enable developers to build Texas electricity comparison tools.
 
 ### Primary data source: Power to Choose API
 

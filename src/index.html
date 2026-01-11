@@ -7,9 +7,9 @@
     <meta name="description"
         content="Texas electricity plan comparison tool. Calculate your true annual cost based on actual usage patterns. Free, transparent, and unbiased analysis.">
     <meta name="keywords"
-        content="Texas electricity, electricity plans, power to choose, electricity rates, Texas energy, ERCOT">
+        content="Texas, Texas power, Texas electricity, electricity plans, power to choose, electricity rates, Texas energy, energy plans, energy plan, power plans, power plan, ERCOT">
     <meta name="author" content="Light Project">
-    <title>Light - Texas Electricity Cost Calculator</title>
+    <title>Light — Texas Electricity Cost Calculator</title>
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 
@@ -36,13 +36,7 @@
             <div class="hero-inner">
                 <div class="hero-content">
                     <h1 class="hero-title">Find your <em>lowest-cost</em> electricity plan</h1>
-                    <p class="hero-description">
-                        Most Texans overpay hundreds of dollars annually by choosing plans based on misleading
-                        advertised rates.
-                        This calculator computes your true annual cost using your actual monthly usage pattern,
-                        accounting for
-                        seasonal variations, TDU delivery charges, base fees, and bill credit eligibility.
-                    </p>
+                    <p class="hero-description">Many Texans overpay hundreds of dollars annually by choosing plans based on misleading advertised rates. This calculator computes your true annual cost using your actual monthly usage pattern, accounting for seasonal variations, TDU delivery charges, base fees, and bill credit eligibility.</p>
                     <div class="hero-metrics">
                         <div class="metric">
                             <span class="metric-value" id="total-plans-count">--</span>
@@ -142,18 +136,17 @@
                                 <label for="home-size" class="field-label">Home Size / Typical Usage</label>
                                 <select id="home-size" class="field-select">
                                     <option value="">Select typical monthly usage...</option>
-                                    <option value="400">Apartment, 1 bedroom (~400 kWh/month)</option>
-                                    <option value="600">Apartment, 2 bedroom (~600 kWh/month)</option>
-                                    <option value="800">Small house, 1,000-1,500 sq ft (~800 kWh/month)</option>
-                                    <option value="1000">Medium house, 1,500-2,000 sq ft (~1,000 kWh/month)</option>
-                                    <option value="1200">Medium-large house, 2,000-2,500 sq ft (~1,200 kWh/month)
+                                    <option value="400">Apartment, 1 bedroom (400 kWh/month)</option>
+                                    <option value="600">Apartment, 2 bedroom (600 kWh/month)</option>
+                                    <option value="800">Small house, 1,000-1,500 sq ft (800 kWh/month)</option>
+                                    <option value="1000">Medium house, 1,500-2,000 sq ft (1,000 kWh/month)</option>
+                                    <option value="1200">Medium-large house, 2,000-2,500 sq ft (1,200 kWh/month)
                                     </option>
-                                    <option value="1500">Large house, 2,500-3,000 sq ft (~1,500 kWh/month)</option>
-                                    <option value="2000">Very large house, 3,000+ sq ft (~2,000 kWh/month)</option>
-                                    <option value="2500">Estate or high-usage home (~2,500+ kWh/month)</option>
+                                    <option value="1500">Large house, 2,500-3,000 sq ft (1,500 kWh/month)</option>
+                                    <option value="2000">Very large house, 3,000+ sq ft (2,000 kWh/month)</option>
+                                    <option value="2500">Estate or high-usage home (2,500+ kWh/month)</option>
                                 </select>
-                                <p class="field-hint">Texas seasonal patterns will be applied automatically (summer AC,
-                                    winter heating)</p>
+                                <p class="field-hint">Texas seasonal patterns will be applied automatically (summer AC, winter heating)</p>
                             </div>
                         </div>
 
@@ -167,8 +160,7 @@
                                         max="10000" step="10">
                                     <span class="input-unit">kWh</span>
                                 </div>
-                                <p class="field-hint">Find this value on your electricity bill or Smart Meter Texas
-                                    account</p>
+                                <p class="field-hint">Find this value on your electricity bill or Smart Meter Texas account</p>
                             </div>
                         </div>
 
@@ -275,8 +267,7 @@
                     <div class="results-header">
                         <h2 class="results-title">Plan Analysis Results</h2>
                         <p class="results-subtitle">
-                            <span id="results-count">--</span> fixed-rate plans analyzed for your usage pattern
-                        </p>
+                            <span id="results-count">--</span> fixed-rate plans analyzed for your usage pattern</p>
                     </div>
 
                     <!-- Usage Profile Summary -->
@@ -323,8 +314,7 @@
                     <!-- Warnings Section -->
                     <div class="warnings-section" id="warnings-section" hidden>
                         <h3 class="section-heading section-heading-caution">Plans Requiring Caution</h3>
-                        <p class="section-intro">These plans have advertised rates that appear low but may cost more due
-                            to bill credit requirements, time-of-use restrictions, or high rate variance.</p>
+                        <p class="section-intro">These plans have advertised rates that appear low but may cost more due to bill credit requirements, time-of-use restrictions, or high rate variance.</p>
                         <div class="warning-list" id="warning-plans"></div>
                     </div>
 
@@ -432,39 +422,19 @@
                 <div class="methodology-content">
                     <div class="method-item">
                         <h3 class="method-heading">Seasonal Usage Modeling</h3>
-                        <p class="method-text">
-                            Texas electricity consumption varies dramatically by season. Summer months (June-September)
-                            typically see 40-80% higher usage due to air conditioning. We apply empirically-derived
-                            seasonal multipliers to your average usage to create a realistic 12-month profile that
-                            accurately reflects when you'll use more or less electricity.
-                        </p>
+                        <p class="method-text">Texas electricity consumption varies dramatically by season. Summer months (June-September) typically see 40-80% higher usage due to air conditioning. We apply empirically-derived seasonal multipliers to your average usage to create a realistic 12-month profile that accurately reflects when you'll use more or less electricity.</p>
                     </div>
                     <div class="method-item">
                         <h3 class="method-heading">Complete Cost Accounting</h3>
-                        <p class="method-text">
-                            The advertised rate on Power to Choose shows cost at exactly 1,000 kWh. This obscures the
-                            true cost for most users. We calculate monthly bills at your actual usage level,
-                            incorporating
-                            the energy rate, TDU delivery charges, base fees, and applicable taxes to determine your
-                            real annual cost for each plan.
-                        </p>
+                        <p class="method-text">The advertised rate on Power to Choose shows cost at exactly 1,000 kWh. This obscures the true cost for most users. We calculate monthly bills at your actual usage level, incorporating the energy rate, TDU delivery charges, base fees, and applicable taxes to determine your real annual cost for each plan.</p>
                     </div>
                     <div class="method-item">
                         <h3 class="method-heading">Bill Credit Analysis</h3>
-                        <p class="method-text">
-                            Many plans advertise low rates that depend on bill credits triggered only when usage falls
-                            within a narrow range (often 1,000-2,000 kWh). We analyze your usage pattern month-by-month
-                            to determine how many months you would actually qualify for these credits, calculating the
-                            real annual cost rather than the optimistic scenario.
-                        </p>
+                        <p class="method-text">Many plans advertise low rates that depend on bill credits triggered only when usage falls within a narrow range (often 1,000-2,000 kWh). We analyze your usage pattern month-by-month to determine how many months you would actually qualify for these credits, calculating the real annual cost rather than the optimistic scenario.</p>
                     </div>
                     <div class="method-item">
                         <h3 class="method-heading">Data Transparency</h3>
-                        <p class="method-text">
-                            All plan data is sourced directly from the PUCT Power to Choose database and updated daily.
-                            TDU delivery rates are updated when utilities file new tariffs. This project is open source
-                            and accepts no commissions or payments from any electricity provider.
-                        </p>
+                        <p class="method-text">All plan data is sourced directly from the PUCT Power to Choose database and updated daily. TDU delivery rates are updated when utilities file new tariffs. This project is open source and accepts no commissions or payments from any electricity provider.</p>
                     </div>
                 </div>
             </div>
@@ -501,14 +471,8 @@
                     </div>
                 </div>
                 <div class="footer-legal">
-                    <p class="legal-text" style="font-family: var(--font-serif);">
-                        This tool provides educational cost estimates based on publicly available data. Plan pricing,
-                        terms, and availability change frequently. Always review the Electricity Facts Label (EFL)
-                        and Terms of Service before enrolling with any provider. This project is not affiliated with
-                        any electricity provider or the Public Utility Commission of Texas.
-                    </p>
-                    <p class="copyright" style="font-family: var(--font-mono);">Open source project. MIT License. Data
-                        updated daily from Power to Choose.</p>
+                    <p class="legal-text" style="font-family: var(--font-serif);">This tool provides educational cost estimates based on publicly available data. Plan pricing, terms, and availability change frequently. Always review the Electricity Facts Label (EFL) and Terms of Service before enrolling with any provider. This project is not affiliated with any electricity provider or the Public Utility Commission of Texas.</p>
+                    <p class="copyright" style="font-family: var(--font-mono);">Open source project. MIT License. Data updated daily from Power to Choose.</p>
                 </div>
             </div>
         </footer>

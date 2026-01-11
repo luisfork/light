@@ -1,5 +1,5 @@
 /**
- * Light - User Interface Module
+ * User Interface Module
  * Handles all UI interactions, form state, and results display
  */
 
@@ -740,9 +740,7 @@ const UI = {
 
         // Calculate savings vs worst plan in top 5
         const savingsVsLast =
-          i === 0 && plans.length > 1
-            ? plans[plans.length - 1].annualCost - plan.annualCost
-            : null;
+          i === 0 && plans.length > 1 ? plans[plans.length - 1].annualCost - plan.annualCost : null;
 
         // Calculate difference from #1
         const diffFromBest = i > 0 ? plan.annualCost - bestPlan.annualCost : 0;
@@ -814,11 +812,15 @@ const UI = {
                         <span class="plan-detail-value">${this.formatETF(plan)}</span>
                     </span>
                 </div>
-                ${plan.warnings && plan.warnings.length > 0 && !isNonFixed ? `
+                ${
+                  plan.warnings && plan.warnings.length > 0 && !isNonFixed
+                    ? `
                 <div class="plan-item-warnings">
                     <span class="warnings-label">Note:</span>
                     <span class="warnings-text">${plan.warnings.length} consideration${plan.warnings.length > 1 ? 's' : ''} - view details</span>
-                </div>` : ''}
+                </div>`
+                    : ''
+                }
                 <div class="plan-item-actions">
                     <button class="btn-plan-action btn-plan-details" onclick="UI.showPlanModal('${plan.plan_id}')">View Details</button>
                     ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-plan-action btn-plan-efl">View EFL</a>` : ''}

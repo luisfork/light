@@ -1,18 +1,16 @@
 /**
- * Light - Texas Electricity Calculator
+ * Texas Electricity Calculator
  * Professional, functionally deep interface design
  * No bento grids, no card borders, diffused ambient light
  *
  * Typography: San Francisco and New York font families
- * © Apple Inc. All rights reserved. Used under Apple Developer License.
+ * © Apple Inc. All rights reserved.
  */
 
 /* Import font declarations */
 @import url('./fonts.css');
 
-/* ============================================================================
-   CSS Variables & Design Tokens
-   ========================================================================= */
+/* CSS Variables & Design Tokens */
 
 :root {
     /* Color System - Sophisticated neutrals with accent */
@@ -100,9 +98,7 @@
         0 12px 32px rgba(37, 99, 235, 0.04);
 }
 
-/* ============================================================================
-   Reset & Base
-   ========================================================================= */
+/* Reset & Base */
 
 *,
 *::before,
@@ -134,9 +130,7 @@ body {
     min-height: 100vh;
 }
 
-/* ============================================================================
-   Typography
-   ========================================================================= */
+/* Typography */
 
 h1,
 h2,
@@ -174,9 +168,7 @@ a:hover {
     opacity: 0.8;
 }
 
-/* ============================================================================
-   Header / Navigation
-   ========================================================================= */
+/* Header / Navigation */
 
 .site-header {
     position: sticky;
@@ -253,9 +245,7 @@ a:hover {
     border-radius: 1px;
 }
 
-/* ============================================================================
-   Hero Section
-   ========================================================================= */
+/* Hero Section */
 
 .hero {
     background: linear-gradient(180deg,
@@ -316,9 +306,7 @@ a:hover {
     letter-spacing: 0.05em;
 }
 
-/* ============================================================================
-   Calculator Section
-   ========================================================================= */
+/* Calculator Section */
 
 .calculator-section {
     flex: 1;
@@ -394,9 +382,7 @@ a:hover {
     }
 }
 
-/* ============================================================================
-   Form Elements
-   ========================================================================= */
+/* Form Elements */
 
 .field-group {
     margin-bottom: var(--space-6);
@@ -624,9 +610,7 @@ a:hover {
     border-color: var(--color-accent);
 }
 
-/* ============================================================================
-   TDU Display
-   ========================================================================= */
+/* TDU Display */
 
 .tdu-display {
     margin-top: var(--space-6);
@@ -684,9 +668,7 @@ a:hover {
     font-variant-numeric: tabular-nums;
 }
 
-/* ============================================================================
-   Usage Method Selector
-   ========================================================================= */
+/* Usage Method Selector */
 
 .method-selector {
     display: flex;
@@ -734,9 +716,7 @@ a:hover {
     color: var(--color-accent-hover);
 }
 
-/* ============================================================================
-   Usage Panels
-   ========================================================================= */
+/* Usage Panels */
 
 .usage-panel {
     display: none;
@@ -811,9 +791,7 @@ a:hover {
     color: var(--color-ink-muted);
 }
 
-/* ============================================================================
-   Calculation Status Indicator (Auto-calculate)
-   ========================================================================= */
+/* Calculation Status Indicator (Auto-calculate) */
 
 .calculation-status {
     margin-top: var(--space-8);
@@ -914,9 +892,7 @@ a:hover {
     display: none;
 }
 
-/* ============================================================================
-   Results Section
-   ========================================================================= */
+/* Results Section */
 
 .results-section {
     margin-top: var(--space-8);
@@ -959,9 +935,7 @@ a:hover {
     margin-bottom: var(--space-4);
 }
 
-/* ============================================================================
-   Usage Profile Display
-   ========================================================================= */
+/* Usage Profile Display */
 
 .usage-profile {
     margin-bottom: var(--space-10);
@@ -1025,9 +999,7 @@ a:hover {
     letter-spacing: 0.05em;
 }
 
-/* ============================================================================
-   Plan List (Recommendations)
-   ========================================================================= */
+/* Plan List (Recommendations) */
 
 .plan-list {
     display: flex;
@@ -1171,9 +1143,7 @@ a:hover {
     background: var(--color-accent-hover);
 }
 
-/* ============================================================================
-   Warning Plans
-   ========================================================================= */
+/* Warning Plans */
 
 .warnings-section {
     margin: var(--space-10) 0;
@@ -1241,9 +1211,7 @@ a:hover {
     border-top: none;
 }
 
-/* ============================================================================
-   Comparison Table
-   ========================================================================= */
+/* Comparison Table */
 
 .full-comparison {
     margin-top: var(--space-10);
@@ -1362,7 +1330,7 @@ a:hover {
     border-top: 5px solid var(--color-accent);
 }
 
-/* Enhanced Term Badge Design */
+/* Term Badge Design */
 .term-badge {
     display: inline-flex;
     align-items: center;
@@ -1504,9 +1472,7 @@ a:hover {
     font-size: var(--text-sm);
 }
 
-/* ============================================================================
-   Methodology Section
-   ========================================================================= */
+/* Methodology Section */
 
 .methodology-section {
     padding: var(--space-16) var(--space-6);
@@ -1554,9 +1520,7 @@ a:hover {
     margin: 0;
 }
 
-/* ============================================================================
-   Footer
-   ========================================================================= */
+/* Footer */
 
 .site-footer {
     background: var(--color-ink);
@@ -1641,9 +1605,7 @@ a:hover {
     margin: 0;
 }
 
-/* ============================================================================
-   Modal
-   ========================================================================= */
+/* Modal */
 
 .modal-backdrop {
     position: fixed;
@@ -1829,9 +1791,7 @@ a:hover {
     border-color: var(--color-ink-muted);
 }
 
-/* ============================================================================
-   Toast Notifications - Enhanced Professional Design
-   ========================================================================= */
+/* Toast Notifications - Enhanced Professional Design */
 
 .toast-container {
     position: fixed;
@@ -2021,9 +1981,7 @@ a:hover {
     }
 }
 
-/* ============================================================================
-   Responsive Adjustments
-   ========================================================================= */
+/* Responsive Adjustments */
 
 @media (max-width: 768px) {
     .hero {
@@ -2092,9 +2050,7 @@ a:hover {
     }
 }
 
-/* ============================================================================
-   Accessibility
-   ========================================================================= */
+/* Accessibility */
 
 :focus-visible {
     outline: 2px solid var(--color-accent);
@@ -2116,9 +2072,7 @@ a:hover {
     }
 }
 
-/* ============================================================================
-   Dark Mode Support
-   ========================================================================= */
+/* Dark Mode Support */
 
 @media (prefers-color-scheme: dark) {
     :root {
@@ -2162,9 +2116,7 @@ a:hover {
     }
 }
 
-/* ============================================================================
-   Non-Fixed Rate Plan Styling
-   ========================================================================= */
+/* Non-Fixed Rate Plan Styling */
 
 /* Visual distinction for non-fixed rate plans */
 .plan-non-fixed {
@@ -2276,9 +2228,7 @@ tr.plan-non-fixed {
     font-weight: 600;
 }
 
-/* ============================================================================
-   Contract Term Cost Display
-   ========================================================================= */
+/* Contract Term Cost Display */
 
 .plan-item-term-cost {
     display: flex;
@@ -2337,9 +2287,7 @@ tr.plan-non-fixed {
     }
 }
 
-/* ============================================================================
-   Enhanced UI Elements
-   ========================================================================= */
+/* UI Elements */
 
 .rank-medal {
     font-size: 1.5rem;
@@ -2388,9 +2336,7 @@ tr.plan-non-fixed {
     font-weight: 600;
 }
 
-/* ============================================================================
-   Enhanced Section Headers and Info Boxes
-   ========================================================================= */
+/* Section Headers and Info Boxes */
 
 .section-header-enhanced {
     margin-bottom: var(--space-6);
@@ -2466,9 +2412,7 @@ tr.plan-non-fixed {
     margin-top: var(--space-3) !important;
 }
 
-/* ============================================================================
-   Enhanced Plan Item Rank Display
-   ========================================================================= */
+/* Plan Item Rank Display */
 
 .plan-item-rank {
     display: flex;
@@ -2540,9 +2484,7 @@ tr.plan-non-fixed {
     text-align: right;
 }
 
-/* ============================================================================
-   Plan Item Warnings
-   ========================================================================= */
+/* Plan Item Warnings */
 
 .plan-item-warnings {
     display: flex;
@@ -2564,9 +2506,7 @@ tr.plan-non-fixed {
     color: var(--color-ink-tertiary);
 }
 
-/* ============================================================================
-   Quality Score Tiers
-   ========================================================================= */
+/* Quality Score Tiers */
 
 .quality-score-high {
     color: var(--color-positive);
@@ -2583,9 +2523,7 @@ tr.plan-non-fixed {
     font-weight: 500;
 }
 
-/* ============================================================================
-   Enhanced Comparison Header
-   ========================================================================= */
+/* Comparison Header */
 
 .comparison-header-enhanced {
     margin-bottom: var(--space-6);
@@ -2603,9 +2541,7 @@ tr.plan-non-fixed {
     margin-bottom: var(--space-4);
 }
 
-/* ============================================================================
-   Enhanced Grade Legend
-   ========================================================================= */
+/* Grade Legend */
 
 .grade-legend-enhanced {
     background: var(--color-surface-sunken);
@@ -2664,9 +2600,7 @@ tr.plan-non-fixed {
     color: var(--color-ink-tertiary);
 }
 
-/* ============================================================================
-   Table Info Bar
-   ========================================================================= */
+/* Table Info Bar */
 
 .table-info-bar {
     display: flex;
@@ -2684,9 +2618,7 @@ tr.plan-non-fixed {
     font-weight: 500;
 }
 
-/* ============================================================================
-   Best Value Indicators
-   ========================================================================= */
+/* Best Value Indicators */
 
 .best-value {
     color: var(--color-positive) !important;
@@ -2707,9 +2639,7 @@ tr.plan-non-fixed {
     vertical-align: middle;
 }
 
-/* ============================================================================
-   Responsive Adjustments for Enhanced Elements
-   ========================================================================= */
+/* Responsive Adjustments for Enhanced Elements */
 
 @media (max-width: 768px) {
     .section-info-box {

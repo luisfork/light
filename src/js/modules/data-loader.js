@@ -1,5 +1,5 @@
 /**
- * Light - Data Loader Module
+ * Data Loader Module
  *
  * Handles fetching data with retry logic, exponential backoff,
  * and timeout handling.

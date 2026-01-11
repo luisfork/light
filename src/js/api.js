@@ -1,5 +1,5 @@
 /**
- * Light - Data API Module
+ * Data API Module
  *
  * Handles loading electricity plan data, TDU rates, and other resources
  * with caching, retry logic, and error handling.
@@ -533,7 +533,7 @@ const API = {
    * This function detects duplicates based on plan features (prices, terms, fees)
    * and keeps the preferred version (typically English, shorter name).
    *
-   * Enhanced version using feature comparison instead of language detection.
+   * Feature comparison instead of language detection.
    *
    * @param {Array} plans - Array of plan objects
    * @returns {Object} Object with deduplicated array, duplicate count, and original count

@@ -1,20 +1,12 @@
 /**
- * Light - Font Declarations
+ * Font Declarations
  *
  * San Francisco (SF Pro, SF Compact, SF Mono) and New York Font Families
  *
- * Copyright Notice:
- * San Francisco and New York are proprietary typefaces developed by Apple Inc.
  * © Apple Inc. All rights reserved.
- *
- * These fonts are provided for use in accordance with Apple's guidelines
- * for developers. Use of these fonts is subject to Apple's terms and conditions.
- * For licensing details, see: https://developer.apple.com/fonts/
  */
 
-/* ============================================================================
-   SF Pro - Primary Text Font
-   ========================================================================= */
+/* SF Pro - Primary Text Font */
 
 @font-face {
     font-family: 'SF Pro';
@@ -113,9 +105,7 @@
     font-display: swap;
 }
 
-/* ============================================================================
-   SF Mono - Monospace Font
-   ========================================================================= */
+/* SF Mono - Monospace Font */
 
 @font-face {
     font-family: 'SF Mono';
@@ -165,9 +155,7 @@
     font-display: swap;
 }
 
-/* ============================================================================
-   New York - Serif Font
-   ========================================================================= */
+/* New York - Serif Font */
 
 @font-face {
     font-family: 'New York';
