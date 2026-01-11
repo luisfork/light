@@ -616,7 +616,9 @@ const API = {
       ' & CO',
       ' (TX)',
       ' (TEXAS)',
-      ' COMPANY'
+      ' COMPANY',
+      ' SERVICES',
+      ' RETAIL'
     ];
 
     // Keep removing suffixes until none match
