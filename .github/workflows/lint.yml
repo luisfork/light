@@ -44,24 +44,61 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-lint-
 
-      - name: Install Python linter (ruff)
-        run: uv tool install ruff
+      - name: Install Python linters (ruff, djlint)
+        run: |
+          uv tool install ruff
+          uv tool install djlint
 
       - name: Install JavaScript tools
         run: npm install -g @biomejs/biome@1.9.4
 
+      - name: Install actionlint
+        run: |
+          curl -sL https://github.com/rhysd/actionlint/releases/latest/download/actionlint_linux_amd64.tar.gz | tar xz -C /tmp
+          sudo mv /tmp/actionlint /usr/local/bin/
+          sudo chmod +x /usr/local/bin/actionlint
+
       - name: Run Ruff (Python)
+        id: ruff
+        continue-on-error: true
         run: uv tool run ruff check scripts/
 
       - name: Run Biome (JS/JSON)
+        id: biome
+        continue-on-error: true
         run: biome check src/
+
+      - name: Run djlint (HTML)
+        id: djlint
+        continue-on-error: true
+        run: uv tool run djlint src/ --check
+
+      - name: Run actionlint (Workflows)
+        id: actionlint
+        continue-on-error: true
+        run: actionlint
 
       - name: Create summary
         if: always()
         run: |
           echo "## Linting Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Ruff (Python) | ${{ steps.ruff.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Biome (JS/JSON) | ${{ steps.biome.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ruff (Python) | ${{ steps.ruff.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| biome (JS/JSON) | ${{ steps.biome.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| djlint (HTML) | ${{ steps.djlint.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| actionlint (Workflows) | ${{ steps.actionlint.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check linting results
+        if: always()
+        run: |
+          if [[ "${{ steps.ruff.outcome }}" == "failure" ]] || \
+             [[ "${{ steps.biome.outcome }}" == "failure" ]] || \
+             [[ "${{ steps.djlint.outcome }}" == "failure" ]] || \
+             [[ "${{ steps.actionlint.outcome }}" == "failure" ]]; then
+            echo "❌ Some linting checks failed"
+            exit 1
+          else
+            echo "✅ All linting checks passed"
+          fi

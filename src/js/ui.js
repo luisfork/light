@@ -662,6 +662,7 @@ const UI = {
     this.displayUsageProfile(monthlyUsage);
     this.displayTopPlans(plans.slice(0, 5));
     this.displayWarningPlans(plans.filter((p) => p.isGimmick).slice(0, 3));
+    this.displayDeduplicationStats();
     this.displayComparisonTable(plans);
 
     if (this.elements.resultsCount) {
@@ -872,6 +873,47 @@ const UI = {
       .join('');
   },
 
+  /**
+   * Display deduplication statistics in results header
+   */
+  displayDeduplicationStats() {
+    // Find table info bar or create container
+    const tableInfoBar = document.querySelector('.table-info-bar');
+    if (!tableInfoBar) return;
+
+    // Check if we have deduplication data
+    if (!this.state.data || typeof this.state.data.duplicate_count === 'undefined') {
+      return;
+    }
+
+    // Remove existing stats if present
+    const existingStats = document.querySelector('.deduplication-stats');
+    if (existingStats) {
+      existingStats.remove();
+    }
+
+    // Only show if there are duplicates
+    const totalPlans = this.state.data.total_plans || 0;
+    const duplicateCount = this.state.data.duplicate_count || 0;
+
+    if (duplicateCount === 0) return;
+
+    const statsHTML = `
+      <div class="deduplication-stats" style="margin-top: var(--space-3); padding: var(--space-3); background: var(--color-surface-sunken); border-radius: var(--radius-md); font-size: var(--text-sm); color: var(--color-text-muted);">
+        <span class="plan-count" style="font-weight: 600; color: var(--color-text);">${totalPlans.toLocaleString()} plans</span>
+        <span class="duplicate-info">
+          (${duplicateCount.toLocaleString()} duplicate${duplicateCount > 1 ? 's' : ''} removed)
+          <span class="info-icon"
+                title="Some providers list identical plans in English and Spanish. We automatically detect and remove duplicates based on pricing structure, contract terms, and plan features. English versions with shorter names are kept."
+                style="display: inline-block; width: 14px; height: 14px; line-height: 14px; text-align: center; background: var(--color-accent); color: white; border-radius: 50%; font-size: 10px; font-weight: 700; margin-left: 4px; cursor: help;">i</span>
+        </span>
+      </div>
+    `;
+
+    // Insert after table info bar
+    tableInfoBar.insertAdjacentHTML('afterend', statsHTML);
+  },
+
   displayComparisonTable(plans) {
     if (!this.elements.comparisonBody) return;
 
@@ -895,6 +937,20 @@ const UI = {
         const rowClass = plan.isGimmick ? 'row-caution' : isNonFixed ? 'plan-non-fixed' : '';
         const termMonths = plan.term_months || 12;
         const contractTotalCost = plan.averageMonthlyCost * termMonths;
+
+        // Calculate contract end date (assuming enrollment today)
+        const contractEndDate = new Date();
+        contractEndDate.setMonth(contractEndDate.getMonth() + termMonths);
+        const endDateFormatted = contractEndDate.toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric'
+        });
+
+        // Get contract expiration analysis
+        const expirationAnalysis =
+          typeof ContractAnalyzer !== 'undefined' && ContractAnalyzer.calculateContractExpiration
+            ? ContractAnalyzer.calculateContractExpiration(termMonths, new Date())
+            : { riskLevel: 'low', renewalSeason: 'Optimal' };
 
         // Check if this plan has best values
         const isBestCost = plan.annualCost === bestValues.lowestCost;
@@ -924,6 +980,16 @@ const UI = {
                     </div>
                 </td>
                 <td><span class="term-badge">${plan.term_months} mo</span></td>
+                <td class="col-contract-end" data-sort-value="${contractEndDate.getTime()}">
+                    <div class="contract-end-wrapper">
+                        <span class="contract-end-date">${endDateFormatted}</span>
+                        ${
+                          expirationAnalysis.riskLevel === 'high'
+                            ? `<span class="contract-end-warning" title="Expires during expensive renewal season (rates 15-40% higher)" style="color: var(--color-caution); margin-left: 4px;">⚠</span>`
+                            : ''
+                        }
+                    </div>
+                </td>
                 <td class="col-annual">
                     <span class="cost-value ${isBestCost ? 'best-value' : ''}">${formatCurrency(plan.annualCost)}</span>
                     ${isBestCost ? '<span class="best-indicator">Lowest</span>' : ''}
@@ -1055,6 +1121,16 @@ const UI = {
             aVal = a.term_months || 0;
             bVal = b.term_months || 0;
             break;
+          case 'contractEnd': {
+            // Sort by contract end date (calculated from term_months)
+            const dateA = new Date();
+            dateA.setMonth(dateA.getMonth() + (a.term_months || 0));
+            const dateB = new Date();
+            dateB.setMonth(dateB.getMonth() + (b.term_months || 0));
+            aVal = dateA.getTime();
+            bVal = dateB.getTime();
+            break;
+          }
           case 'monthly':
             aVal = a.averageMonthlyCost || 0;
             bVal = b.averageMonthlyCost || 0;
@@ -1224,14 +1300,70 @@ const UI = {
    * Format ETF for display, handling per-month-remaining fees
    */
   formatETF(plan) {
-    if (typeof getETFDisplayInfo === 'function') {
-      const etfInfo = getETFDisplayInfo(plan);
+    if (typeof ETFCalculator !== 'undefined' && ETFCalculator.getETFDisplayInfo) {
+      const etfInfo = ETFCalculator.getETFDisplayInfo(plan);
+
+      if (etfInfo.needsConfirmation) {
+        return `
+          ${etfInfo.displayText}
+          <span class="etf-info-icon"
+                title="Fee structure detected automatically. Click for verification guidance."
+                onclick="UI.showETFVerificationModal(event)"
+                style="cursor: pointer; margin-left: 4px; color: var(--color-accent); font-weight: 600;">ⓘ</span>
+        `;
+      }
+
       return etfInfo.displayText;
     }
 
-    // Fallback if function not available
+    // Fallback if module not available
     if (!plan.early_termination_fee) return 'None';
     return formatCurrency(plan.early_termination_fee);
+  },
+
+  /**
+   * Show ETF verification modal with guidance on verifying cancellation fees
+   */
+  showETFVerificationModal(event) {
+    // Prevent event propagation
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+
+    const modalContent = `
+      <div class="etf-verification-content">
+        <h3 style="margin-top: 0; color: var(--color-text);">Early Termination Fee Verification Required</h3>
+        <p style="color: var(--color-text-muted); line-height: 1.6;">
+          This fee structure was detected automatically and may not be accurate.
+        </p>
+
+        <div class="verification-instructions" style="margin: var(--space-6) 0; padding: var(--space-4); background: var(--color-surface-sunken); border-radius: var(--radius-md);">
+          <h4 style="margin-top: 0; font-size: var(--text-base); color: var(--color-text);">Please verify exact cancellation terms in these official documents:</h4>
+          <ul style="margin: var(--space-3) 0; padding-left: var(--space-5); line-height: 1.8;">
+            <li><strong>Electricity Facts Label (EFL)</strong> - Required disclosure document</li>
+            <li><strong>Terms of Service (TOS)</strong> - Full contract terms</li>
+            <li><strong>Your Rights as a Customer</strong> - Consumer protection guide</li>
+          </ul>
+        </div>
+
+        <div class="fee-structure-types" style="margin: var(--space-6) 0;">
+          <h4 style="margin-top: 0; font-size: var(--text-base); color: var(--color-text);">Common Fee Structures:</h4>
+          <ul style="margin: var(--space-3) 0; padding-left: var(--space-5); line-height: 1.8;">
+            <li><strong>Flat fee:</strong> One-time charge (e.g., $150 total)</li>
+            <li><strong>Per-month remaining:</strong> Multiplied by months left (e.g., $20 × 8 months = $160)</li>
+            <li><strong>No fee:</strong> $0 cancellation cost</li>
+          </ul>
+        </div>
+
+        <p class="verification-note" style="margin-top: var(--space-6); padding: var(--space-4); background: var(--color-caution-muted); border-radius: var(--radius-md); border: 1px solid var(--color-caution); font-size: var(--text-sm); line-height: 1.6;">
+          <strong>Important:</strong> The Retail Electric Provider (REP) must clearly disclose cancellation terms in your EFL.
+          Always verify before enrolling.
+        </p>
+      </div>
+    `;
+
+    this.showModal('ETF Verification', modalContent);
   }
 };
 

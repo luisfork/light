@@ -32,10 +32,10 @@ jobs:
       - name: Install dependencies
         run: uv pip install --system requests beautifulsoup4 lxml
 
-      - name: Create historical data directories
+      - name: Create json-archive data directories
         run: |
-          mkdir -p data/historical
-          mkdir -p data/archive-csv
+          mkdir -p data/json-archive
+          mkdir -p data/csv-archive
 
       - name: Archive current data before fetch
         run: |
@@ -43,14 +43,35 @@ jobs:
 
           # Archive JSON
           if [ -f data/plans.json ]; then
-            cp data/plans.json "data/historical/plans_${TIMESTAMP}.json"
-            echo "Archived current plans to data/historical/plans_${TIMESTAMP}.json"
+            cp data/plans.json "data/json-archive/plans_${TIMESTAMP}.json"
+            echo "Archived current plans to data/json-archive/plans_${TIMESTAMP}.json"
           fi
 
           # Archive CSV
           if [ -f data/plans.json ]; then
             export TIMESTAMP="${TIMESTAMP}"
             python scripts/archive_to_csv.py
+          fi
+
+      - name: Verify archive integrity
+        run: |
+          TIMESTAMP=$(date +'%Y-%m-%d')
+
+          # Check JSON is valid
+          if [ -f "data/json-archive/plans_${TIMESTAMP}.json" ]; then
+            python -c "import json; json.load(open('data/json-archive/plans_${TIMESTAMP}.json'))"
+            echo "✓ JSON archive is valid"
+          fi
+
+          # Check CSV has content
+          if [ -f "data/csv-archive/plans_${TIMESTAMP}.csv" ]; then
+            LINE_COUNT=$(wc -l < "data/csv-archive/plans_${TIMESTAMP}.csv")
+            if [ $LINE_COUNT -gt 1 ]; then
+              echo "✓ CSV archive has $LINE_COUNT lines"
+            else
+              echo "✗ CSV archive is empty"
+              exit 1
+            fi
           fi
 
       - name: Fetch electricity plans
@@ -75,17 +96,17 @@ jobs:
             echo "changes=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Verify historical data directory
+      - name: Verify json-archive data directory
         run: |
           echo "Historical plan data archive maintained indefinitely for trend analysis"
-          ls -lh data/historical/ || echo "No historical files yet"
+          ls -lh data/json-archive/ || echo "No json-archive files yet"
 
       - name: Commit and push changes
         if: steps.check_changes.outputs.changes == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/plans.json data/historical/ data/archive-csv/
+          git add data/plans.json data/json-archive/ data/csv-archive/
           git commit -m "Update electricity plans data - $(date +'%Y-%m-%d')"
           git pull --rebase --autostash
           git push

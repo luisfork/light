@@ -1,0 +1,9 @@
+[djlint]
+profile=html
+indent=2
+max_line_length=120
+format_attribute_template_tags=True
+ignore=H006,H030,H031
+# H006: img tag height/width (not always needed)
+# H030: meta description (not applicable)
+# H031: meta keywords (obsolete SEO)

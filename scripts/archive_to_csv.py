@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 def archive_plans_to_csv(
-    json_path: str = "data/plans.json", archive_dir: str = "data/archive-csv"
+    json_path: str = "data/plans.json", archive_dir: str = "data/csv-archive"
 ) -> int:
     """Convert plans.json to CSV and save to archive directory.
 
@@ -53,14 +53,19 @@ def archive_plans_to_csv(
         "is_prepaid",
         "is_tou",
         "special_terms",
+        "promotion_details",
+        "fees_credits",
+        "min_usage_fees",
+        "language",
         "efl_url",
         "enrollment_url",
+        "terms_url",
     ]
 
     # Get timestamp from env or generate new one
     timestamp = os.environ.get("TIMESTAMP")
     if not timestamp:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d")  # Match workflow format
 
     # Create output directory
     os.makedirs(archive_dir, exist_ok=True)

@@ -46,6 +46,28 @@ const ETFCalculator = {
         }
       }
 
+      // Pattern 2.5: "multiplied by months remaining" or "for each month left"
+      if (!perMonthRate) {
+        const multipliedMatch = terms.match(
+          /\$(\d+(?:\.\d{2})?)\s*(?:multiplied\s+by|for\s+each)\s+(?:remaining\s+)?months?\s*(?:remaining|left)?/i
+        );
+        if (multipliedMatch) {
+          perMonthRate = parseFloat(multipliedMatch[1]);
+          etfStructure = 'per-month';
+        }
+      }
+
+      // Pattern 2.6: "cancellation fee equals $X per remaining month"
+      if (!perMonthRate) {
+        const equalsMatch = terms.match(
+          /(?:cancellation|termination|early\s+termination)\s+fee\s+(?:equals|is|of)\s+\$(\d+(?:\.\d{2})?)\s*(?:per|\/|for\s+each)\s+(?:remaining\s+)?months?\s*(?:remaining|left)?/i
+        );
+        if (equalsMatch) {
+          perMonthRate = parseFloat(equalsMatch[1]);
+          etfStructure = 'per-month';
+        }
+      }
+
       // Pattern 3: "months remaining" followed by "$X" or "$X" followed by "months remaining"
       if (!perMonthRate) {
         const monthsFirstMatch = terms.match(

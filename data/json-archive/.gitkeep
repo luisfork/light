@@ -1,10 +1,11 @@
 # Historical Data Directory
 
-This directory stores historical snapshots of electricity plan data for the past 90 days.
+This directory stores historical snapshots of electricity plan data with unlimited retention unless otherwise documented.
 
 Files are automatically managed by GitHub Actions:
+
 - Created daily before data refresh
 - Named as: plans_YYYY-MM-DD.json
-- Deleted after 90 days
+- Not automatically deleted; retained for historical reference.
 
 Do not manually edit or delete files in this directory.

@@ -588,26 +588,93 @@ def parse_int(value: Any) -> int | None:
         return None
 
 
+def create_plan_fingerprint(plan: dict[str, Any]) -> str:
+    """Create fingerprint matching JavaScript implementation"""
+
+    def normalize_price(price):
+        """Round price to 3 decimal places for consistent comparison"""
+        if price is None:
+            return 0.0
+        return round(price * 1000) / 1000
+
+    def normalize_fee(fee):
+        """Round fee to 2 decimal places for consistent comparison"""
+        if fee is None:
+            return 0.0
+        return round(fee * 100) / 100
+
+    fingerprint_data = {
+        "rep": (plan.get("rep_name") or "").upper().strip(),
+        "tdu": (plan.get("tdu_area") or "").upper().strip(),
+        "p500": normalize_price(plan.get("price_kwh_500")),
+        "p1000": normalize_price(plan.get("price_kwh_1000")),
+        "p2000": normalize_price(plan.get("price_kwh_2000")),
+        "term": plan.get("term_months") or 0,
+        "etf": normalize_fee(plan.get("early_termination_fee")),
+        "base": normalize_fee(plan.get("base_charge_monthly")),
+        "renewable": plan.get("renewable_pct") or 0,
+        "prepaid": bool(plan.get("is_prepaid")),
+        "tou": bool(plan.get("is_tou")),
+    }
+
+    return json.dumps(fingerprint_data, sort_keys=True)
+
+
+def calculate_plan_preference(plan: dict[str, Any]) -> int:
+    """Score plans to prefer English versions with shorter names"""
+    score = 100
+    plan_name = plan.get("plan_name", "")
+
+    # Penalize Spanish characters
+    if "ñ" in plan_name.lower():
+        score -= 20
+    for char in ["á", "é", "í", "ó", "ú"]:
+        if char in plan_name.lower():
+            score -= 10
+    if plan_name.lower().endswith("ción"):
+        score -= 15
+
+    # Penalize longer names
+    name_length = len(plan_name)
+    if name_length > 80:
+        score -= 15
+    elif name_length > 60:
+        score -= 10
+    elif name_length > 40:
+        score -= 5
+
+    # Penalize special characters
+    special_chars = sum(1 for c in plan_name if not c.isalnum() and c != " ")
+    score -= special_chars * 2
+
+    return score
+
+
 def deduplicate_plans(plans: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Remove duplicate plans based on key fields."""
-    seen = set()
-    unique_plans = []
+    """Remove duplicate plans based on fingerprinting.
+
+    Uses same fingerprinting logic as JavaScript implementation:
+    - Creates fingerprint from pricing, terms, fees, and features
+    - Prefers English versions with shorter, clearer names
+    - Excludes plan_name and plan_id from fingerprint (these differ for duplicates)
+    """
+    fingerprint_map = {}
 
     for plan in plans:
-        # Create a key from identifying fields
-        key = (
-            plan["rep_name"].lower(),
-            plan["plan_name"].lower(),
-            plan["tdu_area"],
-            plan["term_months"],
-            plan.get("language", "English").lower(),
-        )
+        fingerprint = create_plan_fingerprint(plan)
 
-        if key not in seen:
-            seen.add(key)
-            unique_plans.append(plan)
+        if fingerprint not in fingerprint_map:
+            fingerprint_map[fingerprint] = plan
+        else:
+            # Compare preference scores - higher score wins
+            existing_plan = fingerprint_map[fingerprint]
+            existing_score = calculate_plan_preference(existing_plan)
+            current_score = calculate_plan_preference(plan)
 
-    return unique_plans
+            if current_score > existing_score:
+                fingerprint_map[fingerprint] = plan
+
+    return list(fingerprint_map.values())
 
 
 def save_plans(plans: list[dict[str, Any]], output_path: Path) -> None:

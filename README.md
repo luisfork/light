@@ -39,7 +39,7 @@ Many Texans overpay $816 to $1,072 annually (EnergyBot 2025 study) by choosing p
 - **Gimmick Detection**: Identifies and warns about bill credit traps and time-of-use plans
 - **Provider Name Formatting**: All provider names displayed in clean, professional uppercase format
 - **ETF Calculation**: Properly handles per-month-remaining early termination fees
-- **Duplicate Plan Detection**: Automatically removes duplicate English/Spanish versions of same plan
+- **Duplicate Plan Detection**: Fingerprint-based deduplication automatically removes duplicate English/Spanish versions of same plan
 - **Quality Scoring System**: 0-100 scoring with penalties and bonuses for plan features, transparent score breakdowns on hover
 - **Best Value Indicators**: Visual highlighting of lowest cost, best rate, and highest quality plans in comparison table
 - **Interactive Grade Legend**: Expanded grade guide with descriptions explaining what each grade means
@@ -50,7 +50,7 @@ Many Texans overpay $816 to $1,072 annually (EnergyBot 2025 study) by choosing p
 
 - **Static Site**: Zero hosting cost via GitHub Pages
 - **Daily Data Updates**: GitHub Actions automatically fetches latest plans at 2 AM CT
-- **Historical Data Storage**: Maintains unlimited archive of plan data in `data/historical/` for trend analysis
+- **Historical Data Storage**: Maintains unlimited archive of plan data in `data/json-archive/` and `data/csv-archive/` for trend analysis
 - **Transparent Calculations**: All formulas visible in open-source code
 - **Fast Performance**: Pre-fetched data, no external API calls during use
 - **Cross-Browser Compatible**: Works on all modern browsers and platforms
@@ -215,14 +215,14 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 #### JSON Archive
 
-- **Location:** `data/historical/` directory
+- **Location:** `data/json-archive/` directory
 - **Format:** Timestamped JSON files (`plans_YYYY-MM-DD.json`)
 - **Retention:** Unlimited (growing archive of all historical snapshots)
 - **Purpose:** Programmatic access, trend analysis, data integrity verification
 
 #### CSV Archive
 
-- **Location:** `data/archive-csv/` directory
+- **Location:** `data/csv-archive/` directory
 - **Format:** Timestamped CSV files (`plans_YYYY-MM-DD.csv`)
 - **Retention:** Unlimited (daily snapshots)
 - **Purpose:** Easy analysis in Excel, Google Sheets, or data science tools
@@ -233,14 +233,15 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 plan_id, plan_name, rep_name, tdu_area, rate_type,
 term_months, price_kwh_500, price_kwh_1000, price_kwh_2000,
 base_charge_monthly, early_termination_fee, renewable_pct,
-is_prepaid, is_tou, special_terms, efl_url, enrollment_url
+is_prepaid, is_tou, special_terms, promotion_details,
+fees_credits, min_usage_fees, language, efl_url, enrollment_url, terms_url
 ```
 
 **Accessing Historical Data:**
 
 ```javascript
 // Load historical plan data from specific date (JavaScript)
-const historicalData = await fetch('/data/historical/plans_2025-12-01.json');
+const historicalData = await fetch('/data/json-archive/plans_2025-12-01.json');
 const plans = await historicalData.json();
 
 // Compare current vs historical rates
@@ -253,11 +254,11 @@ console.log(`Plan count: ${plans.total_plans} → ${current.total_plans}`);
 import pandas as pd
 
 # Load specific date
-df = pd.read_csv('data/archive-csv/plans_2026-01-01.csv')
+df = pd.read_csv('data/csv-archive/plans_2026-01-01.csv')
 
 # Compare rates over time
 from pathlib import Path
-csv_files = sorted(Path('data/archive-csv').glob('plans_*.csv'))
+csv_files = sorted(Path('data/csv-archive').glob('plans_*.csv'))
 for f in csv_files[-5:]:  # Last 5 days
     df = pd.read_csv(f)
     avg_rate = df['price_kwh_1000'].mean()
@@ -287,8 +288,8 @@ light/
 │   ├── plans.json               # Current electricity plans (updated daily)
 │   ├── tdu-rates.json           # TDU delivery charges (updated Mar/Sep)
 │   ├── local-taxes.json         # Texas local tax rates
-│   ├── historical/              # Unlimited archive of historical plan snapshots
-│   └── archive-csv/             # Daily CSV exports of plan data
+│   ├── json-archive/            # Unlimited archive of historical plan snapshots (JSON)
+│   └── csv-archive/             # Daily CSV exports of plan data
 ├── docs/                        # Comprehensive technical documentation
 │   ├── api-response-schema.md   # API response formats and data structures
 │   ├── calculation-algorithm.md # Detailed algorithm walkthrough
@@ -403,10 +404,11 @@ uv run python scripts/fetch_tdu_rates.py
 **Daily Data Updates** (`update-plans.yml`):
 
 - Runs at 2 AM Central Time (7 AM UTC)
-- Archives current plans to `data/historical/` (unlimited retention)
-- Archives CSV to `data/archive-csv/` (daily snapshot)
+- Archives current plans to `data/json-archive/` (unlimited retention)
+- Archives CSV to `data/csv-archive/` (daily snapshot with enhanced columns)
+- Verifies archive integrity (JSON validation, CSV line count)
 - Fetches latest plans from Power to Choose API
-- Removes duplicate English/Spanish plan versions
+- Removes duplicate English/Spanish plan versions using fingerprint-based deduplication
 - Commits and pushes if changes detected
 - Triggers deployment workflow
 
@@ -415,6 +417,15 @@ uv run python scripts/fetch_tdu_rates.py
 - Triggered on push to `main` branch
 - Triggered after successful data update
 - Builds site and deploys to GitHub Pages
+
+**Linting** (`lint.yml`):
+
+- Runs on pull requests and pushes to main
+- Biome for JavaScript/JSON linting and formatting
+- Ruff for Python linting and formatting
+- djlint for HTML linting (configured via `.djlintrc`)
+- actionlint for GitHub Actions workflow validation
+- Comprehensive error handling with continue-on-error and summary reporting
 
 ---
 
@@ -442,15 +453,16 @@ If expiration score ≥ 0.8: "High Risk" warning
   → Suggest alternative terms shifting to score < 0.5
 ```
 
-### 2. ETF Calculation
+### 2. ETF Calculation with Verification
 
-Many comparison tools incorrectly display per-month ETFs as flat fees. *Light* properly calculates:
+Many comparison tools incorrectly display per-month ETFs as flat fees. *Light* properly calculates ETFs and alerts users when verification is needed:
 
 ```javascript
 detectETFStructure(plan):
-  if fee ≤ $50 AND term ≥ 12 months:
+  // Enhanced detection with multiple regex patterns
+  if special_terms matches "per month remaining|multiplied by|for each month":
     return "per-month-remaining"
-  if special_terms includes "per month remaining":
+  if fee ≤ $50 AND term ≥ 12 months:
     return "per-month-remaining"
   else:
     return "flat"
@@ -461,6 +473,8 @@ calculateETF(plan, monthsRemaining):
   else:
     return baseFee
 ```
+
+**User Verification Feature:** When ETF structure is automatically detected (not explicitly stated), *Light* displays an info icon (ⓘ) that opens a verification modal reminding users to check the official Electricity Facts Label (EFL), Terms of Service (TOS), and "Your Rights as a Customer" documents for exact cancellation terms.
 
 ### 3. Quality Scoring System
 
@@ -490,8 +504,6 @@ The quality score (0-100) is calculated from multiple factors:
 | Warning Penalty | -25 | Deducted for risk factors (5 per warning) |
 | Base Charge Penalty | -5 | Deducted for high monthly fees (>$15) |
 | Rate Consistency Bonus | +5 | Added for stable pricing across usage levels |
-| Renewable Bonus | +3 | Added for 100% renewable energy |
-| Flexibility Bonus | +2 | Added for shorter contract terms |
 
 **Automatic F Grade (Score = 0):**
 
@@ -515,26 +527,28 @@ The quality score (0-100) is calculated from multiple factors:
 
 **Table Features:**
 
-- Click any column header to sort (Grade, Provider, Plan, Term, Cost, Rate, etc.)
+- Click any column header to sort (Grade, Provider, Plan, Term, Contract Ends, Annual Cost, Monthly Cost, Rate, Renewable %, Cancel Fee)
+- "Contract Ends" column shows expiration date and warns about high-risk renewal months (⚠ for July/August/January)
 - Best values highlighted in green (lowest cost, lowest rate, best quality)
 - "Lowest" indicator badge on the most affordable plan
 - Tooltips on column headers explaining each metric
 
 ### 4. Duplicate Plan Detection
 
-Automatically identifies and removes duplicate English/Spanish plan versions:
+Automatically identifies and removes duplicate English/Spanish plan versions using fingerprint-based deduplication:
 
 ```javascript
 deduplicatePlans(plans):
-  1. Create fingerprint from: rep_name, tdu_area, prices, term, fees
-  2. Detect duplicates with identical fingerprints
-  3. Prefer English version over Spanish
-  4. Remove duplicates, keep one version per unique plan
+  1. Create fingerprint from: rep_name, tdu_area, prices, term, fees, renewable, prepaid, tou
+  2. Normalize prices (round to 3 decimals) and fees (round to 2 decimals)
+  3. Detect duplicates with identical fingerprints
+  4. Prefer English version with shorter name over Spanish
+  5. Remove duplicates, keep one version per unique plan
 
   return { deduplicated, duplicateCount }
 ```
 
-Some providers list the same plan twice (e.g., "Truly Simple 12" and "Verdaderamente Simple 12") with identical pricing. *Light* detects these and shows only one version.
+Some providers list the same plan twice (e.g., "Truly Simple 12" and "Verdaderamente Simple 12") with identical pricing. *Light* detects these using comprehensive fingerprinting and shows only one version. The UI displays deduplication statistics: "X plans (Y duplicates removed)" with a tooltip explaining the methodology.
 
 ### 5. Provider Name Formatting
 
@@ -551,12 +565,13 @@ Example: "Reliant Energy Retail Services, LLC" → "RELIANT ENERGY RETAIL SERVIC
 
 ### 6. Historical Data Tracking
 
-Unlike competitors, *Light* maintains 90-day historical archive:
+Unlike competitors, *Light* maintains unlimited historical archive:
 
-- Daily snapshots before data refresh
-- Enables rate trend analysis
-- Verifies data integrity
-- Supports future predictive features
+- Daily snapshots before data refresh (JSON and CSV formats)
+- Enables rate trend analysis and market research
+- Verifies data integrity across updates
+- Supports data science workflows and predictive modeling
+- Archive integrity verification ensures valid JSON and non-empty CSV files
 
 ---
 

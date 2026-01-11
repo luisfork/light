@@ -15,8 +15,6 @@
  * - Warning penalty: -5 per warning, max -25 points
  * - Base charge penalty: Up to -5 points (high monthly fees)
  * - Rate consistency bonus: Up to +5 points (stable pricing)
- * - Renewable bonus: Up to +3 points (100% renewable)
- * - Contract flexibility: Up to +2 points (shorter terms)
  */
 
 const PlanRanker = {
@@ -36,9 +34,7 @@ const PlanRanker = {
     volatilityPenalty: { max: 25, label: 'Price Stability' },
     warningPenalty: { max: 25, perItem: 5, label: 'Risk Factors' },
     baseChargePenalty: { max: 5, threshold: 15, label: 'Fee Structure' },
-    rateConsistencyBonus: { max: 5, label: 'Rate Consistency' },
-    renewableBonus: { max: 3, label: 'Renewable Energy' },
-    flexibilityBonus: { max: 2, label: 'Contract Flexibility' }
+    rateConsistencyBonus: { max: 5, label: 'Rate Consistency' }
   },
 
   /**
@@ -175,8 +171,6 @@ const PlanRanker = {
       warningPenalty: 0,
       baseChargePenalty: 0,
       rateConsistencyBonus: 0,
-      renewableBonus: 0,
-      flexibilityBonus: 0,
       automaticF: false,
       automaticFReason: null
     };
@@ -246,24 +240,6 @@ const PlanRanker = {
     }
     score += breakdown.rateConsistencyBonus;
 
-    // Bonus 2: Renewable energy bonus (0-3 points)
-    // 100% renewable plans get full bonus
-    if (plan.renewable_pct >= 100) {
-      breakdown.renewableBonus = 3;
-    } else if (plan.renewable_pct >= 50) {
-      breakdown.renewableBonus = 1;
-    }
-    score += breakdown.renewableBonus;
-
-    // Bonus 3: Contract flexibility bonus (0-2 points)
-    // Shorter contracts offer more flexibility
-    if (plan.term_months && plan.term_months <= 6) {
-      breakdown.flexibilityBonus = 2;
-    } else if (plan.term_months && plan.term_months <= 12) {
-      breakdown.flexibilityBonus = 1;
-    }
-    score += breakdown.flexibilityBonus;
-
     // Store breakdown on plan for UI display
     plan.scoreBreakdown = breakdown;
 
@@ -304,12 +280,6 @@ const PlanRanker = {
     }
     if (b.rateConsistencyBonus > 0) {
       parts.push(`Consistent rates: +${b.rateConsistencyBonus}`);
-    }
-    if (b.renewableBonus > 0) {
-      parts.push(`Renewable: +${b.renewableBonus}`);
-    }
-    if (b.flexibilityBonus > 0) {
-      parts.push(`Flexibility: +${b.flexibilityBonus}`);
     }
 
     return parts.join(' | ');
