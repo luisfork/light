@@ -304,9 +304,12 @@ light/
 ├── docs/                        # Comprehensive technical documentation
 │   ├── api-response-schema.md   # API response formats and data structures
 │   ├── calculation-algorithm.md # Detailed algorithm walkthrough
-│   ├── tdu-service-areas.md     # TDU coverage mapping and rates
+│   ├── contract-expiration.md   # Contract timing analysis documentation
+│   ├── data-schema-plans.md     # plans.json structure specification
+│   ├── data_formats.md          # CSV/JSON format specifications
+│   ├── design-philosophy.md     # Design system, spring animations, accessibility
 │   ├── research.md              # Texas electricity market research
-│   └── data-schema-plans.md     # plans.json structure specification
+│   └── tdu-service-areas.md     # TDU coverage mapping and rates
 ├── src/
 │   ├── assets/
 │   │   └── fonts/
@@ -596,9 +599,13 @@ Unlike competitors, *Light* maintains unlimited historical archive:
 - **NO emojis**: Professional text-only communication
 - **NO bento grids**: Clear, hierarchical layout
 - **NO shadcn/ui aesthetic**: Custom Apple-inspired design system
+- **NO animations except spring physics**: All transitions use spring-based cubic-bezier timing functions
 - **Sophisticated neutral palette**: Ink grays, ambient light effects
 - **Typography-focused**: San Francisco & New York fonts, clear hierarchy
 - **Functional depth**: Rich calculations, transparent methodology
+
+> [!TIP]
+> See [**docs/design-philosophy.md**](docs/design-philosophy.md) for comprehensive design guidelines, animation specifications, and implementation checklist.
 
 ### Performance
 
