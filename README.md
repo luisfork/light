@@ -3,6 +3,7 @@
 # ***Light*** — Texas Electricity Plan Finder
 
 > Find the best and most affordable Texas electricity plan.
+>
 > **Free, unbiased, and accurate.**
 
 *Light* is a high-performance static web application that helps Texans find the best electricity plan by calculating true annual costs based on actual usage patterns, seasonal variations, and contract expiration timing—not deceptive advertised rates.
@@ -13,7 +14,7 @@ Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 ## Why *Light*?
 
-Many Texans overpay between **$816** [^1] and **$1,072** [^2] annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage [^3]. This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms [^4].
+Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage[^3]. This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms[^4].
 
 [^1]: EnergyBot. "The Truth About Texas Bill Credit Electricity Plans." *EnergyBot*, 15 Jan. 2025, [www.energybot.com/blog/bill-credit-electricity-plans.html](https://www.energybot.com/blog/bill-credit-electricity-plans.html).
 
@@ -336,7 +337,6 @@ light/
 │   ├── fetch_tdu_rates.py       # TDU rate management
 │   └── archive_to_csv.py        # Archive plans.json to CSV format
 ├── biome.json                   # Biome linter configuration (JS/JSON)
-├── _typos.toml                  # Typos spell checker configuration
 ├── pyproject.toml               # Python deps + Ruff linter config
 ├── README.md                    # This file (hello!)
 └── LICENSE                      # MIT License
@@ -382,15 +382,15 @@ light/
 
 4. **Serve locally**
 
-   > [!IMPORTANT]
-   Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
-
    ```bash
    # Start local server (from project root)
    python -m http.server 8000
 
    # Open http://localhost:8000/src/ in your browser
    ```
+
+   > [!IMPORTANT]
+   > Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
 
 ### Fetching Data
 
@@ -542,7 +542,7 @@ The quality score (0-100) is calculated from multiple factors:
 **Table Features:**
 
 - Click any column header to sort (Grade, Provider, Plan, Term, Contract Ends, Annual Cost, Monthly Cost, Rate, Renewable %, Cancel Fee)
-- "Contract Ends" column shows expiration date and warns about high-risk renewal months (⚠ for July/August/January)
+- "Contract Ends" column shows expiration date and warns about high-risk renewal months (for July/August/January)
 - Best values highlighted in green (lowest cost, lowest rate, best quality)
 - "Lowest" indicator badge on the most affordable plan
 - Tooltips on column headers explaining each metric
