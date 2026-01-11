@@ -1,4 +1,4 @@
-# *Light* — Texas Electricity Plan Finder
+# ***Light*** — Texas Electricity Plan Finder
 
 **Find the best and most affordable Texas electricity plan. Free, unbiased, and accurate.**
 

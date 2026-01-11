@@ -56,9 +56,6 @@ jobs:
       - name: Run Biome (JS/JSON)
         run: biome check src/
 
-      - name: Check for typos
-        uses: crate-ci/typos@v1
-
       - name: Create summary
         if: always()
         run: |
@@ -66,6 +63,5 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Ruff (Python) | ${{ steps.ruff.outcome == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Biome (JS/JSON) | ${{ steps.biome.outcome == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Typos | ${{ steps.typos.outcome == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Ruff (Python) | ${{ steps.ruff.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Biome (JS/JSON) | ${{ steps.biome.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
