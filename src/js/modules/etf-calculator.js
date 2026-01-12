@@ -31,7 +31,7 @@ const ETFCalculator = {
         /\$(\d+(?:\.\d{2})?)\s*(?:per|\/)\s*(?:each\s+)?(?:month|mo)(?:nth)?\s*(?:remaining|left|of\s+(?:the\s+)?(?:contract|term))/i
       );
       if (perMonthMatch) {
-        perMonthRate = parseFloat(perMonthMatch[1]);
+        perMonthRate = Number.parseFloat(perMonthMatch[1]);
         etfStructure = 'per-month';
       }
 
@@ -41,7 +41,7 @@ const ETFCalculator = {
           /\$(\d+(?:\.\d{2})?)\s*(?:times|x|×|\*)\s*(?:the\s+)?(?:number\s+of\s+)?(?:remaining\s+)?months?\s*(?:remaining|left|in\s+(?:the\s+)?(?:contract|term))?/i
         );
         if (timesMatch) {
-          perMonthRate = parseFloat(timesMatch[1]);
+          perMonthRate = Number.parseFloat(timesMatch[1]);
           etfStructure = 'per-month';
         }
       }
@@ -52,7 +52,7 @@ const ETFCalculator = {
           /\$(\d+(?:\.\d{2})?)\s*(?:multiplied\s+by|for\s+each)\s+(?:remaining\s+)?months?\s*(?:remaining|left)?/i
         );
         if (multipliedMatch) {
-          perMonthRate = parseFloat(multipliedMatch[1]);
+          perMonthRate = Number.parseFloat(multipliedMatch[1]);
           etfStructure = 'per-month';
         }
       }
@@ -63,7 +63,7 @@ const ETFCalculator = {
           /(?:cancellation|termination|early\s+termination)\s+fee\s+(?:equals|is|of)\s+\$(\d+(?:\.\d{2})?)\s*(?:per|\/|for\s+each)\s+(?:remaining\s+)?months?\s*(?:remaining|left)?/i
         );
         if (equalsMatch) {
-          perMonthRate = parseFloat(equalsMatch[1]);
+          perMonthRate = Number.parseFloat(equalsMatch[1]);
           etfStructure = 'per-month';
         }
       }
@@ -74,7 +74,7 @@ const ETFCalculator = {
           /(?:months?\s+(?:remaining|left)).*?\$(\d+(?:\.\d{2})?)|(?:\$(\d+(?:\.\d{2})?)).*?(?:months?\s+(?:remaining|left))/i
         );
         if (monthsFirstMatch) {
-          const rate = parseFloat(monthsFirstMatch[1] || monthsFirstMatch[2]);
+          const rate = Number.parseFloat(monthsFirstMatch[1] || monthsFirstMatch[2]);
           // Only treat as per-month if the value is reasonably small (≤$50)
           if (rate <= 50) {
             perMonthRate = rate;

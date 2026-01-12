@@ -263,7 +263,7 @@ const UI = {
     // Average usage input - auto-calculate on input with debounce
     if (this.elements.avgKwh) {
       this.elements.avgKwh.addEventListener('input', (e) => {
-        this.state.avgUsage = parseFloat(e.target.value) || null;
+        this.state.avgUsage = Number.parseFloat(e.target.value) || null;
         this.debounceAutoCalculate();
       });
     }
@@ -481,7 +481,7 @@ const UI = {
 
   handleMonthlyInput() {
     const monthInputs = document.querySelectorAll('[data-month]');
-    const values = Array.from(monthInputs).map((input) => parseFloat(input.value) || 0);
+    const values = Array.from(monthInputs).map((input) => Number.parseFloat(input.value) || 0);
     this.state.monthlyUsage = values;
 
     const total = values.reduce((sum, v) => sum + v, 0);
@@ -514,7 +514,7 @@ const UI = {
       case 'estimate':
         return !!(this.state.homeSize || this.elements.homeSize?.value);
       case 'average':
-        return !!(this.state.avgUsage || parseFloat(this.elements.avgKwh?.value));
+        return !!(this.state.avgUsage || Number.parseFloat(this.elements.avgKwh?.value));
       case 'detailed':
         return this.state.monthlyUsage.some((v) => v > 0);
       default:
@@ -566,11 +566,11 @@ const UI = {
           Toast.warning('Select your home size to estimate usage.', 5000, 'Selection Required');
           return;
         }
-        monthlyUsage = estimateUsagePattern(parseFloat(homeSize));
+        monthlyUsage = estimateUsagePattern(Number.parseFloat(homeSize));
         break;
       }
       case 'average': {
-        const avgKwh = parseFloat(this.elements.avgKwh?.value) || this.state.avgUsage;
+        const avgKwh = Number.parseFloat(this.elements.avgKwh?.value) || this.state.avgUsage;
         if (!avgKwh) {
           Toast.warning('Enter your average monthly kWh usage.', 5000, 'Usage Required');
           return;
@@ -1094,7 +1094,7 @@ const UI = {
 
     const renewableFilter = this.elements.filterRenewable?.value;
     if (renewableFilter && renewableFilter !== 'all') {
-      const minPct = parseInt(renewableFilter, 10);
+      const minPct = Number.parseInt(renewableFilter, 10);
       filtered = filtered.filter((p) => (p.renewable_pct || 0) >= minPct);
     }
 

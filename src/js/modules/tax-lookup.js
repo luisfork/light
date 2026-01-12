@@ -14,7 +14,7 @@ const TaxLookup = {
    * @returns {Object} Tax info object with rate and details
    */
   getLocalTaxInfo(zipCode, taxData) {
-    const zip = parseInt(zipCode, 10);
+    const zip = Number.parseInt(zipCode, 10);
 
     // Check major cities first for exact ZIP match
     for (const [cityName, cityData] of Object.entries(taxData.major_cities || {})) {
@@ -32,8 +32,8 @@ const TaxLookup = {
     // Check ZIP code ranges
     for (const [range, rangeData] of Object.entries(taxData.zip_code_ranges || {})) {
       const [minStr, maxStr] = range.split('-');
-      const min = parseInt(minStr, 10);
-      const max = parseInt(maxStr, 10);
+      const min = Number.parseInt(minStr, 10);
+      const max = Number.parseInt(maxStr, 10);
 
       if (zip >= min && zip <= max) {
         return {

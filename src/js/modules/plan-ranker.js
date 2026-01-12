@@ -356,9 +356,9 @@ const PlanRanker = {
       terms.match(/between\s+(\d+)-(\d+)\s+kwh/i) || terms.match(/exactly\s+(\d+)\s+kwh/i);
 
     if (creditMatch && rangeMatch) {
-      const creditAmount = parseFloat(creditMatch[1]);
-      const minKwh = parseFloat(rangeMatch[1]);
-      const maxKwh = rangeMatch[2] ? parseFloat(rangeMatch[2]) : minKwh;
+      const creditAmount = Number.parseFloat(creditMatch[1]);
+      const minKwh = Number.parseFloat(rangeMatch[1]);
+      const maxKwh = rangeMatch[2] ? Number.parseFloat(rangeMatch[2]) : minKwh;
 
       if (usageKwh >= minKwh && usageKwh <= maxKwh) {
         return creditAmount;
@@ -391,7 +391,7 @@ const PlanRanker = {
           // Estimate missed credit value
           const match = plan.special_terms.match(/\$(\d+)/);
           if (match) {
-            missedValue += parseFloat(match[1]);
+            missedValue += Number.parseFloat(match[1]);
           }
         }
       }

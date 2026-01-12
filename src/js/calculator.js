@@ -106,9 +106,9 @@ function calculateBillCredits(usageKwh, plan) {
     terms.match(/between\s+(\d+)-(\d+)\s+kwh/i) || terms.match(/exactly\s+(\d+)\s+kwh/i);
 
   if (creditMatch && rangeMatch) {
-    const creditAmount = parseFloat(creditMatch[1]);
-    const minKwh = parseFloat(rangeMatch[1]);
-    const maxKwh = rangeMatch[2] ? parseFloat(rangeMatch[2]) : minKwh;
+    const creditAmount = Number.parseFloat(creditMatch[1]);
+    const minKwh = Number.parseFloat(rangeMatch[1]);
+    const maxKwh = rangeMatch[2] ? Number.parseFloat(rangeMatch[2]) : minKwh;
 
     if (usageKwh >= minKwh && usageKwh <= maxKwh) {
       return creditAmount;
@@ -246,7 +246,7 @@ function detectTDU(zipCode, tduList) {
     ]
   };
 
-  const zip = parseInt(zipCode, 10);
+  const zip = Number.parseInt(zipCode, 10);
 
   for (const [tduCode, ranges] of Object.entries(zipRanges)) {
     for (const range of ranges) {
@@ -475,7 +475,7 @@ function identifyWarnings(plan, userUsage, contractStartDate = null) {
         // Estimate missed credit value
         const match = plan.special_terms.match(/\$(\d+)/);
         if (match) {
-          missedValue += parseFloat(match[1]);
+          missedValue += Number.parseFloat(match[1]);
         }
       }
     }
@@ -768,7 +768,7 @@ function calculateEarlyTerminationFee(plan, monthsRemaining) {
       /\$(\d+(?:\.\d{2})?)\s*(?:per|\/)\s*(?:each\s+)?(?:month|mo)(?:nth)?\s*(?:remaining|left)/i
     );
     if (perMonthMatch) {
-      perMonthRate = parseFloat(perMonthMatch[1]);
+      perMonthRate = Number.parseFloat(perMonthMatch[1]);
       etfStructure = 'per-month';
     }
 
@@ -778,7 +778,7 @@ function calculateEarlyTerminationFee(plan, monthsRemaining) {
         /\$(\d+(?:\.\d{2})?)\s*(?:times|x|×)\s*(?:remaining\s+)?months/i
       );
       if (timesMatch) {
-        perMonthRate = parseFloat(timesMatch[1]);
+        perMonthRate = Number.parseFloat(timesMatch[1]);
         etfStructure = 'per-month';
       }
     }

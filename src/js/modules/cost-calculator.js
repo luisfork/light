@@ -60,9 +60,9 @@ const CostCalculator = {
       terms.match(/between\s+(\d+)-(\d+)\s+kwh/i) || terms.match(/exactly\s+(\d+)\s+kwh/i);
 
     if (creditMatch && rangeMatch) {
-      const creditAmount = parseFloat(creditMatch[1]);
-      const minKwh = parseFloat(rangeMatch[1]);
-      const maxKwh = rangeMatch[2] ? parseFloat(rangeMatch[2]) : minKwh;
+      const creditAmount = Number.parseFloat(creditMatch[1]);
+      const minKwh = Number.parseFloat(rangeMatch[1]);
+      const maxKwh = rangeMatch[2] ? Number.parseFloat(rangeMatch[2]) : minKwh;
 
       if (usageKwh >= minKwh && usageKwh <= maxKwh) {
         return creditAmount;
@@ -187,7 +187,7 @@ const CostCalculator = {
       ]
     };
 
-    const zip = parseInt(zipCode, 10);
+    const zip = Number.parseInt(zipCode, 10);
 
     for (const [tduCode, ranges] of Object.entries(zipRanges)) {
       for (const range of ranges) {
