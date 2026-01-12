@@ -351,7 +351,7 @@ const UI = {
       }, this.ZIP_VALIDATION_DELAY);
     } else if (value.length > 0) {
       // Partial input
-      this.elements.zipStatus.innerHTML = `<span class="zip-status-partial">${5 - value.length} monthsre digits</span>`;
+      this.elements.zipStatus.innerHTML = `<span class="zip-status-partial">${5 - value.length} more digits</span>`;
       this.disableUsageSection();
     } else {
       // Empty
