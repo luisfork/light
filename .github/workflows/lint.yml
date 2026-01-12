@@ -60,7 +60,7 @@ jobs:
       - name: Run Biome (JS/JSON)
         id: biome
         continue-on-error: true
-        run: biome check src/
+        run: biome check src/ --diagnostic-level=error
 
       - name: Run djlint (HTML)
         id: djlint
