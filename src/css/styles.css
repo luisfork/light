@@ -13,33 +13,33 @@
 /* CSS Variables & Design Tokens */
 
 :root {
-  /* Color System - Sophisticated neutrals with accent */
+  /* Color System - Apple Developer Color Specifications (Light Mode) */
   --color-ink: #1a1a1a;
-  --color-ink-secondary: #4a4a4a;
-  --color-ink-tertiary: #6b6b6b;
-  --color-ink-muted: #8a8a8a;
+  --color-ink-secondary: #8e8e93; /* Gray (1) */
+  --color-ink-tertiary: #aeaeb2; /* Gray (2) */
+  --color-ink-muted: #aeaeb2; /* Gray (2) */
 
   --color-surface: #ffffff;
-  --color-surface-raised: #fafafa;
-  --color-surface-sunken: #f5f5f5;
+  --color-surface-raised: #f2f2f7; /* Gray (6) */
+  --color-surface-sunken: #e5e5ea; /* Gray (5) */
   --color-surface-overlay: rgba(255, 255, 255, 0.95);
 
   --color-border-subtle: rgba(0, 0, 0, 0.06);
   --color-border-medium: rgba(0, 0, 0, 0.12);
 
-  /* Accent colors - Deep, professional tones */
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-accent-muted: rgba(37, 99, 235, 0.08);
+  /* Accent colors - Apple System Colors (Light Mode) */
+  --color-accent: #0088ff; /* Blue: rgb(0, 136, 255) */
+  --color-accent-hover: #0077e6;
+  --color-accent-muted: rgba(0, 136, 255, 0.08);
 
-  --color-positive: #059669;
-  --color-positive-muted: rgba(5, 150, 105, 0.08);
+  --color-positive: #34c759; /* Green: rgb(52, 199, 89) */
+  --color-positive-muted: rgba(52, 199, 89, 0.08);
 
-  --color-caution: #d97706;
-  --color-caution-muted: rgba(217, 119, 6, 0.08);
+  --color-caution: #ff8d28; /* Orange: rgb(255, 141, 40) */
+  --color-caution-muted: rgba(255, 141, 40, 0.08);
 
-  --color-negative: #dc2626;
-  --color-negative-muted: rgba(220, 38, 38, 0.08);
+  --color-negative: #ff383c; /* Red: rgb(255, 56, 60) */
+  --color-negative-muted: rgba(255, 56, 60, 0.08);
 
   /* Typography - SF Pro, SF Mono, New York with system fallbacks */
   --font-system: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -91,8 +91,8 @@
     0 0 0 1px var(--color-border-subtle), 0 4px 12px rgba(0, 0, 0, 0.04),
     0 16px 48px rgba(0, 0, 0, 0.06);
   --glow-accent:
-    0 0 0 1px rgba(37, 99, 235, 0.15), 0 4px 16px rgba(37, 99, 235, 0.08),
-    0 12px 32px rgba(37, 99, 235, 0.04);
+    0 0 0 1px rgba(0, 136, 255, 0.15), 0 4px 16px rgba(0, 136, 255, 0.08),
+    0 12px 32px rgba(0, 136, 255, 0.04);
 
   /* Shadow system for depth hierarchy */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -2080,31 +2080,33 @@ a:hover {
 
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Color System - Apple Developer Color Specifications (Dark Mode) */
     --color-ink: #f0f0f0;
-    --color-ink-secondary: #b0b0b0;
-    --color-ink-tertiary: #888888;
-    --color-ink-muted: #666666;
+    --color-ink-secondary: #636366; /* Gray (2) Dark */
+    --color-ink-tertiary: #48484a; /* Gray (3) Dark */
+    --color-ink-muted: #8e8e93; /* Gray (1) */
 
-    --color-surface: #1a1a1a;
-    --color-surface-raised: #222222;
-    --color-surface-sunken: #141414;
-    --color-surface-overlay: rgba(26, 26, 26, 0.95);
+    --color-surface: #1c1c1e; /* Gray (6) Dark */
+    --color-surface-raised: #2c2c2e; /* Gray (5) Dark */
+    --color-surface-sunken: #1c1c1e; /* Gray (6) Dark */
+    --color-surface-overlay: rgba(28, 28, 30, 0.95);
 
     --color-border-subtle: rgba(255, 255, 255, 0.06);
     --color-border-medium: rgba(255, 255, 255, 0.12);
 
-    --color-accent: #3b82f6;
-    --color-accent-hover: #60a5fa;
-    --color-accent-muted: rgba(59, 130, 246, 0.15);
+    /* Accent colors - Apple System Colors (Dark Mode) */
+    --color-accent: #0091ff; /* Blue: rgb(0, 145, 255) */
+    --color-accent-hover: #3dadff;
+    --color-accent-muted: rgba(0, 145, 255, 0.15);
 
-    --color-positive: #10b981;
-    --color-positive-muted: rgba(16, 185, 129, 0.15);
+    --color-positive: #30d158; /* Green: rgb(48, 209, 88) */
+    --color-positive-muted: rgba(48, 209, 88, 0.15);
 
-    --color-caution: #f59e0b;
-    --color-caution-muted: rgba(245, 158, 11, 0.15);
+    --color-caution: #ff9230; /* Orange: rgb(255, 146, 48) */
+    --color-caution-muted: rgba(255, 146, 48, 0.15);
 
-    --color-negative: #ef4444;
-    --color-negative-muted: rgba(239, 68, 68, 0.15);
+    --color-negative: #ff4245; /* Red: rgb(255, 66, 69) */
+    --color-negative-muted: rgba(255, 66, 69, 0.15);
   }
 
   body {

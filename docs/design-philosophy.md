@@ -67,43 +67,76 @@ Light implements fluid, natural motion through spring-based timing functions. NO
 
 ## Color System
 
-### Neutral Ink Palette
+### Official Apple Developer Color Specifications
+
+Light implements Apple's official system colors for both Light and Dark modes.
+
+#### Light Mode
 
 ```css
+/* Neutral Ink Palette */
 --color-ink: #1a1a1a;              /* Primary text */
---color-ink-secondary: #4a4a4a;    /* Secondary text */
---color-ink-tertiary: #6b6b6b;     /* Tertiary text */
---color-ink-muted: #8a8a8a;        /* Muted text */
+--color-ink-secondary: #8e8e93;    /* Gray (1): rgb(142, 142, 147) */
+--color-ink-tertiary: #aeaeb2;     /* Gray (2): rgb(174, 174, 178) */
+--color-ink-muted: #aeaeb2;        /* Gray (2): rgb(174, 174, 178) */
+
+/* Surface Colors */
+--color-surface: #ffffff;                      /* Base surface */
+--color-surface-raised: #f2f2f7;               /* Gray (6): rgb(242, 242, 247) */
+--color-surface-sunken: #e5e5ea;               /* Gray (5): rgb(229, 229, 234) */
+--color-surface-overlay: rgba(255, 255, 255, 0.95);
+
+/* Accent Colors - Apple System Colors */
+--color-accent: #0088ff;           /* Blue: rgb(0, 136, 255) */
+--color-positive: #34c759;         /* Green: rgb(52, 199, 89) */
+--color-caution: #ff8d28;          /* Orange: rgb(255, 141, 40) */
+--color-negative: #ff383c;         /* Red: rgb(255, 56, 60) */
 ```
 
-### Surface Colors
+#### Dark Mode
 
 ```css
---color-surface: #ffffff;                      /* Base surface */
---color-surface-raised: #fafafa;               /* Elevated surface */
---color-surface-sunken: #f5f5f5;               /* Recessed surface */
---color-surface-overlay: rgba(255, 255, 255, 0.95);  /* Glassmorphism */
+/* Neutral Ink Palette */
+--color-ink: #f0f0f0;              /* Primary text */
+--color-ink-secondary: #636366;    /* Gray (2) Dark: rgb(99, 99, 102) */
+--color-ink-tertiary: #48484a;     /* Gray (3) Dark: rgb(72, 72, 74) */
+--color-ink-muted: #8e8e93;        /* Gray (1): rgb(142, 142, 147) */
+
+/* Surface Colors */
+--color-surface: #1c1c1e;          /* Gray (6) Dark: rgb(28, 28, 30) */
+--color-surface-raised: #2c2c2e;   /* Gray (5) Dark: rgb(44, 44, 46) */
+--color-surface-sunken: #1c1c1e;   /* Gray (6) Dark: rgb(28, 28, 30) */
+--color-surface-overlay: rgba(28, 28, 30, 0.95);
+
+/* Accent Colors - Apple System Colors */
+--color-accent: #0091ff;           /* Blue: rgb(0, 145, 255) */
+--color-positive: #30d158;         /* Green: rgb(48, 209, 88) */
+--color-caution: #ff9230;          /* Orange: rgb(255, 146, 48) */
+--color-negative: #ff4245;         /* Red: rgb(255, 66, 69) */
 ```
 
-### Accent Colors
+### Complete Apple Color Reference
 
-Following Apple's semantic color guidelines:
-
-- **Blue** (`#2563eb`): Primary actions, links, interactive elements
-- **Green** (`#059669`): Positive indicators, success states
-- **Orange** (`#d97706`): Caution, warnings
-- **Red** (`#dc2626`): Negative indicators, errors
-
-### Official Apple Developer Colors
-
-For future enhancements, reference Apple's official RGB values:
-
-| Color  | Light Mode RGB | Dark Mode RGB |
-|--------|---------------|---------------|
-| Blue   | (0, 136, 255) | (0, 145, 255) |
-| Green  | (52, 199, 89) | (48, 209, 88) |
-| Orange | (255, 141, 40) | (255, 146, 48) |
-| Red    | (255, 56, 60) | (255, 66, 69) |
+| Color    | Light Mode RGB    | Dark Mode RGB     |
+|----------|------------------|-------------------|
+| Red      | (255, 56, 60)    | (255, 66, 69)     |
+| Orange   | (255, 141, 40)   | (255, 146, 48)    |
+| Yellow   | (255, 204, 0)    | (255, 214, 0)     |
+| Green    | (52, 199, 89)    | (48, 209, 88)     |
+| Mint     | (0, 200, 179)    | (0, 218, 195)     |
+| Teal     | (0, 195, 208)    | (0, 210, 224)     |
+| Cyan     | (0, 192, 232)    | (60, 211, 254)    |
+| Blue     | (0, 136, 255)    | (0, 145, 255)     |
+| Indigo   | (97, 85, 245)    | (109, 124, 255)   |
+| Purple   | (203, 48, 224)   | (219, 52, 242)    |
+| Pink     | (255, 45, 85)    | (255, 55, 95)     |
+| Brown    | (172, 127, 94)   | (183, 138, 102)   |
+| Gray (1) | (142, 142, 147)  | (142, 142, 147)   |
+| Gray (2) | (174, 174, 178)  | (99, 99, 102)     |
+| Gray (3) | (199, 199, 204)  | (72, 72, 74)      |
+| Gray (4) | (209, 209, 214)  | (58, 58, 60)      |
+| Gray (5) | (229, 229, 234)  | (44, 44, 46)      |
+| Gray (6) | (242, 242, 247)  | (28, 28, 30)      |
 
 ---
 
@@ -167,9 +200,9 @@ Light uses **layered shadow systems** instead of harsh drop shadows to create de
 
 /* Accent glow */
 --glow-accent:
-    0 0 0 1px rgba(37, 99, 235, 0.15),
-    0 4px 16px rgba(37, 99, 235, 0.08),
-    0 12px 32px rgba(37, 99, 235, 0.04);
+    0 0 0 1px rgba(0, 136, 255, 0.15),
+    0 4px 16px rgba(0, 136, 255, 0.08),
+    0 12px 32px rgba(0, 136, 255, 0.04);
 ```
 
 ### Usage Guidelines
@@ -371,22 +404,7 @@ When adding new UI components, verify:
 
 ## Future Enhancements
 
-### Dark Mode (Planned)
-
-When implementing dark mode, use Apple's official dark mode color palette:
-
-```css
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-ink: #ffffff;
-        --color-surface: #1c1c1e;
-        --color-surface-raised: #2c2c2e;
-        /* Use Apple's dark mode RGB values from table above */
-    }
-}
-```
-
-### Advanced Animations (Planned)
+### Advanced Animations (Potential)
 
 For future interactive features:
 - Gesture-based spring animations
