@@ -41,12 +41,14 @@
   --color-negative: #ff383c; /* Red: rgb(255, 56, 60) */
   --color-negative-muted: rgba(255, 56, 60, 0.08);
 
-  /* Typography - SF Pro, SF Mono, New York with system fallbacks */
+  /* Typography - SF Pro, SF Mono, SF Compact, New York (Apple-exclusive fonts) */
   --font-system: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-display:
-    "SF Pro Display", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono: "SF Mono", ui-monospace, monospace;
-  --font-serif: "New York", serif;
+  --font-display: "SF Pro Display", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "SF Mono", -apple-system, BlinkMacSystemFont, system-ui, monospace;
+  --font-compact: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-compact-display: "SF Compact Display", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-serif: "New York", -apple-system, BlinkMacSystemFont, system-ui, serif;
+  --font-serif-large: "New York Large", "New York", -apple-system, BlinkMacSystemFont, system-ui, serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -272,6 +274,7 @@ a:hover {
 }
 
 .hero-title {
+  font-family: var(--font-serif-large);
   font-size: clamp(var(--text-2xl), 5vw, var(--text-4xl));
   font-weight: 700;
   line-height: 1.1;
@@ -300,6 +303,7 @@ a:hover {
 }
 
 .metric-value {
+  font-family: var(--font-mono);
   font-size: var(--text-2xl);
   font-weight: 700;
   color: var(--color-ink);
@@ -431,6 +435,7 @@ a:hover {
 }
 
 .field-input-zip {
+  font-family: var(--font-mono);
   max-width: 160px;
   font-size: var(--text-xl);
   font-weight: 500;
@@ -667,6 +672,7 @@ a:hover {
 }
 
 .tdu-detail-value {
+  font-family: var(--font-mono);
   font-size: var(--text-base);
   font-weight: 500;
   color: var(--color-ink);
@@ -787,6 +793,7 @@ a:hover {
 }
 
 .summary-value {
+  font-family: var(--font-mono);
   font-weight: 600;
   color: var(--color-ink);
   font-variant-numeric: tabular-nums;
@@ -989,6 +996,7 @@ a:hover {
 }
 
 .stat-value {
+  font-family: var(--font-mono);
   font-size: var(--text-xl);
   font-weight: 600;
   color: var(--color-ink);
@@ -1075,6 +1083,7 @@ a:hover {
 }
 
 .plan-item-annual {
+  font-family: var(--font-mono);
   font-size: var(--text-xl);
   font-weight: 700;
   color: var(--color-positive);
@@ -1082,6 +1091,7 @@ a:hover {
 }
 
 .plan-item-monthly {
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
   color: var(--color-ink-tertiary);
   font-variant-numeric: tabular-nums;
@@ -1272,6 +1282,7 @@ a:hover {
 }
 
 .comparison-table th {
+  font-family: var(--font-compact);
   padding: var(--space-3) var(--space-4);
   text-align: left;
   font-weight: 600;
@@ -1279,6 +1290,9 @@ a:hover {
   background: var(--color-surface-sunken);
   border-bottom: 1px solid var(--color-border-medium);
   white-space: nowrap;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .comparison-table th.sortable {
@@ -1356,6 +1370,7 @@ a:hover {
 .comparison-table .col-monthly,
 .comparison-table .col-rate,
 .comparison-table .col-etf {
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -1439,6 +1454,7 @@ a:hover {
 }
 
 .quality-score {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--color-ink-tertiary);
   font-variant-numeric: tabular-nums;
@@ -1719,6 +1735,7 @@ a:hover {
 }
 
 .modal-stat-value {
+  font-family: var(--font-mono);
   font-size: var(--text-lg);
   font-weight: 600;
   color: var(--color-ink);
@@ -2024,10 +2041,14 @@ a:hover {
   }
 
   .comparison-table {
-    font-size: var(--text-xs);
+    font-size: 0.6875rem; /* 11px - extra compact for mobile */
   }
 
-  .comparison-table th,
+  .comparison-table th {
+    font-family: var(--font-compact);
+    padding: var(--space-2);
+  }
+
   .comparison-table td {
     padding: var(--space-2);
   }
@@ -2263,8 +2284,10 @@ tr.plan-non-fixed {
 }
 
 .term-cost-value {
+  font-family: var(--font-mono);
   font-weight: 600;
   color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .term-cost-label {

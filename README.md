@@ -601,7 +601,13 @@ Unlike competitors, *Light* maintains unlimited historical archive:
 - **NO shadcn/ui aesthetic**: Custom Apple-inspired design system
 - **NO animations except spring physics**: All transitions use spring-based cubic-bezier timing functions
 - **Sophisticated neutral palette**: Ink grays, ambient light effects
-- **Typography-focused**: San Francisco & New York fonts, clear hierarchy
+- **Typography-focused**: Complete Apple font ecosystem (SF Pro, SF Mono, SF Compact, New York, New York Large) with precise usage guidelines
+  - **SF Pro**: Primary UI text and body copy (font-weight: 400-700)
+  - **SF Pro Display**: Large headings ≥20px with optical sizing
+  - **SF Mono**: All numeric and tabular data for superior legibility and alignment
+  - **SF Compact**: Table headers and mobile-responsive dense layouts
+  - **New York**: Editorial headings and serif accent text
+  - **New York Large**: Hero section display headings ≥32px
 - **Functional depth**: Rich calculations, transparent methodology
 
 > [!TIP]
