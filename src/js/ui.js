@@ -138,7 +138,7 @@ const UI = {
     usageMethod: 'estimate',
     homeSize: null,
     avgUsage: null,
-    monthsnthlyUsage: Array(12).fill(0),
+    monthlyUsage: Array(12).fill(0),
     rankedPlans: null,
     isLoading: false,
     autoCalculateTimer: null,
@@ -205,7 +205,7 @@ const UI = {
       homeSize: document.getElementById('home-size'),
       avgKwh: document.getElementById('avg-kwh'),
       annualUsageTotal: document.getElementById('annual-usage-total'),
-      monthsnthlyUsageAvg: document.getElementById('monthly-usage-avg'),
+      monthlyUsageAvg: document.getElementById('monthly-usage-avg'),
       calculateBtn: document.getElementById('calculate-btn'),
 
       // Results
@@ -269,8 +269,8 @@ const UI = {
     }
 
     // Monthly usage inputs - auto-calculate with debounce
-    const monthsnthInputs = document.querySelectorAll('[data-month]');
-    monthsnthInputs.forEach((input) => {
+    const monthInputs = document.querySelectorAll('[data-month]');
+    monthInputs.forEach((input) => {
       input.addEventListener('input', () => {
         this.handleMonthlyInput();
         this.debounceAutoCalculate();
@@ -321,7 +321,7 @@ const UI = {
         const date = new Date(freshness.plansUpdated);
         // Include year in the date format
         this.elements.lastUpdate.textContent = date.toLocaleDateString('en-US', {
-          monthsnth: 'short',
+          month: 'short',
           day: 'numeric',
           year: 'numeric'
         });
@@ -480,7 +480,7 @@ const UI = {
   },
 
   handleMonthlyInput() {
-    const monthsnthInputs = document.querySelectorAll('[data-month]');
+    const monthInputs = document.querySelectorAll('[data-month]');
     const values = Array.from(monthInputs).map((input) => Number.parseFloat(input.value) || 0);
     this.state.monthlyUsage = values;
 
@@ -558,7 +558,7 @@ const UI = {
     }
 
     // Get usage pattern
-    let monthsnthlyUsage;
+    let monthlyUsage;
     switch (this.state.usageMethod) {
       case 'estimate': {
         const homeSize = this.elements.homeSize?.value || this.state.homeSize;
@@ -566,28 +566,28 @@ const UI = {
           Toast.warning('Select your home size to estimate usage.', 5000, 'Selection Required');
           return;
         }
-        monthsnthlyUsage = estimateUsagePattern(Number.parseFloat(homeSize));
+        monthlyUsage = estimateUsagePattern(Number.parseFloat(homeSize));
         break;
       }
       case 'average': {
         const avgKwh = Number.parseFloat(this.elements.avgKwh?.value) || this.state.avgUsage;
         if (!avgKwh) {
-          Toast.warning('Enter your average monthsnthly kWh usage.', 5000, 'Usage Required');
+          Toast.warning('Enter your average monthly kWh usage.', 5000, 'Usage Required');
           return;
         }
-        monthsnthlyUsage = estimateUsagePattern(avgKwh);
+        monthlyUsage = estimateUsagePattern(avgKwh);
         break;
       }
       case 'detailed': {
         if (!this.state.monthlyUsage.some((v) => v > 0)) {
-          Toast.warning('Enter usage for at least one monthsnth.', 5000, 'Usage Required');
+          Toast.warning('Enter usage for at least one month.', 5000, 'Usage Required');
           return;
         }
-        monthsnthlyUsage = [...this.state.monthlyUsage];
-        // Fill empty monthsnths with average of filled monthsnths
-        const filledMonths = monthsnthlyUsage.filter((v) => v > 0);
+        monthlyUsage = [...this.state.monthlyUsage];
+        // Fill empty months with average of filled months
+        const filledMonths = monthlyUsage.filter((v) => v > 0);
         const avgFilled = filledMonths.reduce((a, b) => a + b, 0) / filledMonths.length;
-        monthsnthlyUsage = monthsnthlyUsage.map((v) => v || avgFilled);
+        monthlyUsage = monthlyUsage.map((v) => v || avgFilled);
         break;
       }
     }
@@ -608,10 +608,10 @@ const UI = {
         return;
       }
 
-      const rankedPlans = rankPlans(tduPlans, monthsnthlyUsage, this.state.tdu);
+      const rankedPlans = rankPlans(tduPlans, monthlyUsage, this.state.tdu);
       this.state.rankedPlans = rankedPlans;
 
-      this.displayResults(rankedPlans, monthsnthlyUsage);
+      this.displayResults(rankedPlans, monthlyUsage);
 
       this.elements.resultsSection.hidden = false;
       this.elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -657,7 +657,7 @@ const UI = {
     if (this.elements.statusReady) this.elements.statusReady.hidden = true;
   },
 
-  displayResults(plans, monthsnthlyUsage) {
+  displayResults(plans, monthlyUsage) {
     this.displayUsageProfile(monthlyUsage);
     this.displayTopPlans(plans.slice(0, 5));
     this.displayWarningPlans(plans.filter((p) => p.isGimmick).slice(0, 3));
@@ -670,11 +670,11 @@ const UI = {
   },
 
   displayUsageProfile(monthlyUsage) {
-    const total = monthsnthlyUsage.reduce((a, b) => a + b, 0);
+    const total = monthlyUsage.reduce((a, b) => a + b, 0);
     const avg = total / 12;
     const max = Math.max(...monthlyUsage);
-    const peakMonth = monthsnthlyUsage.indexOf(max);
-    const monthsnthNames = [
+    const peakMonth = monthlyUsage.indexOf(max);
+    const monthNames = [
       'Jan',
       'Feb',
       'Mar',
@@ -699,12 +699,12 @@ const UI = {
       this.elements.profilePeak.textContent = `${monthNames[peakMonth]} (${Math.round(max).toLocaleString()} kWh)`;
     }
 
-    // Render chart with monthsnth names and color-coded intensity
+    // Render chart with month names and color-coded intensity
     if (this.elements.usageChart) {
       const maxHeight = 100; // Increased height for better visibility
       const min = Math.min(...monthlyUsage);
 
-      this.elements.usageChart.innerHTML = monthsnthlyUsage
+      this.elements.usageChart.innerHTML = monthlyUsage
         .map((usage, i) => {
           const height = max > 0 ? (usage / max) * maxHeight : 4;
           // Calculate intensity (0-1) for color coding
@@ -800,7 +800,7 @@ const UI = {
                     </div>
                     <div class="plan-item-cost">
                         <div class="plan-item-annual">${formatCurrency(plan.annualCost)}/yr</div>
-                        ${termMonths !== 12 ? `<div class="plan-item-term-total">${formatCurrency(contractTotalCost)}/ ${termMonths} monthsnths</div>` : ''}
+                        ${termMonths !== 12 ? `<div class="plan-item-term-total">${formatCurrency(contractTotalCost)}/ ${termMonths} months</div>` : ''}
                         <div class="plan-item-monthly">${formatCurrency(plan.averageMonthlyCost)}/month avg</div>
                     </div>
                 </div>
@@ -929,7 +929,7 @@ const UI = {
         const contractEndDate = new Date();
         contractEndDate.setMonth(contractEndDate.getMonth() + termMonths);
         const endDateFormatted = contractEndDate.toLocaleDateString('en-US', {
-          monthsnth: 'short',
+          month: 'short',
           year: 'numeric'
         });
 
@@ -980,7 +980,7 @@ const UI = {
                 <td class="col-annual">
                     <span class="cost-value ${isBestCost ? 'best-value' : ''}">${formatCurrency(plan.annualCost)}</span>
                     ${isBestCost ? '<span class="best-indicator">Lowest</span>' : ''}
-                    ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)}/ ${termMonths} monthsnths</span>` : ''}
+                    ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)}/ ${termMonths} months</span>` : ''}
                 </td>
                 <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
                 <td class="col-rate"><span class="rate-value ${isBestRate ? 'best-value' : ''}">${formatRate(plan.effectiveRate)}</span></td>
@@ -1210,7 +1210,7 @@ const UI = {
                 <h3 class="modal-section-title">Plan Details</h3>
                 <div class="modal-grid">
                     <div class="modal-stat">
-                        <span class="modal-stat-value">${plan.term_months} monthsnths</span>
+                        <span class="modal-stat-value">${plan.term_months} months</span>
                         <span class="modal-stat-label">Contract Term</span>
                     </div>
                     <div class="modal-stat">
