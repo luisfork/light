@@ -67,18 +67,19 @@ function interpolateRate(usageKwh, plan) {
 
   if (usageKwh <= 500) {
     return price_kwh_500;
-  } else if (usageKwh <= 1000) {
+  }
+  if (usageKwh <= 1000) {
     // Linear interpolation between 500 and 1000
     const ratio = (usageKwh - 500) / 500;
     return price_kwh_500 + (price_kwh_1000 - price_kwh_500) * ratio;
-  } else if (usageKwh <= 2000) {
+  }
+  if (usageKwh <= 2000) {
     // Linear interpolation between 1000 and 2000
     const ratio = (usageKwh - 1000) / 1000;
     return price_kwh_1000 + (price_kwh_2000 - price_kwh_1000) * ratio;
-  } else {
-    // Extrapolate beyond 2000 kWh
-    return price_kwh_2000;
   }
+  // Extrapolate beyond 2000 kWh
+  return price_kwh_2000;
 }
 
 /**
@@ -302,9 +303,9 @@ function rankPlans(plans, userUsage, tduRates, options = {}) {
   const bestAnnualCost = Math.min(...fixedRatePlans.map((p) => p.annualCost));
 
   // Calculate quality scores with penalties for bad features
-  fixedRatePlans.forEach((plan) => {
+  for (const plan of fixedRatePlans) {
     plan.qualityScore = calculateQualityScore(plan, bestAnnualCost, options);
-  });
+  }
 
   // Sort by annual cost (primary), then quality score (tie-breaker)
   fixedRatePlans.sort((a, b) => {
@@ -520,8 +521,7 @@ function identifyWarnings(plan, userUsage, contractStartDate = null) {
 
   if (Math.abs(rate500 - rate1000) / rate1000 > 0.5) {
     warnings.push(
-      'Rate varies dramatically with usage. ' +
-        `${rate500.toFixed(1)}¢/kWh at low usage vs ${rate1000.toFixed(1)}¢/kWh at 1000 kWh.`
+      `Rate varies dramatically with usage. ${rate500.toFixed(1)}¢/kWh at low usage vs ${rate1000.toFixed(1)}¢/kWh at 1000 kWh.`
     );
   }
 
@@ -908,31 +908,33 @@ function getQualityGrade(score) {
       description: 'Excellent',
       class: 'grade-a'
     };
-  } else if (score >= 80) {
+  }
+  if (score >= 80) {
     return {
       letter: 'B',
       description: 'Good',
       class: 'grade-b'
     };
-  } else if (score >= 70) {
+  }
+  if (score >= 70) {
     return {
       letter: 'C',
       description: 'Acceptable',
       class: 'grade-c'
     };
-  } else if (score >= 60) {
+  }
+  if (score >= 60) {
     return {
       letter: 'D',
       description: 'Caution',
       class: 'grade-d'
     };
-  } else {
-    return {
-      letter: 'F',
-      description: 'Avoid',
-      class: 'grade-f'
-    };
   }
+  return {
+    letter: 'F',
+    description: 'Avoid',
+    class: 'grade-f'
+  };
 }
 
 // Export functions for use in other modules
