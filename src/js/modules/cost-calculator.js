@@ -21,18 +21,19 @@ const CostCalculator = {
 
     if (usageKwh <= 500) {
       return price_kwh_500;
-    } else if (usageKwh <= 1000) {
+    }
+    if (usageKwh <= 1000) {
       // Linear interpolation between 500 and 1000
       const ratio = (usageKwh - 500) / 500;
       return price_kwh_500 + (price_kwh_1000 - price_kwh_500) * ratio;
-    } else if (usageKwh <= 2000) {
+    }
+    if (usageKwh <= 2000) {
       // Linear interpolation between 1000 and 2000
       const ratio = (usageKwh - 1000) / 1000;
       return price_kwh_1000 + (price_kwh_2000 - price_kwh_1000) * ratio;
-    } else {
-      // Extrapolate beyond 2000 kWh
-      return price_kwh_2000;
     }
+    // Extrapolate beyond 2000 kWh
+    return price_kwh_2000;
   },
 
   /**
