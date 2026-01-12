@@ -60,15 +60,14 @@ const Toast = {
                 <div class="toast-message">${this.escapeHtml(message)}</div>
             </div>
             <button class="toast-close" aria-label="Dismiss notification">&times;</button>
-            ${
-              duration > 0
-                ? `
+            ${duration > 0
+        ? `
                 <div class="toast-progress">
                     <div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div>
                 </div>
             `
-                : ''
-            }
+        : ''
+      }
         `;
 
     const closeBtn = toast.querySelector('.toast-close');
@@ -223,9 +222,9 @@ const UI = {
       filterRenewable: document.getElementById('filter-renewable'),
 
       // Modal
-      monthsdalBackdrop: document.getElementById('modal-backdrop'),
-      monthsdalBody: document.getElementById('modal-body'),
-      monthsdalClose: document.getElementById('modal-close'),
+      modalBackdrop: document.getElementById('modal-backdrop'),
+      modalBody: document.getElementById('modal-body'),
+      modalClose: document.getElementById('modal-close'),
 
       // Status indicator
       statusIdle: document.getElementById('status-idle'),
@@ -312,7 +311,7 @@ const UI = {
           this.elements.totalPlansCount.setAttribute(
             'title',
             `${freshness.originalPlanCount.toLocaleString()} total plans, ` +
-              `${freshness.duplicateCount} duplicates removed`
+            `${freshness.duplicateCount} duplicates removed`
           );
         }
       }
@@ -623,7 +622,7 @@ const UI = {
           : 0;
       Toast.success(
         `Lowest cost plan: ${formatCurrency(best.annualCost)}/year. ` +
-          (savings > 0 ? `Save up to ${formatCurrency(savings)} vs other plans.` : ''),
+        (savings > 0 ? `Save up to ${formatCurrency(savings)} vs other plans.` : ''),
         6000,
         `${rankedPlans.length} Plans Analyzed`
       );
@@ -781,15 +780,14 @@ const UI = {
                         <span class="grade-desc">${grade.shortDesc || grade.description}</span>
                     </div>
                 </div>
-                ${
-                  isNonFixed
-                    ? `
+                ${isNonFixed
+            ? `
                 <div class="non-fixed-warning">
                     <span class="non-fixed-warning-icon">!</span>
                     <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate:</strong> Price can change based on market conditions. Consider fixed-rate plans for budget certainty.</span>
                 </div>`
-                    : ''
-                }
+            : ''
+          }
                 <div class="plan-item-header">
                     <div>
                         <div class="plan-item-name">${this.escapeHtml(plan.plan_name)}</div>
@@ -826,15 +824,14 @@ const UI = {
                         <span class="plan-detail-value">${this.formatETF(plan)}</span>
                     </span>
                 </div>
-                ${
-                  plan.warnings && plan.warnings.length > 0 && !isNonFixed
-                    ? `
+                ${plan.warnings && plan.warnings.length > 0 && !isNonFixed
+            ? `
                 <div class="plan-item-warnings">
                     <span class="warnings-label">Note:</span>
                     <span class="warnings-text">${plan.warnings.length} consideration${plan.warnings.length > 1 ? 's' : ''} - view details</span>
                 </div>`
-                    : ''
-                }
+            : ''
+          }
                 <div class="plan-item-actions">
                     <button class="btn-plan-action btn-plan-details" onclick="UI.showPlanModal('${plan.plan_id}')">View Details</button>
                     ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-plan-action btn-plan-efl">View EFL</a>` : ''}
@@ -970,11 +967,10 @@ const UI = {
                 <td class="col-contract-end" data-sort-value="${contractEndDate.getTime()}">
                     <div class="contract-end-wrapper">
                         <span class="contract-end-date">${endDateFormatted}</span>
-                        ${
-                          expirationAnalysis.riskLevel === 'high'
-                            ? `<span class="contract-end-warning" title="Expires during expensive renewal season (rates 15-40% higher)" style="color: var(--color-caution); margin-left: 4px;">⚠</span>`
-                            : ''
-                        }
+                        ${expirationAnalysis.riskLevel === 'high'
+            ? `<span class="contract-end-warning" title="Expires during expensive renewal season (rates 15-40% higher)" style="color: var(--color-caution); margin-left: 4px;">⚠</span>`
+            : ''
+          }
                     </div>
                 </td>
                 <td class="col-annual">
@@ -1167,16 +1163,15 @@ const UI = {
                 <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
             </p>
 
-            ${
-              isNonFixed
-                ? `
+            ${isNonFixed
+        ? `
             <div class="non-fixed-warning" style="margin-bottom: var(--space-4);">
                 <span class="non-fixed-warning-icon">!</span>
-                <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly monthsre during peak demand periods. Fixed-rate plans provide monthsre budget certainty.</span>
+                <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly more during peak demand periods. Fixed-rate plans provide more budget certainty.</span>
             </div>
             `
-                : ''
-            }
+        : ''
+      }
 
             <div class="modal-section">
                 <h3 class="modal-section-title">Cost Summary</h3>
@@ -1185,16 +1180,15 @@ const UI = {
                         <span class="modal-stat-value highlight">${formatCurrency(plan.annualCost)}</span>
                         <span class="modal-stat-label">Annual Cost</span>
                     </div>
-                    ${
-                      termMonths !== 12
-                        ? `
+                    ${termMonths !== 12
+        ? `
                     <div class="modal-stat">
                         <span class="modal-stat-value">${formatCurrency(contractTotalCost)}</span>
                         <span class="modal-stat-label">${termMonths}-Month Contract Total</span>
                     </div>
                     `
-                        : ''
-                    }
+        : ''
+      }
                     <div class="modal-stat">
                         <span class="modal-stat-value">${formatCurrency(plan.averageMonthlyCost)}</span>
                         <span class="modal-stat-label">Monthly Average</span>
@@ -1246,9 +1240,8 @@ const UI = {
                 </div>
             </div>
 
-            ${
-              plan.warnings.length > 0
-                ? `
+            ${plan.warnings.length > 0
+        ? `
                 <div class="modal-section">
                     <h3 class="modal-section-title">Warnings</h3>
                     <div class="modal-warnings">
@@ -1256,8 +1249,8 @@ const UI = {
                     </div>
                 </div>
             `
-                : ''
-            }
+        : ''
+      }
 
             <div class="modal-actions">
                 ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn monthsdal-btn-primary">View EFL</a>` : ''}
