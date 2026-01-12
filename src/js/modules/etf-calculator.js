@@ -68,6 +68,17 @@ const ETFCalculator = {
         }
       }
 
+      // Pattern 2.7: "$X multiplied by the number of months remaining" or "$X multiplied by months remaining"
+      if (!perMonthRate) {
+        const multipliedByMatch = terms.match(
+          /\$(\d+(?:\.\d{2})?)\s+multiplied\s+by\s+(?:the\s+)?(?:number\s+of\s+)?months?\s+remaining/i
+        );
+        if (multipliedByMatch) {
+          perMonthRate = Number.parseFloat(multipliedByMatch[1]);
+          etfStructure = 'per-month';
+        }
+      }
+
       // Pattern 3: "months remaining" followed by "$X" or "$X" followed by "months remaining"
       if (!perMonthRate) {
         const monthsFirstMatch = terms.match(

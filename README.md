@@ -37,6 +37,24 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 ---
 
+## Recent Updates (January 11, 2026)
+
+### UI/UX Enhancements
+- **Improved Accessibility**: Enhanced text contrast for WCAG 2.1 AA compliance (5.74:1 and 4.54:1 ratios)
+- **Better Visualization**: Redesigned usage chart with 75% taller bars, month labels, and heat-map color coding (red=high, orange=medium-high, yellow=medium, blue=low)
+- **Polished Components**: Upgraded grade badges with gradients, enhanced dropdown styling, and improved TIME OF USE warning badges
+- **Cleaner Layout**: Moved ZIP validation indicator horizontal, removed redundant "Plans Requiring Caution" section
+- **Fixed Precision**: Annual usage now displays exactly 12,000 kWh (was 11,999 kWh due to rounding)
+
+### Functional Improvements
+- **Smarter Ranking**: F-grade plans (0/100 quality) now properly rank below acceptable plans regardless of cost
+- **Better ETF Detection**: Enhanced cancelation fee pattern matching for phrases like "multiplied by months remaining"
+- **Consistent Display**: All contract lengths now show as "months" instead of abbreviated "mo" with proper spacing
+
+See [docs/CHANGELOG-2026-01-11.md](docs/CHANGELOG-2026-01-11.md) for complete details.
+
+---
+
 ## Features
 
 ### For Users

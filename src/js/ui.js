@@ -138,7 +138,7 @@ const UI = {
     usageMethod: 'estimate',
     homeSize: null,
     avgUsage: null,
-    monthlyUsage: Array(12).fill(0),
+    monthsnthlyUsage: Array(12).fill(0),
     rankedPlans: null,
     isLoading: false,
     autoCalculateTimer: null,
@@ -205,7 +205,7 @@ const UI = {
       homeSize: document.getElementById('home-size'),
       avgKwh: document.getElementById('avg-kwh'),
       annualUsageTotal: document.getElementById('annual-usage-total'),
-      monthlyUsageAvg: document.getElementById('monthly-usage-avg'),
+      monthsnthlyUsageAvg: document.getElementById('monthly-usage-avg'),
       calculateBtn: document.getElementById('calculate-btn'),
 
       // Results
@@ -223,9 +223,9 @@ const UI = {
       filterRenewable: document.getElementById('filter-renewable'),
 
       // Modal
-      modalBackdrop: document.getElementById('modal-backdrop'),
-      modalBody: document.getElementById('modal-body'),
-      modalClose: document.getElementById('modal-close'),
+      monthsdalBackdrop: document.getElementById('modal-backdrop'),
+      monthsdalBody: document.getElementById('modal-body'),
+      monthsdalClose: document.getElementById('modal-close'),
 
       // Status indicator
       statusIdle: document.getElementById('status-idle'),
@@ -269,8 +269,8 @@ const UI = {
     }
 
     // Monthly usage inputs - auto-calculate with debounce
-    const monthInputs = document.querySelectorAll('[data-month]');
-    monthInputs.forEach((input) => {
+    const monthsnthInputs = document.querySelectorAll('[data-month]');
+    monthsnthInputs.forEach((input) => {
       input.addEventListener('input', () => {
         this.handleMonthlyInput();
         this.debounceAutoCalculate();
@@ -321,7 +321,7 @@ const UI = {
         const date = new Date(freshness.plansUpdated);
         // Include year in the date format
         this.elements.lastUpdate.textContent = date.toLocaleDateString('en-US', {
-          month: 'short',
+          monthsnth: 'short',
           day: 'numeric',
           year: 'numeric'
         });
@@ -351,7 +351,7 @@ const UI = {
       }, this.ZIP_VALIDATION_DELAY);
     } else if (value.length > 0) {
       // Partial input
-      this.elements.zipStatus.innerHTML = `<span class="zip-status-partial">${5 - value.length} more digits</span>`;
+      this.elements.zipStatus.innerHTML = `<span class="zip-status-partial">${5 - value.length} monthsre digits</span>`;
       this.disableUsageSection();
     } else {
       // Empty
@@ -432,7 +432,7 @@ const UI = {
 
     this.elements.tduDisplay.hidden = false;
     this.elements.tduName.textContent = tdu.name;
-    this.elements.tduBase.textContent = `$${tdu.monthly_base_charge.toFixed(2)}/mo`;
+    this.elements.tduBase.textContent = `$${tdu.monthly_base_charge.toFixed(2)}/month`;
     this.elements.tduRate.textContent = `${tdu.per_kwh_rate.toFixed(2)} cents/kWh`;
     this.elements.tduArea.textContent = tdu.service_area;
   },
@@ -480,7 +480,7 @@ const UI = {
   },
 
   handleMonthlyInput() {
-    const monthInputs = document.querySelectorAll('[data-month]');
+    const monthsnthInputs = document.querySelectorAll('[data-month]');
     const values = Array.from(monthInputs).map((input) => Number.parseFloat(input.value) || 0);
     this.state.monthlyUsage = values;
 
@@ -558,7 +558,7 @@ const UI = {
     }
 
     // Get usage pattern
-    let monthlyUsage;
+    let monthsnthlyUsage;
     switch (this.state.usageMethod) {
       case 'estimate': {
         const homeSize = this.elements.homeSize?.value || this.state.homeSize;
@@ -566,28 +566,28 @@ const UI = {
           Toast.warning('Select your home size to estimate usage.', 5000, 'Selection Required');
           return;
         }
-        monthlyUsage = estimateUsagePattern(Number.parseFloat(homeSize));
+        monthsnthlyUsage = estimateUsagePattern(Number.parseFloat(homeSize));
         break;
       }
       case 'average': {
         const avgKwh = Number.parseFloat(this.elements.avgKwh?.value) || this.state.avgUsage;
         if (!avgKwh) {
-          Toast.warning('Enter your average monthly kWh usage.', 5000, 'Usage Required');
+          Toast.warning('Enter your average monthsnthly kWh usage.', 5000, 'Usage Required');
           return;
         }
-        monthlyUsage = estimateUsagePattern(avgKwh);
+        monthsnthlyUsage = estimateUsagePattern(avgKwh);
         break;
       }
       case 'detailed': {
         if (!this.state.monthlyUsage.some((v) => v > 0)) {
-          Toast.warning('Enter usage for at least one month.', 5000, 'Usage Required');
+          Toast.warning('Enter usage for at least one monthsnth.', 5000, 'Usage Required');
           return;
         }
-        monthlyUsage = [...this.state.monthlyUsage];
-        // Fill empty months with average of filled months
-        const filledMonths = monthlyUsage.filter((v) => v > 0);
+        monthsnthlyUsage = [...this.state.monthlyUsage];
+        // Fill empty monthsnths with average of filled monthsnths
+        const filledMonths = monthsnthlyUsage.filter((v) => v > 0);
         const avgFilled = filledMonths.reduce((a, b) => a + b, 0) / filledMonths.length;
-        monthlyUsage = monthlyUsage.map((v) => v || avgFilled);
+        monthsnthlyUsage = monthsnthlyUsage.map((v) => v || avgFilled);
         break;
       }
     }
@@ -608,10 +608,10 @@ const UI = {
         return;
       }
 
-      const rankedPlans = rankPlans(tduPlans, monthlyUsage, this.state.tdu);
+      const rankedPlans = rankPlans(tduPlans, monthsnthlyUsage, this.state.tdu);
       this.state.rankedPlans = rankedPlans;
 
-      this.displayResults(rankedPlans, monthlyUsage);
+      this.displayResults(rankedPlans, monthsnthlyUsage);
 
       this.elements.resultsSection.hidden = false;
       this.elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -657,7 +657,7 @@ const UI = {
     if (this.elements.statusReady) this.elements.statusReady.hidden = true;
   },
 
-  displayResults(plans, monthlyUsage) {
+  displayResults(plans, monthsnthlyUsage) {
     this.displayUsageProfile(monthlyUsage);
     this.displayTopPlans(plans.slice(0, 5));
     this.displayWarningPlans(plans.filter((p) => p.isGimmick).slice(0, 3));
@@ -670,11 +670,11 @@ const UI = {
   },
 
   displayUsageProfile(monthlyUsage) {
-    const total = monthlyUsage.reduce((a, b) => a + b, 0);
+    const total = monthsnthlyUsage.reduce((a, b) => a + b, 0);
     const avg = total / 12;
     const max = Math.max(...monthlyUsage);
-    const peakMonth = monthlyUsage.indexOf(max);
-    const monthNames = [
+    const peakMonth = monthsnthlyUsage.indexOf(max);
+    const monthsnthNames = [
       'Jan',
       'Feb',
       'Mar',
@@ -699,14 +699,28 @@ const UI = {
       this.elements.profilePeak.textContent = `${monthNames[peakMonth]} (${Math.round(max).toLocaleString()} kWh)`;
     }
 
-    // Render chart
+    // Render chart with monthsnth names and color-coded intensity
     if (this.elements.usageChart) {
-      const maxHeight = 60;
-      this.elements.usageChart.innerHTML = monthlyUsage
+      const maxHeight = 100; // Increased height for better visibility
+      const min = Math.min(...monthlyUsage);
+
+      this.elements.usageChart.innerHTML = monthsnthlyUsage
         .map((usage, i) => {
           const height = max > 0 ? (usage / max) * maxHeight : 4;
-          const isPeak = i === peakMonth;
-          return `<div class="bar ${isPeak ? 'peak' : ''}" style="height: ${height}px" title="${monthNames[i]}: ${Math.round(usage)} kWh"></div>`;
+          // Calculate intensity (0-1) for color coding
+          const intensity = max > min ? (usage - min) / (max - min) : 0.5;
+          // Assign intensity class: high (red), medium-high (orange), medium (yellow), low (blue)
+          let intensityClass = 'intensity-low';
+          if (intensity >= 0.75) intensityClass = 'intensity-high';
+          else if (intensity >= 0.5) intensityClass = 'intensity-medium-high';
+          else if (intensity >= 0.25) intensityClass = 'intensity-medium';
+
+          return `
+            <div class="bar-container">
+              <div class="bar ${intensityClass}" style="height: ${height}px" title="${monthNames[i]}: ${Math.round(usage).toLocaleString()} kWh"></div>
+              <div class="bar-label">${monthNames[i]}</div>
+            </div>
+          `;
         })
         .join('');
     }
@@ -786,8 +800,8 @@ const UI = {
                     </div>
                     <div class="plan-item-cost">
                         <div class="plan-item-annual">${formatCurrency(plan.annualCost)}/yr</div>
-                        ${termMonths !== 12 ? `<div class="plan-item-term-total">${formatCurrency(contractTotalCost)}/${termMonths}mo</div>` : ''}
-                        <div class="plan-item-monthly">${formatCurrency(plan.averageMonthlyCost)}/mo avg</div>
+                        ${termMonths !== 12 ? `<div class="plan-item-term-total">${formatCurrency(contractTotalCost)}/ ${termMonths} monthsnths</div>` : ''}
+                        <div class="plan-item-monthly">${formatCurrency(plan.averageMonthlyCost)}/month avg</div>
                     </div>
                 </div>
                 <div class="plan-item-details">
@@ -797,7 +811,7 @@ const UI = {
                     </span>
                     <span class="plan-detail-item" title="Contract duration - longer terms may offer lower rates but less flexibility">
                         <span class="plan-detail-label">Term:</span>
-                        <span class="plan-detail-value">${plan.term_months} mo</span>
+                        <span class="plan-detail-value">${plan.term_months} months</span>
                     </span>
                     <span class="plan-detail-item" title="Your effective rate based on your usage pattern">
                         <span class="plan-detail-label">Effective Rate:</span>
@@ -840,36 +854,10 @@ const UI = {
     return 'low';
   },
 
-  displayWarningPlans(plans) {
-    if (!this.elements.warningsSection || !this.elements.warningPlans) return;
-
-    if (plans.length === 0) {
-      this.elements.warningsSection.hidden = true;
-      return;
-    }
-
-    this.elements.warningsSection.hidden = false;
-    this.elements.warningPlans.innerHTML = plans
-      .map(
-        (plan) => `
-            <div class="warning-item">
-                <div class="warning-item-header">
-                    <div>
-                        <div class="warning-item-title">${this.escapeHtml(plan.plan_name)}</div>
-                        <div class="warning-item-provider">${this.escapeHtml(plan.rep_name)}</div>
-                    </div>
-                    <div class="warning-item-cost">
-                        <div class="warning-item-advertised">Advertised: ${formatRate(plan.price_kwh_1000)}</div>
-                        <div class="warning-item-actual">Actual: ${formatCurrency(plan.annualCost)}/yr</div>
-                    </div>
-                </div>
-                <div class="warning-reasons">
-                    ${plan.warnings.map((w) => `<div class="warning-reason">${this.escapeHtml(w)}</div>`).join('')}
-                </div>
-            </div>
-        `
-      )
-      .join('');
+  displayWarningPlans(_plans) {
+    // Plans Requiring Caution section has been removed
+    // All plan warnings are now shown inline in the plan cards and comparison table
+    return;
   },
 
   /**
@@ -941,7 +929,7 @@ const UI = {
         const contractEndDate = new Date();
         contractEndDate.setMonth(contractEndDate.getMonth() + termMonths);
         const endDateFormatted = contractEndDate.toLocaleDateString('en-US', {
-          month: 'short',
+          monthsnth: 'short',
           year: 'numeric'
         });
 
@@ -978,7 +966,7 @@ const UI = {
                         ${plan.is_tou ? '<span class="rate-type-badge rate-type-badge-tou">TIME OF USE</span>' : ''}
                     </div>
                 </td>
-                <td><span class="term-badge">${plan.term_months} mo</span></td>
+                <td><span class="term-badge">${plan.term_months} months</span></td>
                 <td class="col-contract-end" data-sort-value="${contractEndDate.getTime()}">
                     <div class="contract-end-wrapper">
                         <span class="contract-end-date">${endDateFormatted}</span>
@@ -992,7 +980,7 @@ const UI = {
                 <td class="col-annual">
                     <span class="cost-value ${isBestCost ? 'best-value' : ''}">${formatCurrency(plan.annualCost)}</span>
                     ${isBestCost ? '<span class="best-indicator">Lowest</span>' : ''}
-                    ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)}/${termMonths}mo</span>` : ''}
+                    ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)}/ ${termMonths} monthsnths</span>` : ''}
                 </td>
                 <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
                 <td class="col-rate"><span class="rate-value ${isBestRate ? 'best-value' : ''}">${formatRate(plan.effectiveRate)}</span></td>
@@ -1184,7 +1172,7 @@ const UI = {
                 ? `
             <div class="non-fixed-warning" style="margin-bottom: var(--space-4);">
                 <span class="non-fixed-warning-icon">!</span>
-                <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly more during peak demand periods. Fixed-rate plans provide more budget certainty.</span>
+                <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly monthsre during peak demand periods. Fixed-rate plans provide monthsre budget certainty.</span>
             </div>
             `
                 : ''
@@ -1222,7 +1210,7 @@ const UI = {
                 <h3 class="modal-section-title">Plan Details</h3>
                 <div class="modal-grid">
                     <div class="modal-stat">
-                        <span class="modal-stat-value">${plan.term_months} months</span>
+                        <span class="modal-stat-value">${plan.term_months} monthsnths</span>
                         <span class="modal-stat-label">Contract Term</span>
                     </div>
                     <div class="modal-stat">
@@ -1272,8 +1260,8 @@ const UI = {
             }
 
             <div class="modal-actions">
-                ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn modal-btn-primary">View EFL</a>` : ''}
-                ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="modal-btn modal-btn-secondary">Enroll</a>` : ''}
+                ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn monthsdal-btn-primary">View EFL</a>` : ''}
+                ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="modal-btn monthsdal-btn-secondary">Enroll</a>` : ''}
             </div>
         `;
 
@@ -1315,13 +1303,13 @@ const UI = {
       return etfInfo.displayText;
     }
 
-    // Fallback if module not available
+    // Fallback if monthsdule not available
     if (!plan.early_termination_fee) return 'None';
     return formatCurrency(plan.early_termination_fee);
   },
 
   /**
-   * Show ETF verification modal with guidance on verifying cancellation fees
+   * Show ETF verification monthsdal with guidance on verifying cancellation fees
    */
   showETFVerificationModal(event) {
     // Prevent event propagation
@@ -1332,31 +1320,34 @@ const UI = {
 
     const modalContent = `
       <div class="etf-verification-content">
-        <h3 style="margin-top: 0; color: var(--color-text);">Early Termination Fee Verification Required</h3>
-        <p style="color: var(--color-text-muted); line-height: 1.6;">
+        <h3 style="margin-top: 0; color: var(--color-ink);">Early Termination Fee Verification Required</h3>
+        <p style="color: var(--color-ink-secondary); line-height: 1.6;">
           This fee structure was detected automatically and may not be accurate.
         </p>
 
-        <div class="verification-instructions" style="margin: var(--space-6) 0; padding: var(--space-4); background: var(--color-surface-sunken); border-radius: var(--radius-md);">
-          <h4 style="margin-top: 0; font-size: var(--text-base); color: var(--color-text);">Please verify exact cancellation terms in these official documents:</h4>
-          <ul style="margin: var(--space-3) 0; padding-left: var(--space-5); line-height: 1.8;">
+        <div class="verification-instructions" style="margin: var(--space-6) 0; padding: var(--space-4); background: var(--color-surface-sunken); border-radius: 8px;">
+          <h4 style="margin-top: 0; font-size: var(--text-base); color: var(--color-ink);">Please verify exact cancellation terms in these official documents:</h4>
+          <ul style="margin: var(--space-3) 0; padding-left: var(--space-5); line-height: 1.8; color: var(--color-ink-secondary);">
             <li><strong>Electricity Facts Label (EFL)</strong> - Required disclosure document</li>
-            <li><strong>Terms of Service (TOS)</strong> - Full contract terms</li>
-            <li><strong>Your Rights as a Customer</strong> - Consumer protection guide</li>
+            <li><strong>Residential Terms of Service</strong> - Full contract terms</li>
+            <li><strong>Your Rights as a Retail Electric Customer</strong> - Consumer protection guide</li>
           </ul>
+          <p style="margin: var(--space-3) 0; font-size: var(--text-sm); color: var(--color-ink-secondary);">
+            Contact the Retail Electric Provider (REP) directly if terms are unclear.
+          </p>
         </div>
 
         <div class="fee-structure-types" style="margin: var(--space-6) 0;">
-          <h4 style="margin-top: 0; font-size: var(--text-base); color: var(--color-text);">Common Fee Structures:</h4>
-          <ul style="margin: var(--space-3) 0; padding-left: var(--space-5); line-height: 1.8;">
-            <li><strong>Flat fee:</strong> One-time charge (e.g., $150 total)</li>
-            <li><strong>Per-month remaining:</strong> Multiplied by months left (e.g., $20 × 8 months = $160)</li>
+          <h4 style="margin-top: 0; font-size: var(--text-base); color: var(--color-ink);">Common Fee Structures:</h4>
+          <ul style="margin: var(--space-3) 0; padding-left: var(--space-5); line-height: 1.8; color: var(--color-ink-secondary);">
+            <li><strong>Fixed fee:</strong> One-time charge (e.g., $150 total)</li>
+            <li><strong>Per-month remaining:</strong> Multiplied by months left in contract (e.g., $20 × 8 months = $160)</li>
             <li><strong>No fee:</strong> $0 cancellation cost</li>
           </ul>
         </div>
 
-        <p class="verification-note" style="margin-top: var(--space-6); padding: var(--space-4); background: var(--color-caution-muted); border-radius: var(--radius-md); border: 1px solid var(--color-caution); font-size: var(--text-sm); line-height: 1.6;">
-          <strong>Important:</strong> The Retail Electric Provider (REP) must clearly disclose cancellation terms in your EFL.
+        <p class="verification-note" style="margin-top: var(--space-6); padding: var(--space-4); background: var(--color-caution-muted); border-radius: 8px; border: 1px solid var(--color-caution); font-size: var(--text-sm); line-height: 1.6; color: var(--color-ink);">
+          <strong>Important:</strong> Texas law requires the Retail Electric Provider (REP) to clearly disclose cancellation terms in your EFL.
           Always verify before enrolling.
         </p>
       </div>
@@ -1375,7 +1366,7 @@ if (typeof document !== 'undefined') {
   }
 }
 
-// Export for modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { UI, Toast };
+// Export for monthsdules
+if (typeof monthsdule !== 'undefined' && monthsdule.exports) {
+  monthsdule.exports = { UI, Toast };
 }

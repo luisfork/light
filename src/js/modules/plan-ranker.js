@@ -121,7 +121,16 @@ const PlanRanker = {
       const qualityScore = plan.qualityScore;
 
       // Combined weighted score: 85% cost efficiency + 15% quality
-      plan.combinedScore = Math.round(costScore * 0.85 + qualityScore * 0.15);
+      // BUT: F-grade plans (quality = 0) receive heavy penalty to prevent high ranking
+      let combinedScore = Math.round(costScore * 0.85 + qualityScore * 0.15);
+
+      // Apply severe penalty to F-grade plans (quality score = 0)
+      // This ensures they rank below all acceptable plans regardless of cost
+      if (qualityScore === 0) {
+        combinedScore = Math.min(combinedScore, 40); // Cap F-grade plans at 40 combined score
+      }
+
+      plan.combinedScore = combinedScore;
     });
 
     // Sort by combined score (higher is better) - no tie-breakers
