@@ -60,14 +60,15 @@ const Toast = {
                 <div class="toast-message">${this.escapeHtml(message)}</div>
             </div>
             <button class="toast-close" aria-label="Dismiss notification">&times;</button>
-            ${duration > 0
-        ? `
+            ${
+              duration > 0
+                ? `
                 <div class="toast-progress">
                     <div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div>
                 </div>
             `
-        : ''
-      }
+                : ''
+            }
         `;
 
     const closeBtn = toast.querySelector('.toast-close');
@@ -312,7 +313,7 @@ const UI = {
           this.elements.totalPlansCount.setAttribute(
             'title',
             `${freshness.originalPlanCount.toLocaleString()} total plans, ` +
-            `${freshness.duplicateCount} duplicates removed`
+              `${freshness.duplicateCount} duplicates removed`
           );
         }
       }
@@ -626,7 +627,7 @@ const UI = {
           : 0;
       Toast.success(
         `Lowest cost plan: ${formatCurrency(best.annualCost)}/year. ` +
-        (savings > 0 ? `Save up to ${formatCurrency(savings)} vs other plans.` : ''),
+          (savings > 0 ? `Save up to ${formatCurrency(savings)} vs other plans.` : ''),
         6000,
         `${rankedPlans.length} Plans Analyzed`
       );
@@ -785,14 +786,15 @@ const UI = {
                         <span class="grade-desc">${grade.shortDesc || grade.description}</span>
                     </div>
                 </div>
-                ${isNonFixed
-            ? `
+                ${
+                  isNonFixed
+                    ? `
                 <div class="non-fixed-warning">
                     <span class="non-fixed-warning-icon">!</span>
                     <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate:</strong> Price can change based on market conditions. Consider fixed-rate plans for budget certainty.</span>
                 </div>`
-            : ''
-          }
+                    : ''
+                }
                 <div class="plan-item-header">
                     <div>
                         <div class="plan-item-name">${this.escapeHtml(plan.plan_name)}</div>
@@ -829,14 +831,15 @@ const UI = {
                         <span class="plan-detail-value">${this.formatETF(plan)}</span>
                     </span>
                 </div>
-                ${plan.warnings && plan.warnings.length > 0 && !isNonFixed
-            ? `
+                ${
+                  plan.warnings && plan.warnings.length > 0 && !isNonFixed
+                    ? `
                 <div class="plan-item-warnings">
                     <span class="warnings-label">Note:</span>
                     <span class="warnings-text">${plan.warnings.length} consideration${plan.warnings.length > 1 ? 's' : ''} - view details</span>
                 </div>`
-            : ''
-          }
+                    : ''
+                }
                 <div class="plan-item-actions">
                     <button class="btn-plan-action btn-plan-details" onclick="UI.showPlanModal('${plan.plan_id}')">View Details</button>
                     ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-plan-action btn-plan-efl">View EFL</a>` : ''}
@@ -892,15 +895,19 @@ const UI = {
           <span class="plan-count" style="font-weight: 600; color: var(--color-text); font-size: var(--text-base);">
             ${totalPlans.toLocaleString()} unique plan${totalPlans !== 1 ? 's' : ''}
           </span>
-          ${duplicateCount > 0 ? `
+          ${
+            duplicateCount > 0
+              ? `
             <span class="duplicate-info" style="color: var(--color-text-muted);">
               (${originalCount.toLocaleString()} total, ${duplicateCount.toLocaleString()} duplicate${duplicateCount !== 1 ? 's' : ''} removed)
             </span>
-          ` : `
+          `
+              : `
             <span class="duplicate-info" style="color: var(--color-text-muted);">
               (${originalCount.toLocaleString()} total)
             </span>
-          `}
+          `
+          }
           <button
             class="info-tooltip-trigger"
             aria-label="Information about duplicate detection"
@@ -931,7 +938,6 @@ const UI = {
     const duplicateCount = this.state.data.duplicate_count || 0;
     const orphanedEnglish = this.state.data.orphaned_english_count || 0;
     const orphanedSpanish = this.state.data.orphaned_spanish_count || 0;
-    const totalUnique = this.state.data.total_plans || 0;
     const languagePairs = Math.floor(duplicateCount / 2);
 
     const modalHTML = `
@@ -976,38 +982,58 @@ const UI = {
               Not all plans have both English and Spanish versions. Some providers only offer certain plans in one language:
             </p>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-4);">
-              ${languagePairs > 0 ? `
+              ${
+                languagePairs > 0
+                  ? `
                 <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
                   <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-text);">${languagePairs.toLocaleString()}</div>
                   <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">Language Pairs</div>
                 </div>
-              ` : ''}
-              ${orphanedEnglish > 0 ? `
+              `
+                  : ''
+              }
+              ${
+                orphanedEnglish > 0
+                  ? `
                 <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
                   <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-text);">${orphanedEnglish.toLocaleString()}</div>
                   <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">English Only</div>
                 </div>
-              ` : ''}
-              ${orphanedSpanish > 0 ? `
+              `
+                  : ''
+              }
+              ${
+                orphanedSpanish > 0
+                  ? `
                 <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
                   <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-accent);">${orphanedSpanish.toLocaleString()}</div>
                   <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">Spanish Only</div>
                 </div>
-              ` : ''}
+              `
+                  : ''
+              }
             </div>
-            ${orphanedSpanish > 0 ? `
+            ${
+              orphanedSpanish > 0
+                ? `
               <p style="margin-bottom: var(--space-4); font-size: var(--text-sm); color: var(--color-text-muted); background: var(--color-surface-sunken); padding: var(--space-2); border-radius: var(--radius-sm); border-left: 3px solid var(--color-accent);">
                 <strong style="color: var(--color-text);">Note:</strong> ${orphanedSpanish.toLocaleString()} plan${orphanedSpanish !== 1 ? 's are' : ' is'} marked <span style="background: var(--color-accent); color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600;">SPANISH ONLY</span> because no English equivalent exists for this provider and service area.
               </p>
-            ` : ''}
+            `
+                : ''
+            }
 
-            ${duplicateCount > 0 ? `
+            ${
+              duplicateCount > 0
+                ? `
               <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); margin-top: var(--space-4);">
                 <p style="margin: 0; font-size: var(--text-sm); color: var(--color-text-muted);">
                   <strong style="color: var(--color-text);">${duplicateCount.toLocaleString()} duplicate plan${duplicateCount !== 1 ? 's' : ''}</strong> removed from this dataset to ensure you see only unique options.
                 </p>
               </div>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
         </div>
       </div>
@@ -1111,10 +1137,11 @@ const UI = {
                 <td class="col-contract-end" data-sort-value="${contractEndDate.getTime()}">
                     <div class="contract-end-wrapper">
                         <span class="contract-end-date">${endDateFormatted}</span>
-                        ${expirationAnalysis.riskLevel === 'high'
-            ? `<span class="contract-end-warning" title="Expires during expensive renewal season (rates 15-40% higher)" style="color: var(--color-caution); margin-left: 4px;">⚠</span>`
-            : ''
-          }
+                        ${
+                          expirationAnalysis.riskLevel === 'high'
+                            ? `<span class="contract-end-warning" title="Expires during expensive renewal season (rates 15-40% higher)" style="color: var(--color-caution); margin-left: 4px;">⚠</span>`
+                            : ''
+                        }
                     </div>
                 </td>
                 <td class="col-annual">
@@ -1308,15 +1335,16 @@ const UI = {
                 ${plan.is_spanish_only ? '<span class="rate-type-badge rate-type-badge-language" title="This plan is only available in Spanish">SPANISH ONLY</span>' : ''}
             </p>
 
-            ${isNonFixed
-        ? `
+            ${
+              isNonFixed
+                ? `
             <div class="non-fixed-warning" style="margin-bottom: var(--space-4);">
                 <span class="non-fixed-warning-icon">!</span>
                 <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly more during peak demand periods. Fixed-rate plans provide more budget certainty.</span>
             </div>
             `
-        : ''
-      }
+                : ''
+            }
 
             <div class="modal-section">
                 <h3 class="modal-section-title">Cost Summary</h3>
@@ -1325,15 +1353,16 @@ const UI = {
                         <span class="modal-stat-value highlight">${formatCurrency(plan.annualCost)}</span>
                         <span class="modal-stat-label">Annual Cost</span>
                     </div>
-                    ${termMonths !== 12
-        ? `
+                    ${
+                      termMonths !== 12
+                        ? `
                     <div class="modal-stat">
                         <span class="modal-stat-value">${formatCurrency(contractTotalCost)} (${termMonths} months)</span>
                         <span class="modal-stat-label">Contract Total</span>
                     </div>
                     `
-        : ''
-      }
+                        : ''
+                    }
                     <div class="modal-stat">
                         <span class="modal-stat-value">${formatCurrency(plan.averageMonthlyCost)}</span>
                         <span class="modal-stat-label">Monthly Average</span>
@@ -1385,8 +1414,9 @@ const UI = {
                 </div>
             </div>
 
-            ${plan.warnings.length > 0
-        ? `
+            ${
+              plan.warnings.length > 0
+                ? `
                 <div class="modal-section">
                     <h3 class="modal-section-title">Warnings</h3>
                     <div class="modal-warnings">
@@ -1394,8 +1424,8 @@ const UI = {
                     </div>
                 </div>
             `
-        : ''
-      }
+                : ''
+            }
 
             <div class="modal-actions">
                 ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn monthsdal-btn-primary">View EFL</a>` : ''}

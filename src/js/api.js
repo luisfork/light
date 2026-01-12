@@ -156,12 +156,12 @@ const API = {
         }
 
         // Log orphaned plan info
-        if (deduplicationResult.orphanedSpanishCount > 0 || deduplicationResult.orphanedEnglishCount > 0) {
+        if (
+          deduplicationResult.orphanedSpanishCount > 0 ||
+          deduplicationResult.orphanedEnglishCount > 0
+        ) {
           console.info(
-            `Language distribution: ` +
-              `${deduplicationResult.orphanedEnglishCount} English-only, ` +
-              `${deduplicationResult.orphanedSpanishCount} Spanish-only, ` +
-              `${deduplicationResult.duplicateCount} language pairs`
+            `Language distribution: ${deduplicationResult.orphanedEnglishCount} English-only, ${deduplicationResult.orphanedSpanishCount} Spanish-only, ${deduplicationResult.duplicateCount} language pairs`
           );
         }
 
