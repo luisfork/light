@@ -606,6 +606,7 @@ def create_plan_fingerprint(plan: dict[str, Any]) -> str:
     fingerprint_data = {
         "rep": (plan.get("rep_name") or "").upper().strip(),
         "tdu": (plan.get("tdu_area") or "").upper().strip(),
+        "rate_type": (plan.get("rate_type") or "FIXED").upper().strip(),
         "p500": normalize_price(plan.get("price_kwh_500")),
         "p1000": normalize_price(plan.get("price_kwh_1000")),
         "p2000": normalize_price(plan.get("price_kwh_2000")),
@@ -624,27 +625,36 @@ def calculate_plan_preference(plan: dict[str, Any]) -> int:
     """Score plans to prefer English versions with shorter names"""
     score = 100
     plan_name = plan.get("plan_name", "")
+    special_terms = plan.get("special_terms", "")
+    language = (plan.get("language") or "").lower()
+    text = f"{plan_name} {special_terms}".lower()
+
+    # Strong preference for explicitly marked English plans
+    if language == "english":
+        score += 50
+    elif language in ("spanish", "español"):
+        score -= 50
 
     # Penalize Spanish characters
-    if "ñ" in plan_name.lower():
+    if "ñ" in text:
         score -= 20
     for char in ["á", "é", "í", "ó", "ú"]:
-        if char in plan_name.lower():
+        if char in text:
             score -= 10
-    if plan_name.lower().endswith("ción"):
+    if "ción" in text:
         score -= 15
 
     # Penalize longer names
     name_length = len(plan_name)
-    if name_length > 80:
+    if name_length > 50:
         score -= 15
-    elif name_length > 60:
+    elif name_length > 30:
         score -= 10
-    elif name_length > 40:
+    elif name_length > 20:
         score -= 5
 
     # Penalize special characters
-    special_chars = sum(1 for c in plan_name if not c.isalnum() and c != " ")
+    special_chars = sum(1 for c in plan_name if not c.isalnum() and c not in (" ", "-"))
     score -= special_chars * 2
 
     return score
@@ -678,10 +688,12 @@ def deduplicate_plans(plans: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def save_plans(plans: list[dict[str, Any]], output_path: Path) -> None:
-    """Save plans to JSON file with metadata."""
-    # Deduplicate before saving
-    plans = deduplicate_plans(plans)
+    """Save plans to JSON file with metadata.
 
+    Note: We intentionally do NOT deduplicate here. Deduplication happens
+    client-side in JavaScript so we can show statistics to the user about
+    how many duplicates were removed.
+    """
     data = {
         "last_updated": datetime.now(UTC).isoformat(),
         "data_source": "Power to Choose (https://www.powertochoose.org)",
@@ -700,11 +712,15 @@ def save_plans(plans: list[dict[str, Any]], output_path: Path) -> None:
 
 def print_summary(plans: list[dict[str, Any]]) -> None:
     """Print a summary of fetched plans."""
-    # Filter plans to match what was saved (deduplicated)
+    # Show both total and deduplicated counts
     unique_plans = deduplicate_plans(plans)
+    duplicate_count = len(plans) - len(unique_plans)
 
     print("\nSummary:")
-    print(f"  Total plans: {len(unique_plans)}")
+    print(f"  Total plans (with duplicates): {len(plans)}")
+    print(f"  Unique plans (after deduplication): {len(unique_plans)}")
+    if duplicate_count > 0:
+        print(f"  Duplicates removed: {duplicate_count}")
 
     # Count plans by TDU
     tdu_counts: dict[str, int] = {}

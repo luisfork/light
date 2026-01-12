@@ -227,6 +227,7 @@ const UI = {
       modalClose: document.getElementById('modal-close'),
 
       // Status indicator
+      calculationStatus: document.getElementById('calculation-status'),
       statusIdle: document.getElementById('status-idle'),
       statusLoading: document.getElementById('status-loading'),
       statusReady: document.getElementById('status-ready')
@@ -613,6 +614,9 @@ const UI = {
       this.displayResults(rankedPlans, monthlyUsage);
 
       this.elements.resultsSection.hidden = false;
+      if (this.elements.calculationStatus) {
+        this.elements.calculationStatus.hidden = true;
+      }
       this.elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       const best = rankedPlans[0];
@@ -651,6 +655,7 @@ const UI = {
 
   resetStatus() {
     // Reset status indicator to idle state
+    if (this.elements.calculationStatus) this.elements.calculationStatus.hidden = false;
     if (this.elements.statusIdle) this.elements.statusIdle.hidden = false;
     if (this.elements.statusLoading) this.elements.statusLoading.hidden = true;
     if (this.elements.statusReady) this.elements.statusReady.hidden = true;
@@ -876,26 +881,164 @@ const UI = {
       existingStats.remove();
     }
 
-    // Only show if there are duplicates
     const totalPlans = this.state.data.total_plans || 0;
+    const originalCount = this.state.data.original_plan_count || totalPlans;
     const duplicateCount = this.state.data.duplicate_count || 0;
 
-    if (duplicateCount === 0) return;
-
+    // Always show the stats, even if no duplicates found
     const statsHTML = `
       <div class="deduplication-stats" style="margin-top: var(--space-3); padding: var(--space-3); background: var(--color-surface-sunken); border-radius: var(--radius-md); font-size: var(--text-sm); color: var(--color-text-muted);">
-        <span class="plan-count" style="font-weight: 600; color: var(--color-text);">${totalPlans.toLocaleString()} plans</span>
-        <span class="duplicate-info">
-          (${duplicateCount.toLocaleString()} duplicate${duplicateCount > 1 ? 's' : ''} removed)
-          <span class="info-icon"
-                title="Some providers list identical plans in English and Spanish. We automatically detect and remove duplicates based on pricing structure, contract terms, and plan features. English versions with shorter names are kept."
-                style="display: inline-block; width: 14px; height: 14px; line-height: 14px; text-align: center; background: var(--color-accent); color: white; border-radius: 50%; font-size: 10px; font-weight: 700; margin-left: 4px; cursor: help;">i</span>
-        </span>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <span class="plan-count" style="font-weight: 600; color: var(--color-text); font-size: var(--text-base);">
+            ${totalPlans.toLocaleString()} unique plan${totalPlans !== 1 ? 's' : ''}
+          </span>
+          ${duplicateCount > 0 ? `
+            <span class="duplicate-info" style="color: var(--color-text-muted);">
+              (${originalCount.toLocaleString()} total, ${duplicateCount.toLocaleString()} duplicate${duplicateCount !== 1 ? 's' : ''} removed)
+            </span>
+          ` : `
+            <span class="duplicate-info" style="color: var(--color-text-muted);">
+              (${originalCount.toLocaleString()} total)
+            </span>
+          `}
+          <button
+            class="info-tooltip-trigger"
+            aria-label="Information about duplicate detection"
+            style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; padding: 0; background: var(--color-accent); color: white; border: none; border-radius: 50%; font-size: 11px; font-weight: 700; cursor: help; flex-shrink: 0;">
+            i
+          </button>
+        </div>
       </div>
     `;
 
     // Insert after table info bar
     tableInfoBar.insertAdjacentHTML('afterend', statsHTML);
+
+    // Add click handler for info tooltip
+    const tooltipTrigger = document.querySelector('.deduplication-stats .info-tooltip-trigger');
+    if (tooltipTrigger) {
+      tooltipTrigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.showDeduplicationInfo();
+      });
+    }
+  },
+
+  /**
+   * Show detailed deduplication information in a modal-like overlay
+   */
+  showDeduplicationInfo() {
+    const duplicateCount = this.state.data.duplicate_count || 0;
+    const orphanedEnglish = this.state.data.orphaned_english_count || 0;
+    const orphanedSpanish = this.state.data.orphaned_spanish_count || 0;
+    const totalUnique = this.state.data.total_plans || 0;
+    const languagePairs = Math.floor(duplicateCount / 2);
+
+    const modalHTML = `
+      <div class="deduplication-modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: var(--space-4);">
+        <div class="deduplication-modal" style="background: var(--color-surface); border-radius: var(--radius-lg); max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: var(--shadow-2xl); padding: var(--space-6);">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-4);">
+            <h3 style="margin: 0; font-size: var(--text-xl); font-weight: 600; color: var(--color-text);">Duplicate Plan Detection</h3>
+            <button class="close-modal" style="background: none; border: none; font-size: var(--text-2xl); line-height: 1; cursor: pointer; color: var(--color-text-muted); padding: 0; width: 32px; height: 32px;">&times;</button>
+          </div>
+
+          <div style="color: var(--color-text); line-height: 1.6;">
+            <p style="margin-bottom: var(--space-4);">
+              Many electricity providers list identical plans in both <strong>English and Spanish</strong> on Power to Choose. These plans have the same pricing, terms, and features, but different plan names and documentation URLs.
+            </p>
+
+            <h4 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); color: var(--color-text);">How We Detect Duplicates</h4>
+            <p style="margin-bottom: var(--space-4); color: var(--color-text-muted);">
+              We create a "fingerprint" for each plan based on:
+            </p>
+            <ul style="margin: 0 0 var(--space-4) var(--space-4); padding: 0; list-style: disc; color: var(--color-text-muted);">
+              <li>Provider name and TDU service area</li>
+              <li>Rate type (Fixed, Variable, etc.)</li>
+              <li>Pricing at 500, 1000, and 2000 kWh</li>
+              <li>Contract term length</li>
+              <li>Early termination fee and base charge</li>
+              <li>Renewable percentage, prepaid status, time-of-use status</li>
+            </ul>
+
+            <h4 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); color: var(--color-text);">Which Version Do We Keep?</h4>
+            <p style="margin-bottom: var(--space-2); color: var(--color-text-muted);">
+              When duplicates are found, we prefer the <strong>English version</strong> based on:
+            </p>
+            <ul style="margin: 0 0 var(--space-4) var(--space-4); padding: 0; list-style: disc; color: var(--color-text-muted);">
+              <li>Explicit language field (English vs Spanish)</li>
+              <li>Absence of Spanish characters (ñ, á, é, í, ó, ú)</li>
+              <li>Shorter plan names (English versions are typically more concise)</li>
+              <li>Fewer special characters</li>
+            </ul>
+
+            <h4 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); color: var(--color-text);">Language Distribution</h4>
+            <p style="margin-bottom: var(--space-3); color: var(--color-text-muted);">
+              Not all plans have both English and Spanish versions. Some providers only offer certain plans in one language:
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-4);">
+              ${languagePairs > 0 ? `
+                <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
+                  <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-text);">${languagePairs.toLocaleString()}</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">Language Pairs</div>
+                </div>
+              ` : ''}
+              ${orphanedEnglish > 0 ? `
+                <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
+                  <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-text);">${orphanedEnglish.toLocaleString()}</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">English Only</div>
+                </div>
+              ` : ''}
+              ${orphanedSpanish > 0 ? `
+                <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
+                  <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-accent);">${orphanedSpanish.toLocaleString()}</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">Spanish Only</div>
+                </div>
+              ` : ''}
+            </div>
+            ${orphanedSpanish > 0 ? `
+              <p style="margin-bottom: var(--space-4); font-size: var(--text-sm); color: var(--color-text-muted); background: var(--color-surface-sunken); padding: var(--space-2); border-radius: var(--radius-sm); border-left: 3px solid var(--color-accent);">
+                <strong style="color: var(--color-text);">Note:</strong> ${orphanedSpanish.toLocaleString()} plan${orphanedSpanish !== 1 ? 's are' : ' is'} marked <span style="background: var(--color-accent); color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600;">SPANISH ONLY</span> because no English equivalent exists for this provider and service area.
+              </p>
+            ` : ''}
+
+            ${duplicateCount > 0 ? `
+              <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); margin-top: var(--space-4);">
+                <p style="margin: 0; font-size: var(--text-sm); color: var(--color-text-muted);">
+                  <strong style="color: var(--color-text);">${duplicateCount.toLocaleString()} duplicate plan${duplicateCount !== 1 ? 's' : ''}</strong> removed from this dataset to ensure you see only unique options.
+                </p>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Add modal to document
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Add close handlers
+    const overlay = document.querySelector('.deduplication-modal-overlay');
+    const closeBtn = document.querySelector('.deduplication-modal .close-modal');
+
+    const closeModal = () => {
+      overlay.remove();
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        closeModal();
+      }
+    });
+
+    // Close on Escape key
+    const escapeHandler = (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        document.removeEventListener('keydown', escapeHandler);
+      }
+    };
+    document.addEventListener('keydown', escapeHandler);
   },
 
   displayComparisonTable(plans) {
@@ -961,6 +1104,7 @@ const UI = {
                         <span>${this.escapeHtml(plan.plan_name)}</span>
                         ${plan.is_prepaid ? '<span class="rate-type-badge rate-type-badge-prepaid">PREPAID</span>' : ''}
                         ${plan.is_tou ? '<span class="rate-type-badge rate-type-badge-tou">TIME OF USE</span>' : ''}
+                        ${plan.is_spanish_only ? '<span class="rate-type-badge rate-type-badge-language" title="This plan is only available in Spanish (no English version offered)">SPANISH ONLY</span>' : ''}
                     </div>
                 </td>
                 <td><span class="term-badge">${plan.term_months} months</span></td>
@@ -1161,6 +1305,7 @@ const UI = {
             <p class="modal-provider">
                 ${this.escapeHtml(plan.rep_name)}
                 <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
+                ${plan.is_spanish_only ? '<span class="rate-type-badge rate-type-badge-language" title="This plan is only available in Spanish">SPANISH ONLY</span>' : ''}
             </p>
 
             ${isNonFixed

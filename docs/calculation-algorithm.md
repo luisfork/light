@@ -1197,9 +1197,162 @@ This ensures cost remains the primary factor while quality influences ranking fo
 
 ### 10. Duplicate Plans (English/Spanish)
 
-**Issue:** Same plan listed twice with different names.
+**Issue:** Many providers list identical plans in both English and Spanish versions. While feature-identical, they have different plan names, documentation URLs, and language fields.
 
-**Solution:** Detect by matching plan_id, rep_name, prices, and term; show only one.
+**Solution:** Advanced fingerprint-based deduplication that:
+1. Creates a unique fingerprint from plan features (not names)
+2. Identifies language pairs and orphaned plans
+3. Preserves English versions while tracking language-only plans
+4. Displays transparency statistics to users
+
+#### Fingerprinting Algorithm
+
+Plans are fingerprinted using structural features that should be identical for duplicates:
+
+```javascript
+function createPlanFingerprint(plan) {
+  return JSON.stringify({
+    rep: plan.rep_name.toUpperCase().trim(),
+    tdu: plan.tdu_area.toUpperCase().trim(),
+    rate_type: plan.rate_type.toUpperCase().trim(),
+    p500: Math.round(plan.price_kwh_500 * 1000) / 1000,
+    p1000: Math.round(plan.price_kwh_1000 * 1000) / 1000,
+    p2000: Math.round(plan.price_kwh_2000 * 1000) / 1000,
+    term: plan.term_months || 0,
+    etf: Math.round((plan.early_termination_fee || 0) * 100) / 100,
+    base: Math.round((plan.base_charge_monthly || 0) * 100) / 100,
+    renewable: plan.renewable_pct || 0,
+    prepaid: !!plan.is_prepaid,
+    tou: !!plan.is_tou
+  }, null, 0);  // Sorted keys for consistent hashing
+}
+```
+
+**Note:** `plan_name` and `plan_id` are intentionally excluded since these differ for English/Spanish versions.
+
+#### Language Preference Scoring
+
+When duplicates are found, the system selects the preferred version using a weighted scoring system:
+
+```javascript
+function calculatePlanPreference(plan) {
+  let score = 100;
+  const language = (plan.language || '').toLowerCase();
+  const text = `${plan.plan_name} ${plan.special_terms || ''}`.toLowerCase();
+
+  // Strong preference for English
+  if (language === 'english') score += 50;
+  else if (language === 'spanish' || language === 'español') score -= 50;
+
+  // Penalize Spanish characters
+  if (text.includes('ñ')) score -= 20;
+  if (/[áéíóú]/.test(text)) score -= 10;
+  if (text.includes('ción')) score -= 15;
+
+  // Prefer shorter names (English typically more concise)
+  if (plan.plan_name.length > 50) score -= 15;
+  else if (plan.plan_name.length > 30) score -= 10;
+  else if (plan.plan_name.length > 20) score -= 5;
+
+  // Prefer fewer special characters
+  const specialChars = (plan.plan_name.match(/[^a-zA-Z0-9\s-]/g) || []).length;
+  score -= specialChars * 2;
+
+  return score;
+}
+```
+
+#### Orphaned Plan Detection
+
+Not all plans have both English and Spanish versions. The system identifies three categories:
+
+1. **Language Pairs** (~87%): Plans with both English and Spanish versions (English kept)
+2. **English-Only** (~10%): Plans offered only in English (no Spanish equivalent exists)
+3. **Spanish-Only** (~3%): Plans offered only in Spanish (no English equivalent exists)
+
+**Example from real data (1,854 total plans):**
+- 866 language pairs (433 plans kept after deduplication)
+- 97 English-only plans
+- 25 Spanish-only plans
+- **Result:** 988 unique plans (555 unique + 433 from pairs)
+
+#### Visual Indicators
+
+Spanish-only plans receive a `SPANISH ONLY` badge in the UI to inform users:
+
+```html
+<span class="rate-type-badge rate-type-badge-language"
+      title="This plan is only available in Spanish (no English version offered)">
+  SPANISH ONLY
+</span>
+```
+
+#### Why This Matters
+
+**Without deduplication:**
+- Users see 1,854 plans (confusing, redundant)
+- Comparison becomes overwhelming
+- English and Spanish versions appear as separate options
+
+**With enhanced deduplication:**
+- Users see 988 unique plans (manageable)
+- Spanish-only plans are preserved and clearly marked
+- Transparency: "988 unique plans (1,854 total, 866 duplicates removed)"
+- Modal info shows exact language distribution
+
+#### Implementation Notes
+
+**Server-Side (Python):**
+- `scripts/fetch_plans.py` saves ALL plans (no deduplication)
+- Allows client-side to show real-time statistics
+- Preserves data integrity for analysis
+
+**Client-Side (JavaScript):**
+- `src/js/api.js` performs deduplication on page load
+- Returns metrics: `duplicateCount`, `orphanedEnglishCount`, `orphanedSpanishCount`
+- Marks plans with `is_spanish_only` flag for UI display
+
+**Example Detection:**
+
+```javascript
+// These are DUPLICATES (same fingerprint):
+{
+  plan_name: "SoFed Better Rate - 3",
+  rep_name: "SOUTHERN FEDERAL POWER",
+  language: "English",
+  price_kwh_1000: 11.7,
+  term_months: 3,
+  tdu_area: "ONCOR"
+}
+
+{
+  plan_name: "SoFed Mejor Tarifa – 3",
+  rep_name: "SOUTHERN FEDERAL POWER",
+  language: "Spanish",
+  price_kwh_1000: 11.7,  // Same pricing
+  term_months: 3,
+  tdu_area: "ONCOR"
+}
+// System keeps: "SoFed Better Rate - 3" (English, higher score)
+```
+
+```javascript
+// These are NOT DUPLICATES (different pricing):
+{
+  plan_name: "SoFed Better Rate 12",
+  price_kwh_1000: 15.0,
+  term_months: 12,
+  tdu_area: "LPL"
+}
+
+{
+  plan_name: "SoFed Mejor Tarifa – 12",
+  price_kwh_1000: 13.1,  // Different pricing!
+  term_months: 12,
+  tdu_area: "LPL"
+}
+// System keeps: BOTH (different fingerprints, Spanish marked as orphaned)
+```
 
 ---
 

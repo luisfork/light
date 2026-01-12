@@ -143,6 +143,8 @@ const API = {
         data.original_plan_count = originalPlanCount;
         data.total_plans = deduplicationResult.deduplicated.length;
         data.duplicate_count = deduplicationResult.duplicateCount;
+        data.orphaned_english_count = deduplicationResult.orphanedEnglishCount;
+        data.orphaned_spanish_count = deduplicationResult.orphanedSpanishCount;
 
         // Log deduplication info
         if (deduplicationResult.duplicateCount > 0) {
@@ -150,6 +152,16 @@ const API = {
             `Deduplication: ${originalPlanCount} total plans, ` +
               `${deduplicationResult.duplicateCount} duplicates removed, ` +
               `${data.total_plans} unique plans`
+          );
+        }
+
+        // Log orphaned plan info
+        if (deduplicationResult.orphanedSpanishCount > 0 || deduplicationResult.orphanedEnglishCount > 0) {
+          console.info(
+            `Language distribution: ` +
+              `${deduplicationResult.orphanedEnglishCount} English-only, ` +
+              `${deduplicationResult.orphanedSpanishCount} Spanish-only, ` +
+              `${deduplicationResult.duplicateCount} language pairs`
           );
         }
 
@@ -477,6 +489,7 @@ const API = {
     return JSON.stringify({
       rep: (plan.rep_name || '').toUpperCase().trim(),
       tdu: (plan.tdu_area || '').toUpperCase().trim(),
+      rate_type: (plan.rate_type || 'FIXED').toUpperCase().trim(),
       p500: normalizePrice(plan.price_kwh_500),
       p1000: normalizePrice(plan.price_kwh_1000),
       p2000: normalizePrice(plan.price_kwh_2000),
@@ -493,13 +506,22 @@ const API = {
    * Calculate a preference score for a plan name
    * Higher scores indicate more preferred plans (e.g., English, shorter names)
    *
-   * @param {string} planName - Plan name to check
-   * @param {string} specialTerms - Optional special terms text
+   * @param {Object} plan - Plan object containing name, language, and special terms
    * @returns {number} Preference score (higher = more preferred)
    */
-  calculatePlanPreference(planName, specialTerms = '') {
+  calculatePlanPreference(plan) {
     let score = 100;
+    const planName = plan.plan_name || '';
+    const specialTerms = plan.special_terms || '';
+    const language = (plan.language || '').toLowerCase();
     const text = `${planName} ${specialTerms}`.toLowerCase();
+
+    // Strong preference for explicitly marked English plans
+    if (language === 'english') {
+      score += 50;
+    } else if (language === 'spanish' || language === 'español') {
+      score -= 50;
+    }
 
     // Penalize Spanish-specific characters and patterns
     if (text.includes('ñ')) score -= 20;
@@ -542,6 +564,8 @@ const API = {
     const fingerprintMap = new Map();
     const duplicateDetails = [];
     let duplicateCount = 0;
+    let orphanedEnglishCount = 0;
+    let orphanedSpanishCount = 0;
 
     for (const plan of plans) {
       const fingerprint = this.createPlanFingerprint(plan);
@@ -550,13 +574,17 @@ const API = {
         // First occurrence, keep it
         fingerprintMap.set(fingerprint, {
           plan: plan,
-          preference: this.calculatePlanPreference(plan.plan_name, plan.special_terms)
+          preference: this.calculatePlanPreference(plan),
+          hasLanguagePair: false
         });
       } else {
         // Duplicate found - compare based on plan features
         duplicateCount++;
         const existing = fingerprintMap.get(fingerprint);
-        const currentPreference = this.calculatePlanPreference(plan.plan_name, plan.special_terms);
+        const currentPreference = this.calculatePlanPreference(plan);
+
+        // Mark that this fingerprint has a language pair
+        existing.hasLanguagePair = true;
 
         // Keep the plan with higher preference score
         const keepCurrent = currentPreference > existing.preference;
@@ -565,29 +593,53 @@ const API = {
           duplicateDetails.push({
             removed: existing.plan.plan_name,
             kept: plan.plan_name,
-            provider: plan.rep_name
+            provider: plan.rep_name,
+            removedLanguage: existing.plan.language,
+            keptLanguage: plan.language
           });
           fingerprintMap.set(fingerprint, {
             plan: plan,
-            preference: currentPreference
+            preference: currentPreference,
+            hasLanguagePair: true
           });
         } else {
           duplicateDetails.push({
             removed: plan.plan_name,
             kept: existing.plan.plan_name,
-            provider: plan.rep_name
+            provider: plan.rep_name,
+            removedLanguage: plan.language,
+            keptLanguage: existing.plan.language
           });
         }
       }
     }
 
-    const deduplicated = Array.from(fingerprintMap.values()).map((entry) => entry.plan);
+    // Process results and mark orphaned plans
+    const deduplicated = Array.from(fingerprintMap.values()).map((entry) => {
+      const plan = entry.plan;
+      const language = (plan.language || '').toLowerCase();
+
+      // Mark orphaned plans (no language pair)
+      if (!entry.hasLanguagePair) {
+        if (language === 'spanish' || language === 'español') {
+          plan.is_spanish_only = true;
+          orphanedSpanishCount++;
+        } else if (language === 'english') {
+          plan.is_english_only = true;
+          orphanedEnglishCount++;
+        }
+      }
+
+      return plan;
+    });
 
     return {
       deduplicated: deduplicated,
       duplicateCount: duplicateCount,
       originalCount: plans.length,
-      duplicateDetails: duplicateDetails
+      duplicateDetails: duplicateDetails,
+      orphanedEnglishCount: orphanedEnglishCount,
+      orphanedSpanishCount: orphanedSpanishCount
     };
   },
 

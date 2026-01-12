@@ -37,9 +37,23 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 ---
 
-## Recent Updates (January 11, 2026)
+## Recent Updates (January 12, 2026)
 
-### UI/UX Enhancements
+### Enhanced Deduplication System
+
+- **Advanced Fingerprinting**: Added `rate_type` to plan fingerprints to prevent incorrectly deduplicating fixed vs. variable plans
+- **Language Field Integration**: Leverages explicit language field from Power to Choose data (+50 preference for English, -50 for Spanish)
+- **Orphaned Plan Detection**: Identifies and tracks plans that only exist in one language:
+  - Language pairs (~87%): Plans with both English and Spanish versions
+  - English-only (~10%): Plans offered only in English (no Spanish equivalent)
+  - Spanish-only (~3%): Plans offered only in Spanish with no English version
+- **Transparency UI**: Enhanced deduplication statistics display showing "988 unique plans (1,854 total, 866 duplicates removed)"
+- **Spanish-Only Badges**: Visual indicators (blue `SPANISH ONLY` badge) for plans without English equivalents
+- **Detailed Modal**: Clickable info button opens comprehensive explanation with language distribution breakdown
+
+### Previous Updates (January 11, 2026)
+
+#### UI/UX Enhancements
 
 - **Improved Accessibility**: Enhanced text contrast for WCAG 2.1 AA compliance (5.74:1 and 4.54:1 ratios)
 - **Better Visualization**: Redesigned usage chart with 75% taller bars, month labels, and heat-map color coding (red=high, orange=medium-high, yellow=medium, blue=low)
@@ -47,13 +61,13 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 - **Cleaner Layout**: Moved ZIP validation indicator horizontal, removed redundant "Plans Requiring Caution" section
 - **Fixed Precision**: Annual usage now displays exactly 12,000 kWh (was 11,999 kWh due to rounding)
 
-### Functional Improvements
+#### Functional Improvements
 
 - **Smarter Ranking**: F-grade plans (0/100 quality) now properly rank below acceptable plans regardless of cost
 - **Better ETF Detection**: Enhanced cancelation fee pattern matching for phrases like "multiplied by months remaining"
 - **Consistent Display**: All contract lengths now show as "months" instead of abbreviated "mo" with proper spacing
 
-See [docs/CHANGELOG-2026-01-11.md](docs/CHANGELOG-2026-01-11.md) for complete details.
+See [docs/CHANGELOG-2026-01-11.md](docs/CHANGELOG-2026-01-11.md) for January 11 details.
 
 ---
 
@@ -598,22 +612,63 @@ The quality score (0-100) is calculated from multiple factors:
 - "Lowest" indicator badge on the most affordable plan
 - Tooltips on column headers explaining each metric
 
-### 4. Duplicate Plan Detection
+### 4. Enhanced Duplicate Plan Detection & Language Tracking
 
-Automatically identifies and removes duplicate English/Spanish plan versions using fingerprint-based deduplication:
+Automatically identifies and removes duplicate English/Spanish plan versions using advanced fingerprint-based deduplication with orphaned plan detection:
 
 ```javascript
 deduplicatePlans(plans):
-  1. Create fingerprint from: rep_name, tdu_area, prices, term, fees, renewable, prepaid, tou
+  1. Create fingerprint from: rep_name, tdu_area, rate_type, prices, term, fees, renewable, prepaid, tou
   2. Normalize prices (round to 3 decimals) and fees (round to 2 decimals)
   3. Detect duplicates with identical fingerprints
-  4. Prefer English version with shorter name over Spanish
-  5. Remove duplicates, keep one version per unique plan
+  4. Track language pairs vs. orphaned plans:
+     - Language pairs: Plans with both English and Spanish versions
+     - English-only: Plans offered only in English (no Spanish equivalent)
+     - Spanish-only: Plans offered only in Spanish (no English equivalent)
+  5. Prefer English version using weighted scoring:
+     - Explicit language field: +50 for English, -50 for Spanish
+     - Spanish characters (ñ, á, é, í, ó, ú): -10 to -20 points
+     - Name length: Shorter preferred (English typically more concise)
+  6. Mark Spanish-only plans with is_spanish_only flag for UI display
+  7. Remove duplicates, keep one version per unique plan
 
-  return { deduplicated, duplicateCount }
+  return {
+    deduplicated,
+    duplicateCount,
+    orphanedEnglishCount,
+    orphanedSpanishCount
+  }
 ```
 
-Some providers list the same plan twice (e.g., "Truly Simple 12" and "Verdaderamente Simple 12") with identical pricing. *Light* detects these using comprehensive fingerprinting and shows only one version. The UI displays deduplication statistics: "X plans (Y duplicates removed)" with a tooltip explaining the methodology.
+**Why This Matters:**
+
+Many providers list identical plans in both English and Spanish (e.g., "Truly Simple 12" and "Verdaderamente Simple 12"). However, not all plans have both versions—some providers offer certain plans in only one language.
+
+**Example from real data (1,854 total plans):**
+- 866 duplicates removed (433 language pairs)
+- 97 English-only plans (no Spanish version exists)
+- 25 Spanish-only plans (no English version exists)
+- Result: 988 unique plans displayed
+
+**Transparency Features:**
+- UI displays: "988 unique plans (1,854 total, 866 duplicates removed)"
+- Spanish-only plans show blue `SPANISH ONLY` badge with tooltip
+- Clickable info button opens detailed modal with language distribution breakdown
+- Console logging: "Language distribution: 97 English-only, 25 Spanish-only, 866 language pairs"
+
+**Correct Detection Examples:**
+
+```javascript
+// DUPLICATES (same fingerprint, English kept):
+"SoFed Better Rate - 3" vs "SoFed Mejor Tarifa – 3"
+  → Same pricing (11.7¢), term (3 months), provider, TDU area
+  → System keeps English version
+
+// NOT DUPLICATES (different fingerprints, both kept):
+"SoFed Better Rate 12" (15.0¢) vs "SoFed Mejor Tarifa – 12" (13.1¢)
+  → Different pricing despite similar names
+  → Spanish version marked as orphaned (Spanish-only)
+```
 
 ### 5. Provider Name Formatting
 
@@ -625,7 +680,7 @@ formatProviderName(name):
   2. Remove trailing: LLC, INC, LP, & CO, (TX), (TEXAS), COMPANY, RETAIL, SERVICES
   3. Trim whitespace and punctuation
 
-Example: "Reliant Energy Retail Services, LLC" → "RELIANT ENERGY RETAIL SERVICES" → "RELIANT ENERGY"
+Example: "Reliant Energy Retail Services, LLC" → "RELIANT ENERGY"
 ```
 
 ### 6. Historical Data Tracking
