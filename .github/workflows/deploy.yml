@@ -89,7 +89,9 @@ jobs:
 
       - name: Create deployment summary
         run: |
-          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** ✅ Successfully deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
-          echo "**URL:** ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Deployment Summary"
+            echo "**Status:** ✅ Successfully deployed to GitHub Pages"
+            echo "**URL:** ${{ steps.deployment.outputs.page_url }}"
+            echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -77,14 +77,16 @@ jobs:
       - name: Create summary
         if: always()
         run: |
-          echo "## Linting Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Tool | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| ruff (Python) | ${{ steps.ruff.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| biome (JS/JSON) | ${{ steps.biome.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| djlint (HTML) | ${{ steps.djlint.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| actionlint (Workflows) | ${{ steps.actionlint.outcome == 'success' && '✓' || '✗' }} |" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Linting Summary"
+            echo ""
+            echo "| Tool | Status |"
+            echo "|------|--------|"
+            echo "| ruff (Python) | ${{ steps.ruff.outcome == 'success' && '✓' || '✗' }} |"
+            echo "| biome (JS/JSON) | ${{ steps.biome.outcome == 'success' && '✓' || '✗' }} |"
+            echo "| djlint (HTML) | ${{ steps.djlint.outcome == 'success' && '✓' || '✗' }} |"
+            echo "| actionlint (Workflows) | ${{ steps.actionlint.outcome == 'success' && '✓' || '✗' }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Check linting results
         if: always()
