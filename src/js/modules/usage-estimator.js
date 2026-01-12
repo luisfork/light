@@ -61,7 +61,7 @@ const UsageEstimator = {
     );
 
     // Adjust to ensure sum equals exactly avgMonthlyKwh * 12
-    const targetTotal = avgMonthlyKwh * 12;
+    const targetTotal = Math.round(avgMonthlyKwh * 12);
     const actualTotal = monthlyUsage.reduce((a, b) => a + b, 0);
     const difference = targetTotal - actualTotal;
 

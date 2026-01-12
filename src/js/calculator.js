@@ -186,10 +186,23 @@ function estimateUsagePattern(avgMonthlyKwh, _homeSize = null) {
   const sumMultipliers = seasonalMultipliers.reduce((a, b) => a + b, 0);
   const adjustmentFactor = 12 / sumMultipliers;
 
-  // Generate monthly usage pattern
-  return seasonalMultipliers.map((multiplier) =>
+  // Generate monthly usage pattern with precise rounding
+  const monthlyUsage = seasonalMultipliers.map((multiplier) =>
     Math.round(avgMonthlyKwh * multiplier * adjustmentFactor)
   );
+
+  // Adjust to ensure sum equals exactly avgMonthlyKwh * 12
+  const targetTotal = Math.round(avgMonthlyKwh * 12);
+  const actualTotal = monthlyUsage.reduce((a, b) => a + b, 0);
+  const difference = targetTotal - actualTotal;
+
+  if (difference !== 0) {
+    // Find the month with highest usage and adjust it
+    const maxIndex = monthlyUsage.indexOf(Math.max(...monthlyUsage));
+    monthlyUsage[maxIndex] += difference;
+  }
+
+  return monthlyUsage;
 }
 
 /**
