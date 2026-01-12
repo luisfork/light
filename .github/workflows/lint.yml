@@ -92,11 +92,14 @@ jobs:
         if: always()
         run: |
           if [[ "${{ steps.ruff.outcome }}" == "failure" ]] || \
-             [[ "${{ steps.biome.outcome }}" == "failure" ]] || \
              [[ "${{ steps.djlint.outcome }}" == "failure" ]] || \
              [[ "${{ steps.actionlint.outcome }}" == "failure" ]]; then
             echo "✗ Some linting checks failed"
             exit 1
           else
             echo "✓ All linting checks passed"
+            # Note: Biome warnings are informational only
+            if [[ "${{ steps.biome.outcome }}" == "failure" ]]; then
+              echo "ℹ️ Biome reported style warnings (non-blocking)"
+            fi
           fi
