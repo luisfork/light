@@ -52,3 +52,20 @@ htmlcov/
 
 # OS
 Thumbs.db
+
+# Node / JS
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm/
+
+# Playwright
+playwright-report/
+test-results/
+.playwright/
+
+# Bun
+bun.lockb
+.bun/

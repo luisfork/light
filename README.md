@@ -40,6 +40,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 ## Recent Updates (January 11, 2026)
 
 ### UI/UX Enhancements
+
 - **Improved Accessibility**: Enhanced text contrast for WCAG 2.1 AA compliance (5.74:1 and 4.54:1 ratios)
 - **Better Visualization**: Redesigned usage chart with 75% taller bars, month labels, and heat-map color coding (red=high, orange=medium-high, yellow=medium, blue=low)
 - **Polished Components**: Upgraded grade badges with gradients, enhanced dropdown styling, and improved TIME OF USE warning badges
@@ -47,6 +48,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 - **Fixed Precision**: Annual usage now displays exactly 12,000 kWh (was 11,999 kWh due to rounding)
 
 ### Functional Improvements
+
 - **Smarter Ranking**: F-grade plans (0/100 quality) now properly rank below acceptable plans regardless of cost
 - **Better ETF Detection**: Enhanced cancelation fee pattern matching for phrases like "multiplied by months remaining"
 - **Consistent Display**: All contract lengths now show as "months" instead of abbreviated "mo" with proper spacing
@@ -370,8 +372,9 @@ light/
 ### Prerequisites
 
 - Python 3.11+
+- Node.js 18+ (optional, bun preferred)
 - `uv` package manager (or pip)
-- Modern web browser
+- `bun` (preferred) or `npm`
 
 ### Installation
 
@@ -401,7 +404,14 @@ light/
    TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py
    ```
 
-4. **Serve locally**
+4. **Install UI testing dependencies**
+
+   ```bash
+   bun install
+   bunx playwright install --with-deps chromium
+   ```
+
+5. **Serve locally**
 
    ```bash
    # Start local server (from project root)
@@ -412,6 +422,26 @@ light/
 
 > [!IMPORTANT]
 > Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
+
+### Automated UI Testing
+
+*Light* uses **Playwright** for robust automated UI testing. This ensures that core calculation logic, cost formatting, and critical UI components remain stable after code changes.
+
+> [!NOTE]
+> Testing is performed against a real browser engine (Chromium) but remains decoupled from the production code, which stays **100% Vanilla JavaScript**.
+
+```bash
+# Run all UI tests (headless)
+bunx playwright test
+
+# Run tests and show report on failure
+bunx playwright test --reporter=html
+
+# Debug tests (shows browser window)
+bunx playwright test --debug
+```
+
+Test specifications are located in `tests/ui/` and configuration in `playwright.config.js`.
 
 ### Fetching Data
 

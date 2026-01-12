@@ -1,0 +1,28 @@
+{
+  "name": "light",
+  "version": "1.0.0",
+  "description": "<!-- markdownlint-disable MD053 -->",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luisfork/light.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/luisfork/light/issues"
+  },
+  "homepage": "https://github.com/luisfork/light#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.6"
+  }
+}

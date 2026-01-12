@@ -338,6 +338,14 @@ a:hover {
   margin: 0 auto;
 }
 
+/* Calculator Steps - Linear flow, not cards */
+.calc-step {
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition: opacity var(--transition-base);
+}
+
 .calc-step:last-of-type {
   border-bottom: none;
 }
@@ -1288,17 +1296,21 @@ a:hover {
 }
 
 .filter-select {
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4);
   font-size: var(--text-sm);
   font-family: var(--font-system);
   font-weight: 500;
   color: var(--color-ink);
   background: var(--color-surface);
   border: 1.5px solid var(--color-border-medium);
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all var(--transition-fast);
   box-shadow: var(--shadow-sm);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
 
 .filter-select:hover {
@@ -2269,28 +2281,30 @@ tr.plan-non-fixed {
 
 .rate-type-badge-prepaid,
 .rate-type-badge-tou {
-  background: var(--color-caution-muted);
-  color: var(--color-caution);
-  border: 1.5px solid var(--color-caution);
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(255, 141, 40, 0.2);
+  background: rgba(255, 141, 40, 0.1);
+  color: #c45a00;
+  border: 1.5px solid #ff8d28;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(255, 141, 40, 0.1);
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
 }
 
 .rate-type-badge-prepaid::before,
 .rate-type-badge-tou::before {
-  content: "⚠";
+  content: "";
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 16px;
   height: 16px;
-  font-size: 12px;
-  font-weight: 700;
-  background: var(--color-caution);
-  color: white;
-  border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='8' fill='%23FF8D28'/%3E%3Crect x='7' y='4' width='2' height='5' rx='1' fill='white'/%3E%3Ccircle cx='8' cy='11.5' r='1.2' fill='white'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
   margin-right: var(--space-2);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 /* Non-fixed plan warning banner in results */
@@ -2646,21 +2660,21 @@ tr.plan-non-fixed {
 /* Grade Legend */
 
 .grade-legend-enhanced {
-  background: var(--color-surface-sunken);
-  border-radius: 12px;
-  padding: var(--space-5) var(--space-6);
-  margin-bottom: var(--space-6);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: var(--space-6) var(--space-8);
+  margin-bottom: var(--space-8);
+  box-shadow: var(--glow-medium);
   border: 1px solid var(--color-border-subtle);
 }
 
 .grade-legend-header {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  margin-bottom: var(--space-5);
+  gap: var(--space-1);
+  margin-bottom: var(--space-6);
   padding-bottom: var(--space-4);
-  border-bottom: 2px solid var(--color-border-medium);
+  border-bottom: 1px solid var(--color-border-medium);
 }
 
 .grade-legend-enhanced .grade-legend-title {

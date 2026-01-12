@@ -28,14 +28,31 @@ uv run python scripts/fetch_plans.py
 # Serve locally (REQUIRED - file:// protocol won't work due to CORS)
 python -m http.server 8000
 # Then open http://localhost:8000/src/ in browser
+
+# Install UI testing dependencies (bun required)
+bun install
+bunx playwright install --with-deps chromium
+```
+
+### Automated UI Testing
+
+```bash
+# Run all UI tests (headless)
+bunx playwright test
+
+# Run tests and show report on failure
+bunx playwright test --reporter=html
+
+# Debug tests (shows browser window)
+bunx playwright test --debug
 ```
 
 ### Linting & Formatting
 
 ```bash
 # JavaScript/JSON linting with Biome
-npx @biomejs/biome check src/
-npx @biomejs/biome format --write src/
+bunx biome check src/
+bunx biome format --write src/
 
 # HTML linting with djlint
 uv tool run djlint src/ --check
@@ -217,6 +234,7 @@ Ensure professional, consistent display:
 - **Indentation:** 2 spaces
 - **Line width:** 100 characters
 - **Trailing commas:** None
+- **Cost Format:** Always use `"$XXX.XX (X months)"` (e.g., "$318.21 (3 months)") for multi-month totals.
 
 ### Python (Ruff)
 
@@ -234,6 +252,7 @@ This is a professional financial tool with a sophisticated, Apple-inspired desig
 - **Typography-focused:** San Francisco & New York fonts
 - **Neutral palette:** Ink grays, ambient light effects
 - **Functional depth:** Rich calculations, transparent methodology
+- **Warning Icons:** Always use custom **perfect circle** SVG icons (not emojis) for "TIME OF USE" or "PREPAID" badges.
 - **WCAG 2.1 AA compliant:** Contrast ratios > 4.5:1, semantic HTML5, ARIA labels
 
 ### Performance First
@@ -329,6 +348,8 @@ TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py
 
 This populates `data/plans.json` without hitting the Power to Choose API.
 
-### No Node.js Required
+### Bun (Required for Testing & Linting)
 
-This is a **static web application** with vanilla JavaScript. No build process, no npm dependencies (except Biome for linting). All JavaScript modules use browser-native ES6 imports.
+This is a **static web application** with vanilla JavaScript. No build process is required for production. However, **Bun** is required for the Playwright automated testing suite and Biome linting.
+
+All JavaScript modules use browser-native ES6 imports.

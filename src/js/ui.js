@@ -798,7 +798,7 @@ const UI = {
                     </div>
                     <div class="plan-item-cost">
                         <div class="plan-item-annual">${formatCurrency(plan.annualCost)}/yr</div>
-                        ${termMonths !== 12 ? `<div class="plan-item-term-total">${formatCurrency(contractTotalCost)}/ ${termMonths} months</div>` : ''}
+                        ${termMonths !== 12 ? `<div class="plan-item-term-total">${formatCurrency(contractTotalCost)} (${termMonths} months)</div>` : ''}
                         <div class="plan-item-monthly">${formatCurrency(plan.averageMonthlyCost)}/month avg</div>
                     </div>
                 </div>
@@ -976,7 +976,7 @@ const UI = {
                 <td class="col-annual">
                     <span class="cost-value ${isBestCost ? 'best-value' : ''}">${formatCurrency(plan.annualCost)}</span>
                     ${isBestCost ? '<span class="best-indicator">Lowest</span>' : ''}
-                    ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)}/ ${termMonths} months</span>` : ''}
+                    ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)} (${termMonths} months)</span>` : ''}
                 </td>
                 <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
                 <td class="col-rate"><span class="rate-value ${isBestRate ? 'best-value' : ''}">${formatRate(plan.effectiveRate)}</span></td>
@@ -1183,8 +1183,8 @@ const UI = {
                     ${termMonths !== 12
         ? `
                     <div class="modal-stat">
-                        <span class="modal-stat-value">${formatCurrency(contractTotalCost)}</span>
-                        <span class="modal-stat-label">${termMonths}-Month Contract Total</span>
+                        <span class="modal-stat-value">${formatCurrency(contractTotalCost)} (${termMonths} months)</span>
+                        <span class="modal-stat-label">Contract Total</span>
                     </div>
                     `
         : ''
