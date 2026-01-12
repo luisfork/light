@@ -66,7 +66,7 @@ jobs:
           # Check CSV has content
           if [ -f "data/csv-archive/plans_${TIMESTAMP}.csv" ]; then
             LINE_COUNT=$(wc -l < "data/csv-archive/plans_${TIMESTAMP}.csv")
-            if [ $LINE_COUNT -gt 1 ]; then
+            if [ "$LINE_COUNT" -gt 1 ]; then
               echo "✓ CSV archive has $LINE_COUNT lines"
             else
               echo "✗ CSV archive is empty"
@@ -91,9 +91,9 @@ jobs:
         run: |
           # Check for changes in data directory (JSON or CSV)
           if [ -n "$(git status --porcelain data/)" ]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "changes=true" >> "$GITHUB_OUTPUT"
           else
-            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "changes=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Verify json-archive data directory
@@ -113,14 +113,16 @@ jobs:
 
       - name: Create summary
         run: |
-          echo "## Data Update Summary" >> $GITHUB_STEP_SUMMARY
-          echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.check_changes.outputs.changes }}" == "true" ]; then
-            echo "**Status:** ✅ Data updated successfully" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "**Status:** ℹ️ No changes detected" >> $GITHUB_STEP_SUMMARY
-          fi
+          {
+            echo "## Data Update Summary"
+            echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')"
+            if [ "${{ steps.check_changes.outputs.changes }}" == "true" ]; then
+              echo "**Status:** ✅ Data updated successfully"
+            else
+              echo "**Status:** ℹ️ No changes detected"
+            fi
 
-          # Count plans in the file
-          PLAN_COUNT=$(python -c "import json; data = json.load(open('data/plans.json')); print(data['total_plans'])")
-          echo "**Total Plans:** $PLAN_COUNT" >> $GITHUB_STEP_SUMMARY
+            # Count plans in the file
+            PLAN_COUNT=$(python -c "import json; data = json.load(open('data/plans.json')); print(data['total_plans'])")
+            echo "**Total Plans:** $PLAN_COUNT"
+          } >> "$GITHUB_STEP_SUMMARY"
