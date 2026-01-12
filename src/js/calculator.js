@@ -164,7 +164,7 @@ function calculateAnnualCost(monthlyUsageArray, plan, tduRates, localTaxRate = 0
  * @param {string} homeSize - Home size category (optional, for future refinement)
  * @returns {number[]} Array of 12 monthly usage estimates
  */
-function estimateUsagePattern(avgMonthlyKwh, homeSize = null) {
+function estimateUsagePattern(avgMonthlyKwh, _homeSize = null) {
   // Texas seasonal multipliers (based on research data)
   const seasonalMultipliers = [
     1.2, // January (winter)
@@ -245,7 +245,7 @@ function detectTDU(zipCode, tduList) {
     ]
   };
 
-  const zip = parseInt(zipCode);
+  const zip = parseInt(zipCode, 10);
 
   for (const [tduCode, ranges] of Object.entries(zipRanges)) {
     for (const range of ranges) {
@@ -270,7 +270,7 @@ function detectTDU(zipCode, tduList) {
  * @returns {Object[]} Ranked plans with warnings and quality scores
  */
 function rankPlans(plans, userUsage, tduRates, options = {}) {
-  const { localTaxRate = 0, termLengthPreference = null, contractStartDate = null } = options;
+  const { localTaxRate = 0, _termLengthPreference = null, contractStartDate = null } = options;
 
   // Calculate metrics for all plans first
   const rankedPlans = plans.map((plan) => {
@@ -343,7 +343,7 @@ function rankPlans(plans, userUsage, tduRates, options = {}) {
  * @param {Object} options - Scoring options
  * @returns {number} Quality score (0-100)
  */
-function calculateQualityScore(plan, bestAnnualCost, options = {}) {
+function calculateQualityScore(plan, bestAnnualCost, _options = {}) {
   // Automatic F (0) for problematic plan types
   // These plan types are considered unsuitable for most consumers
   if (plan.rate_type !== 'FIXED') {
@@ -416,7 +416,7 @@ function calculateVolatility(plan, userUsage) {
   let volatilityScore = 0;
 
   // Bill credits increase volatility
-  if (plan.special_terms && plan.special_terms.includes('credit')) {
+  if (plan.special_terms?.includes('credit')) {
     volatilityScore += 0.5;
 
     // Count how many months user would miss the credit
@@ -463,7 +463,7 @@ function identifyWarnings(plan, userUsage, contractStartDate = null) {
   const warnings = [];
 
   // Bill credit warnings
-  if (plan.special_terms && plan.special_terms.includes('credit')) {
+  if (plan.special_terms?.includes('credit')) {
     let missedMonths = 0;
     let missedValue = 0;
 
@@ -516,7 +516,7 @@ function identifyWarnings(plan, userUsage, contractStartDate = null) {
   // Rate volatility warning
   const rate500 = plan.price_kwh_500;
   const rate1000 = plan.price_kwh_1000;
-  const rate2000 = plan.price_kwh_2000;
+  const _rate2000 = plan.price_kwh_2000;
 
   if (Math.abs(rate500 - rate1000) / rate1000 > 0.5) {
     warnings.push(
@@ -591,7 +591,7 @@ function calculateContractExpiration(startDate, termMonths) {
   }
 
   // Handle invalid dates
-  if (isNaN(start.getTime())) {
+  if (Number.isNaN(start.getTime())) {
     start = new Date();
   }
 
@@ -695,7 +695,7 @@ function calculateContractExpiration(startDate, termMonths) {
         expirationMonthName: getMonthName(altMonth),
         seasonalityScore: altScore,
         riskLevel: altRiskLevel,
-        improvement: Math.round(Math.max(0, improvement)) + '% better timing'
+        improvement: `${Math.round(Math.max(0, improvement))}% better timing`
       });
     }
   }

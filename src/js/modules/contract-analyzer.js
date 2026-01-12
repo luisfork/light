@@ -51,7 +51,7 @@ const ContractAnalyzer = {
     }
 
     // Handle invalid dates
-    if (isNaN(start.getTime())) {
+    if (Number.isNaN(start.getTime())) {
       start = new Date();
     }
 
@@ -230,7 +230,7 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Also export individual functions for backwards compatibility
-const calculateContractExpiration =
+const _calculateContractExpiration =
   ContractAnalyzer.calculateContractExpiration.bind(ContractAnalyzer);
-const getContractExpirationForPlan =
+const _getContractExpirationForPlan =
   ContractAnalyzer.getContractExpirationForPlan.bind(ContractAnalyzer);

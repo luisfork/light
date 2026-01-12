@@ -351,8 +351,7 @@ const UI = {
       }, this.ZIP_VALIDATION_DELAY);
     } else if (value.length > 0) {
       // Partial input
-      this.elements.zipStatus.innerHTML =
-        '<span class="zip-status-partial">' + (5 - value.length) + ' more digits</span>';
+      this.elements.zipStatus.innerHTML = `<span class="zip-status-partial">${5 - value.length} more digits</span>`;
       this.disableUsageSection();
     } else {
       // Empty
@@ -921,7 +920,7 @@ const UI = {
     const bestValues = this.calculateBestValues(plans);
 
     this.elements.comparisonBody.innerHTML = plans
-      .map((plan, i) => {
+      .map((plan, _i) => {
         const grade =
           typeof getQualityGrade === 'function'
             ? getQualityGrade(plan.qualityScore || 0)

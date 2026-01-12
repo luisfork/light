@@ -50,7 +50,7 @@ const UsageEstimator = {
    * @param {string} homeSize - Home size category (optional, for future refinement)
    * @returns {number[]} Array of 12 monthly usage estimates
    */
-  estimateUsagePattern(avgMonthlyKwh, homeSize = null) {
+  estimateUsagePattern(avgMonthlyKwh, _homeSize = null) {
     // Calculate adjustment factor to ensure average equals input
     const sumMultipliers = this.seasonalMultipliers.reduce((a, b) => a + b, 0);
     const adjustmentFactor = 12 / sumMultipliers;
@@ -91,5 +91,5 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Also export individual functions for backwards compatibility
-const estimateUsagePattern = UsageEstimator.estimateUsagePattern.bind(UsageEstimator);
-const estimateUsageFromHomeSize = UsageEstimator.estimateUsageFromHomeSize.bind(UsageEstimator);
+const _estimateUsagePattern = UsageEstimator.estimateUsagePattern.bind(UsageEstimator);
+const _estimateUsageFromHomeSize = UsageEstimator.estimateUsageFromHomeSize.bind(UsageEstimator);

@@ -84,6 +84,6 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Also export individual functions for backwards compatibility
-const formatCurrency = Formatters.formatCurrency.bind(Formatters);
-const formatRate = Formatters.formatRate.bind(Formatters);
-const getMonthName = Formatters.getMonthName.bind(Formatters);
+const _formatCurrency = Formatters.formatCurrency.bind(Formatters);
+const _formatRate = Formatters.formatRate.bind(Formatters);
+const _getMonthName = Formatters.getMonthName.bind(Formatters);

@@ -204,5 +204,6 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Also export individual functions for backwards compatibility
-const calculateEarlyTerminationFee = ETFCalculator.calculateEarlyTerminationFee.bind(ETFCalculator);
-const getETFDisplayInfo = ETFCalculator.getETFDisplayInfo.bind(ETFCalculator);
+const _calculateEarlyTerminationFee =
+  ETFCalculator.calculateEarlyTerminationFee.bind(ETFCalculator);
+const _getETFDisplayInfo = ETFCalculator.getETFDisplayInfo.bind(ETFCalculator);

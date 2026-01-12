@@ -824,7 +824,7 @@ a:hover {
 }
 
 [hidden] {
-  display: none !important;
+  display: none;
 }
 
 .status-dot {
@@ -2070,9 +2070,9 @@ a:hover {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
   }
 }
 
@@ -2280,7 +2280,7 @@ tr.plan-non-fixed {
   .action-bar,
   .modal-backdrop,
   .toast-container {
-    display: none !important;
+    display: none;
   }
 
   body {
@@ -2413,7 +2413,7 @@ tr.plan-non-fixed {
   color: var(--color-ink-tertiary);
   padding-top: var(--space-2);
   border-top: 1px solid var(--color-border-subtle);
-  margin-top: var(--space-3) !important;
+  margin-top: var(--space-3);
 }
 
 /* Plan Item Rank Display */
@@ -2625,7 +2625,7 @@ tr.plan-non-fixed {
 /* Best Value Indicators */
 
 .best-value {
-  color: var(--color-positive) !important;
+  color: var(--color-positive);
   font-weight: 700;
 }
 

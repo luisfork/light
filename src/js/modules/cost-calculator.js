@@ -186,7 +186,7 @@ const CostCalculator = {
       ]
     };
 
-    const zip = parseInt(zipCode);
+    const zip = parseInt(zipCode, 10);
 
     for (const [tduCode, ranges] of Object.entries(zipRanges)) {
       for (const range of ranges) {
@@ -206,6 +206,6 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Also export individual functions for backwards compatibility
-const calculateMonthlyCost = CostCalculator.calculateMonthlyCost.bind(CostCalculator);
-const calculateAnnualCost = CostCalculator.calculateAnnualCost.bind(CostCalculator);
-const detectTDU = CostCalculator.detectTDU.bind(CostCalculator);
+const _calculateMonthlyCost = CostCalculator.calculateMonthlyCost.bind(CostCalculator);
+const _calculateAnnualCost = CostCalculator.calculateAnnualCost.bind(CostCalculator);
+const _detectTDU = CostCalculator.detectTDU.bind(CostCalculator);

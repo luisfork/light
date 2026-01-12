@@ -54,7 +54,7 @@ const PlanRanker = {
   rankPlans(plans, userUsage, tduRates, options = {}, CostCalculator = null) {
     const {
       localTaxRate = 0,
-      termLengthPreference = null,
+      _termLengthPreference = null,
       contractStartDate = null,
       includeNonFixed = true
     } = options;
@@ -148,7 +148,7 @@ const PlanRanker = {
         'NON-FIXED RATE: Your price can change based on market conditions. ' +
         'Fixed-rate plans provide more budget certainty and protection from price spikes.'
     };
-    return messages[rateType] || messages['default'];
+    return messages[rateType] || messages.default;
   },
 
   /**
@@ -162,7 +162,7 @@ const PlanRanker = {
    * @param {Object} options - Scoring options
    * @returns {number} Quality score (0-100)
    */
-  calculateQualityScore(plan, bestAnnualCost, options = {}) {
+  calculateQualityScore(plan, bestAnnualCost, _options = {}) {
     // Initialize score breakdown for transparency
     const breakdown = {
       baseScore: 100,
@@ -303,7 +303,7 @@ const PlanRanker = {
     }
 
     // Bill credits increase volatility
-    if (plan.special_terms && plan.special_terms.includes('credit')) {
+    if (plan.special_terms?.includes('credit')) {
       volatilityScore += 0.5;
 
       // Count how many months user would miss the credit
@@ -380,7 +380,7 @@ const PlanRanker = {
     const warnings = [];
 
     // Bill credit warnings
-    if (plan.special_terms && plan.special_terms.includes('credit')) {
+    if (plan.special_terms?.includes('credit')) {
       let missedMonths = 0;
       let missedValue = 0;
 
@@ -433,7 +433,7 @@ const PlanRanker = {
     // Rate volatility warning
     const rate500 = plan.price_kwh_500;
     const rate1000 = plan.price_kwh_1000;
-    const rate2000 = plan.price_kwh_2000;
+    const _rate2000 = plan.price_kwh_2000;
 
     if (Math.abs(rate500 - rate1000) / rate1000 > 0.5) {
       warnings.push(
@@ -677,8 +677,8 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Also export individual functions for backwards compatibility
-const rankPlans = PlanRanker.rankPlans.bind(PlanRanker);
-const getQualityGrade = PlanRanker.getQualityGrade.bind(PlanRanker);
-const getScoreExplanation = PlanRanker.getScoreExplanation.bind(PlanRanker);
-const comparePlans = PlanRanker.comparePlans.bind(PlanRanker);
-const getRankDescription = PlanRanker.getRankDescription.bind(PlanRanker);
+const _rankPlans = PlanRanker.rankPlans.bind(PlanRanker);
+const _getQualityGrade = PlanRanker.getQualityGrade.bind(PlanRanker);
+const _getScoreExplanation = PlanRanker.getScoreExplanation.bind(PlanRanker);
+const _comparePlans = PlanRanker.comparePlans.bind(PlanRanker);
+const _getRankDescription = PlanRanker.getRankDescription.bind(PlanRanker);

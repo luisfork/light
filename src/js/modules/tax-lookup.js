@@ -18,7 +18,7 @@ const TaxLookup = {
 
     // Check major cities first for exact ZIP match
     for (const [cityName, cityData] of Object.entries(taxData.major_cities || {})) {
-      if (cityData.zip_codes && cityData.zip_codes.includes(zipCode)) {
+      if (cityData.zip_codes?.includes(zipCode)) {
         return {
           rate: cityData.rate || 0,
           city: cityName.replace(/_/g, ' '),
