@@ -58,7 +58,7 @@ The `fetch_plans.py` script performs significant normalization:
 2. **TDU Normalization**: Maps various TDU names (e.g., "AEP TEXAS CENTRAL COMPANY", "AEP Central") to internal codes (`AEP_CENTRAL`, `ONCOR`, etc.).
 3. **Price Parsing**: Converts values to floats. Handles formatted strings like `$0.16` or `16.5%`.
 4. **Fee Extraction**: If the `CancelFee` column is missing (common in Zip code exports), strictly parses the `Pricing Details` text using Regex to find "Cancellation Fee: $XXX".
-5. **Deduplication**: Removes duplicate entries based on `rep_name`, `plan_name`, `tdu_area`, `term_months`, and `language`.
+5. **Deduplication**: Performed client-side in `src/js/api.js` using numeric-only plan fingerprints (provider, TDU area, rate type, prices, term, ETF, base charge, renewable %, prepaid flag, TOU flag). This removes English/Spanish duplicates without text parsing.
 
 ## Tips
 

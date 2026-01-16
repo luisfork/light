@@ -21,6 +21,7 @@ Enhanced the deduplication system to correctly identify duplicate English/Spanis
 ### Before vs After
 
 **BEFORE (11 fields):**
+
 ```javascript
 {
   rep, tdu, rate_type,
@@ -31,6 +32,7 @@ Enhanced the deduplication system to correctly identify duplicate English/Spanis
 ```
 
 **AFTER (13 fields):**
+
 ```javascript
 {
   rep, tdu, rate_type,
@@ -91,11 +93,13 @@ Plan 4: Free Weekends 12 (English)  [UNIQUE]
 ### Hero Metrics Section
 
 **Before:**
+
 ```
 486 Plans Analyzed
 ```
 
 **After:**
+
 ```
 486                           ← Large, prominent
 (986 total, 500 duplicates removed)  ← Smaller subtitle
@@ -105,6 +109,7 @@ Plan 4: Free Weekends 12 (English)  [UNIQUE]
 ### Deduplication Modal
 
 Enhanced modal now includes:
+
 - Bill credits in fingerprint field list
 - Special features in fingerprint field list
 - Note: "Plans with different bill credits or special features are treated as unique"
@@ -144,6 +149,7 @@ Enhanced modal now includes:
 ### Concern 1: Orphaned Plans (English-only or Spanish-only)
 
 **Handled:** System tracks and reports:
+
 - `orphaned_english_count`: Plans with no Spanish equivalent
 - `orphaned_spanish_count`: Plans with no English equivalent
 - These are NOT removed, just tracked for transparency
@@ -151,6 +157,7 @@ Enhanced modal now includes:
 ### Concern 2: Should We Remove Plans That Are Identical Besides Name?
 
 **Yes, but comprehensively:** The enhanced system removes plans that are:
+
 - Same provider and TDU area
 - Same rate type (FIXED, VARIABLE, etc.)
 - Same pricing at all usage tiers
@@ -199,6 +206,7 @@ Only the plan names and documentation URLs can differ.
 ## Conclusion
 
 The enhanced deduplication system provides:
+
 - **Robustness**: Feature-based matching, not language detection heuristics
 - **Accuracy**: Correctly handles bill credits and special features
 - **Transparency**: Users see full statistics with click-through details

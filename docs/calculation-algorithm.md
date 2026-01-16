@@ -214,7 +214,7 @@ function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
             tduCost: tduCost,
             credits: credits,
             tax: taxAmount,
-            effectiveRate: (total / usageKwh * 100)  // cents per kWh
+            effectiveRate: usageKwh > 0 ? (total / usageKwh * 100) : 0  // cents per kWh
         }
     };
 }
@@ -1000,15 +1000,16 @@ The quality score (0-100) is calculated from multiple factors:
 
 ### Combined Ranking Score
 
-Plans are ranked using a weighted combination:
+Plans are ranked using a multiplicative value model that discounts risky plans:
 
 ```javascript
-// Combined Score = (85% Cost Efficiency) + (15% Quality)
+// Combined Score = Cost Score × (Quality Score / 100)
 const costScore = 100 - ((plan.annualCost - bestAnnualCost) / costRange) * 100;
-const combinedScore = Math.round(costScore * 0.85 + plan.qualityScore * 0.15);
+const qualityFactor = Math.max(1, plan.qualityScore) / 100;
+const combinedScore = costScore * qualityFactor;
 ```
 
-This ensures cost remains the primary factor while quality influences ranking for similar-priced plans.
+This ensures a plan must be both competitively priced and high quality to rank well.
 
 ---
 
@@ -1028,9 +1029,9 @@ This ensures cost remains the primary factor while quality influences ranking fo
 
 ### 3. Zero or Negative Usage
 
-**Issue:** Invalid input.
+**Issue:** Invalid input or empty usage profile can create divide-by-zero in rate calculations.
 
-**Solution:** Validate input, reject if any month < 0 or annual total < 1200 kWh.
+**Solution:** Validate input and guard calculations. When usage is 0, effective rates are set to 0 instead of dividing by zero.
 
 ### 4. Bill Credit Exactly at Threshold
 
@@ -1073,6 +1074,7 @@ This ensures cost remains the primary factor while quality influences ranking fo
 **Issue:** Many providers list identical plans in both English and Spanish versions. While feature-identical, they have different plan names, documentation URLs, and language fields.
 
 **Solution:** Advanced fingerprint-based deduplication that:
+
 1. Creates a unique fingerprint from plan features (not names)
 2. Identifies language pairs and orphaned plans
 3. Preserves English versions while tracking language-only plans
@@ -1144,6 +1146,7 @@ Not all plans have both English and Spanish versions. The system identifies thre
 3. **Spanish-Only** (~3%): Plans offered only in Spanish (no English equivalent exists)
 
 **Example from real data (1,854 total plans):**
+
 - 866 language pairs (433 plans kept after deduplication)
 - 97 English-only plans
 - 25 Spanish-only plans
@@ -1163,11 +1166,13 @@ Spanish-only plans receive a `SPANISH ONLY` badge in the UI to inform users:
 #### Why This Matters
 
 **Without deduplication:**
+
 - Users see 1,854 plans (confusing, redundant)
 - Comparison becomes overwhelming
 - English and Spanish versions appear as separate options
 
 **With enhanced deduplication:**
+
 - Users see 988 unique plans (manageable)
 - Spanish-only plans are preserved and clearly marked
 - Transparency: "988 unique plans (1,854 total, 866 duplicates removed)"
@@ -1176,11 +1181,13 @@ Spanish-only plans receive a `SPANISH ONLY` badge in the UI to inform users:
 #### Implementation Notes
 
 **Server-Side (Python):**
+
 - `scripts/fetch_plans.py` saves ALL plans (no deduplication)
 - Allows client-side to show real-time statistics
 - Preserves data integrity for analysis
 
 **Client-Side (JavaScript):**
+
 - `src/js/api.js` performs deduplication on page load
 - Returns metrics: `duplicateCount`, `orphanedEnglishCount`, `orphanedSpanishCount`
 - Marks plans with `is_spanish_only` flag for UI display

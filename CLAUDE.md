@@ -29,14 +29,17 @@ uv run python scripts/fetch_plans.py
 python -m http.server 8000
 # Then open http://localhost:8000/src/ in browser
 
-# Install UI testing dependencies (bun required)
+# Install JavaScript/testing dependencies (bun required)
 bun install
 bunx playwright install --with-deps chromium
 ```
 
-### Automated UI Testing
+### Automated Testing
 
 ```bash
+# Run unit tests (node:test)
+bun test tests/unit
+
 # Run all UI tests (headless)
 bunx playwright test
 

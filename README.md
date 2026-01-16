@@ -56,7 +56,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 ## Updates
 
-### Simplified Deduplication System
+### Deduplication System
 
 - **Numeric-Only Fingerprinting**: Simplified from 13 fields to 11 fields by removing complex text extraction
 - **Removed 100+ Lines of Code**: Eliminated fragile keyword matching and bilingual text parsing
@@ -68,9 +68,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 - **Transparency UI**: Enhanced statistics showing "988 unique plans (1,854 total, 866 duplicates removed)"
 - **Detailed Modal**: Clickable info button explains numeric-only fingerprinting rationale
 
-### Previous Updates
-
-#### UI/UX Enhancements
+### UI/UX Enhancements
 
 - **Improved Accessibility**: Enhanced text contrast for WCAG 2.1 AA compliance (5.74:1 and 4.54:1 ratios)
 - **Better Visualization**: Redesigned usage chart with 75% taller bars, month labels, and heat-map color coding (red=high, orange=medium-high, yellow=medium, blue=low)
@@ -78,7 +76,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 - **Cleaner Layout**: Moved ZIP validation indicator horizontal, removed redundant "Plans Requiring Caution" section
 - **Fixed Precision**: Annual usage now displays exactly 12,000 kWh (was 11,999 kWh due to rounding)
 
-#### Functional Improvements
+### Functional Improvements
 
 - **Smarter Ranking**: F-grade plans (0/100 quality) now properly rank below acceptable plans regardless of cost
 - **Better ETF Detection**: Enhanced cancelation fee pattern matching for phrases like "multiplied by months remaining"
@@ -91,11 +89,12 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 ### For Users
 
 - **ZIP Code Detection**: Automatically identifies your TDU service area
+- **Regulated Area Detection**: Warns if your ZIP code is outside deregulated markets
 - **Three Usage Input Methods**
   - Quick estimate by home size
   - Average monthly usage
   - Detailed 12-month pattern for maximum accuracy
-- **Accurate Cost Calculation**: Includes energy, TDU delivery, base charges, and local taxes
+- **Accurate Cost Calculation**: Includes energy, TDU delivery, base charges, and ZIP-based local taxes
 - **Contract Expiration Analysis**: Identifies when contracts expire during expensive renewal periods and suggests optimal contract lengths
 - **Gimmick Detection**: Identifies and warns about bill credit traps and time-of-use plans
 - **Provider Name Formatting**: All provider names displayed in clean, professional uppercase format
@@ -433,7 +432,7 @@ light/
    TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py
    ```
 
-4. **Install UI testing dependencies**
+4. **Install JavaScript dependencies**
 
    ```bash
    bun install
@@ -453,14 +452,17 @@ light/
 > Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions.
 > You must use a local HTTP server.
 
-### Automated UI Testing
+### Automated Testing
 
-*Light* uses **Playwright** for robust automated UI testing. This ensures that core calculation logic, cost formatting, and critical UI components remain stable after code changes.
+*Light* uses **node:test** (via Bun) for unit tests and **Playwright** for robust UI testing. This ensures that core calculation logic, cost formatting, and critical UI components remain stable after code changes.
 
 > [!NOTE]
 > Testing is performed against a real browser engine (Chromium) but remains decoupled from the production code, which stays **100% *Vanilla* JavaScript**.
 
 ```bash
+# Run unit tests
+bun test tests/unit
+
 # Run all UI tests (headless)
 bunx playwright test
 

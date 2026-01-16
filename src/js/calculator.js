@@ -39,6 +39,8 @@ function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
   // Total cost
   const total = Math.max(0, subtotal - credits + taxAmount);
 
+  const effectiveRate = usageKwh > 0 ? (total / usageKwh) * 100 : 0;
+
   return {
     total: total,
     breakdown: {
@@ -47,7 +49,7 @@ function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
       tduCost: tduCost,
       credits: credits,
       tax: taxAmount,
-      effectiveRate: (total / usageKwh) * 100 // cents per kWh
+      effectiveRate: effectiveRate // cents per kWh
     }
   };
 }
@@ -144,12 +146,14 @@ function calculateAnnualCost(monthlyUsageArray, plan, tduRates, localTaxRate = 0
     totalUsage += usage;
   }
 
+  const effectiveAnnualRate = totalUsage > 0 ? (totalCost / totalUsage) * 100 : 0;
+
   return {
     annualCost: totalCost,
     monthlyCosts: monthlyCosts,
     averageMonthlyCost: totalCost / 12,
     totalUsage: totalUsage,
-    effectiveAnnualRate: (totalCost / totalUsage) * 100 // cents per kWh
+    effectiveAnnualRate: effectiveAnnualRate // cents per kWh
   };
 }
 
@@ -767,6 +771,9 @@ function getContractExpirationForPlan(plan) {
  * @returns {Object} ETF calculation result with total and structure type
  */
 function calculateEarlyTerminationFee(plan, monthsRemaining) {
+  if (typeof ETFCalculator !== 'undefined' && ETFCalculator.calculateEarlyTerminationFee) {
+    return ETFCalculator.calculateEarlyTerminationFee(plan, monthsRemaining);
+  }
   // Parse the ETF value - handle various formats
   let etfValue = 0;
   let etfStructure = 'flat';
@@ -861,6 +868,10 @@ function calculateEarlyTerminationFee(plan, monthsRemaining) {
 function getETFDisplayInfo(plan, monthsRemaining = null) {
   if (monthsRemaining === null) {
     monthsRemaining = Math.floor((plan.term_months || 12) / 2);
+  }
+
+  if (typeof ETFCalculator !== 'undefined' && ETFCalculator.getETFDisplayInfo) {
+    return ETFCalculator.getETFDisplayInfo(plan, monthsRemaining);
   }
 
   const result = calculateEarlyTerminationFee(plan, monthsRemaining);

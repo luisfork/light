@@ -19,6 +19,14 @@ python -m http.server 8000
 
 The server will run at `http://localhost:8000/src/` (navigate to `/src/` for the app)
 
+### 1b. Install JavaScript Dependencies (for tests)
+
+```bash
+cd /Users/luis/Desktop/light
+bun install
+bunx playwright install --with-deps chromium
+```
+
 ### 2. Ensure Test Data Exists
 
 If `data/plans.json` doesn't exist or is empty, generate it from test CSV:
@@ -95,3 +103,11 @@ python -m http.server 8000
 ### "TypeError: Cannot read properties of null"
 
 The API is failing to load. Check browser console for specific errors and ensure the server is serving from the correct directory.
+
+### Playwright tests fail to launch browsers
+
+Install Playwright browsers with Bun:
+
+```bash
+bunx playwright install
+```

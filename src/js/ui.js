@@ -143,7 +143,9 @@ const UI = {
     isLoading: false,
     autoCalculateTimer: null,
     zipValidationTimer: null,
-    lastCalculation: null
+    lastCalculation: null,
+    localTaxRate: 0,
+    taxInfo: null
   },
 
   elements: {},
@@ -387,6 +389,19 @@ const UI = {
 
     try {
       const taxInfo = await API.getLocalTaxInfo(zipCode);
+      this.state.taxInfo = taxInfo;
+      this.state.localTaxRate = taxInfo?.rate || 0;
+
+      if (taxInfo.deregulated === false) {
+        Toast.warning(
+          'This ZIP code is in a regulated service area where retail choice is not available.',
+          8000,
+          'Regulated Area'
+        );
+        this.disableUsageSection();
+        this.elements.zipStatus.innerHTML = '<span class="zip-status-unknown">Regulated</span>';
+        return;
+      }
 
       if (taxInfo.tdu) {
         const tdu = await API.getTDUByCode(taxInfo.tdu);
@@ -460,6 +475,8 @@ const UI = {
       this.elements.tduDisplay.hidden = true;
     }
     this.state.tdu = null;
+    this.state.localTaxRate = 0;
+    this.state.taxInfo = null;
     this.updateCalculateButton();
   },
 
@@ -622,7 +639,9 @@ const UI = {
           ? PlanRanker.rankPlans.bind(PlanRanker)
           : rankPlans;
 
-      const rankedPlans = rankingFunction(tduPlans, monthlyUsage, this.state.tdu);
+      const rankedPlans = rankingFunction(tduPlans, monthlyUsage, this.state.tdu, {
+        localTaxRate: this.state.localTaxRate || 0
+      });
       this.state.rankedPlans = rankedPlans;
 
       this.displayResults(rankedPlans, monthlyUsage);
@@ -1185,7 +1204,7 @@ const UI = {
         const isBestCost = plan.annualCost === bestValues.lowestCost;
         const isBestRate = plan.effectiveRate === bestValues.lowestRate;
         const isBestQuality = plan.qualityScore === bestValues.highestQuality;
-        const isLowestFee = plan.early_termination_fee === bestValues.lowestFee;
+        const isLowestFee = this.getETFSortValue(plan) === bestValues.lowestFee;
 
         // Badge Logic
         const variableBadge = isNonFixed
@@ -1273,7 +1292,7 @@ const UI = {
       lowestCost: Math.min(...plans.map((p) => p.annualCost || Infinity)),
       lowestRate: Math.min(...plans.map((p) => p.effectiveRate || Infinity)),
       highestQuality: Math.max(...plans.map((p) => p.qualityScore || 0)),
-      lowestFee: Math.min(...plans.map((p) => p.early_termination_fee || 0))
+      lowestFee: Math.min(...plans.map((p) => this.getETFSortValue(p)))
     };
   },
 
@@ -1396,8 +1415,8 @@ const UI = {
             return aVal < bVal ? -dir : aVal > bVal ? dir : 0;
           case 'cancelFee':
             // Sort by ETF amount, treating 'None' as 0
-            aVal = a.early_termination_fee || 0;
-            bVal = b.early_termination_fee || 0;
+            aVal = this.getETFSortValue(a);
+            bVal = this.getETFSortValue(b);
             break;
           default:
             return 0;
@@ -1481,8 +1500,8 @@ const UI = {
                         <span class="modal-stat-label">Contract Term</span>
                     </div>
                     <div class="modal-stat">
-                        <span class="modal-stat-value">${formatCurrency(plan.early_termination_fee || 0)}</span>
-                        <span class="modal-stat-label">Cancellation Fee</span>
+                      <span class="modal-stat-value">${this.renderETFModalValue(plan)}</span>
+                      <span class="modal-stat-label">Cancellation Fee</span>
                     </div>
                     <div class="modal-stat">
                         <span class="modal-stat-value">${plan.renewable_pct || 0}%</span>
@@ -1526,6 +1545,12 @@ const UI = {
                 : ''
             }
 
+            <div class="modal-section">
+              <div class="etf-reminder">
+                <strong>Verify cancellation terms:</strong> Always confirm details in the Electricity Facts Label (EFL), Residential Terms of Service, and Your Rights as a Retail Electric Customer documents. Contact the REP directly if terms are unclear.
+              </div>
+            </div>
+
             <div class="modal-actions">
                 ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn monthsdal-btn-primary">View EFL</a>` : ''}
                 ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="modal-btn monthsdal-btn-secondary">Enroll</a>` : ''}
@@ -1560,25 +1585,58 @@ const UI = {
    * Format ETF for display, handling per-month-remaining fees
    */
   formatETF(plan) {
-    if (typeof ETFCalculator !== 'undefined' && ETFCalculator.getETFDisplayInfo) {
-      const etfInfo = ETFCalculator.getETFDisplayInfo(plan);
+    const etfInfo = this.getETFInfo(plan);
 
-      if (etfInfo.needsConfirmation) {
-        return `
-          ${etfInfo.displayText}
+    const exampleTitle =
+      etfInfo.structure === 'per-month' || etfInfo.structure === 'per-month-inferred'
+        ? `Example: ${formatCurrency(etfInfo.exampleTotal)} with ${etfInfo.exampleMonths} months remaining`
+        : '';
+
+    if (etfInfo.needsConfirmation) {
+      return `
+          <span title="${this.escapeHtml(exampleTitle)}">${etfInfo.displayText}</span>
           <span class="etf-info-icon"
                 title="Fee structure detected automatically. Click for verification guidance."
                 onclick="UI.showETFVerificationModal(event)"
                 style="cursor: pointer; margin-left: 4px; color: var(--color-accent); font-weight: 600;">ⓘ</span>
         `;
-      }
-
-      return etfInfo.displayText;
     }
 
-    // Fallback if monthsdule not available
-    if (!plan.early_termination_fee) return 'None';
-    return formatCurrency(plan.early_termination_fee);
+    return `<span title="${this.escapeHtml(exampleTitle)}">${etfInfo.displayText}</span>`;
+  },
+
+  getETFInfo(plan) {
+    if (typeof ETFCalculator !== 'undefined' && ETFCalculator.getETFDisplayInfo) {
+      return ETFCalculator.getETFDisplayInfo(plan);
+    }
+
+    const fallbackFee = plan.early_termination_fee || 0;
+    return {
+      total: fallbackFee,
+      structure: fallbackFee > 0 ? 'flat' : 'none',
+      perMonthRate: 0,
+      monthsRemaining: Math.floor((plan.term_months || 12) / 2),
+      displayText: fallbackFee > 0 ? formatCurrency(fallbackFee) : 'None',
+      exampleTotal: fallbackFee,
+      exampleMonths: Math.floor((plan.term_months || 12) / 2),
+      needsConfirmation: false
+    };
+  },
+
+  getETFSortValue(plan) {
+    const etfInfo = this.getETFInfo(plan);
+    if (!etfInfo || etfInfo.structure === 'none') return 0;
+    if (etfInfo.structure === 'unknown') return Number.POSITIVE_INFINITY;
+    if (etfInfo.structure === 'flat') return etfInfo.total || 0;
+    return etfInfo.exampleTotal || etfInfo.total || 0;
+  },
+
+  renderETFModalValue(plan) {
+    const etfInfo = this.getETFInfo(plan);
+    if (etfInfo.structure === 'per-month' || etfInfo.structure === 'per-month-inferred') {
+      return `${etfInfo.displayText} <span class="modal-subtext">(example ${formatCurrency(etfInfo.exampleTotal)} with ${etfInfo.exampleMonths} months remaining)</span>`;
+    }
+    return etfInfo.displayText;
   },
 
   /**

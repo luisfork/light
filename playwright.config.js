@@ -1,5 +1,7 @@
 const { defineConfig, devices } = require('@playwright/test');
 
+process.env.PLAYWRIGHT_RUNNING = '1';
+
 module.exports = defineConfig({
   testDir: './tests/ui',
   fullyParallel: true,
@@ -9,17 +11,17 @@ module.exports = defineConfig({
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:8000',
-    trace: 'on-first-retry',
+    trace: 'on-first-retry'
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+      use: { ...devices['Desktop Chrome'] }
+    }
   ],
   webServer: {
     command: 'python3 -m http.server 8000',
     url: 'http://localhost:8000',
-    reuseExistingServer: !process.env.CI,
-  },
+    reuseExistingServer: !process.env.CI
+  }
 });

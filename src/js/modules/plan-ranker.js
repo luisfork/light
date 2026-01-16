@@ -22,8 +22,8 @@ const PlanRanker = {
    * Scoring weight configuration
    */
   SCORING_WEIGHTS: {
-    costEfficiency: 0.30, // Heavily reduced to ensure visual grade consistency
-    quality: 0.70 // Dominant factor: Grade A plans should almost always beat Grade B
+    costEfficiency: 0.3, // Heavily reduced to ensure visual grade consistency
+    quality: 0.7 // Dominant factor: Grade A plans should almost always beat Grade B
   },
 
   /**
@@ -123,12 +123,12 @@ const PlanRanker = {
       // NEW SCORING SYSTEM: Multiplicative Value Scoring
       // Instead of adding Cost + Quality, we use Quality as a multiplier for the Cost Score.
       // This ensures that a "cheap" plan with "poor" quality (e.g., risky renewal) is heavily discounted.
-      // Example: 
+      // Example:
       // - Perfect Plan: Cost 100 * Quality 1.0 = 100
       // - Risky Plan: Cost 100 * Quality 0.7 = 70
       // - Expensive Safe Plan: Cost 80 * Quality 1.0 = 80
       // Result: Expensive Safe Plan (80) beats Cheap Risky Plan (70).
-      
+
       const qualityFactor = Math.max(1, qualityScore) / 100;
       let combinedScore = costScore * qualityFactor;
 
@@ -136,7 +136,7 @@ const PlanRanker = {
       if (qualityScore < 60) {
         // F-Grade (Avoid): Severe penalty, strictly at bottom
         // Still allow sorting within F-grade by cost
-        combinedScore = (qualityScore - 1000) + (costScore * 0.1);
+        combinedScore = qualityScore - 1000 + costScore * 0.1;
       } else if (qualityScore < 70) {
         // D-Grade (Caution): Apply a flat penalty to the final score to separate from C-tier
         combinedScore -= 10;
@@ -249,12 +249,17 @@ const PlanRanker = {
     // Critical: Penalize plans that expire during peak demand months (Summer/Winter)
     // This ensures the algorithm accounts for "optimal renewal months vs mad renewal months"
     if (_options.contractStartDate && plan.term_months) {
-      const expiration = this.calculateContractExpiration(_options.contractStartDate, plan.term_months);
-      
-      if (expiration.riskLevel === 'high') { // Summer/Winter peak (e.g., July/Aug/Jan)
+      const expiration = this.calculateContractExpiration(
+        _options.contractStartDate,
+        plan.term_months
+      );
+
+      if (expiration.riskLevel === 'high') {
+        // Summer/Winter peak (e.g., July/Aug/Jan)
         breakdown.expirationPenalty = 30; // Increased penalty for high risk
         score -= 30;
-      } else if (expiration.riskLevel === 'medium') { // Shoulder peaks (e.g., June/Dec)
+      } else if (expiration.riskLevel === 'medium') {
+        // Shoulder peaks (e.g., June/Dec)
         breakdown.expirationPenalty = 15;
         score -= 15;
       }
@@ -488,6 +493,9 @@ const PlanRanker = {
    * @returns {Object} ETF calculation result
    */
   calculateEarlyTerminationFee(plan, monthsRemaining) {
+    if (typeof ETFCalculator !== 'undefined' && ETFCalculator.calculateEarlyTerminationFee) {
+      return ETFCalculator.calculateEarlyTerminationFee(plan, monthsRemaining);
+    }
     if (!plan.early_termination_fee) {
       return { total: 0, structure: 'none', perMonthRate: 0, monthsRemaining };
     }

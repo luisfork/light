@@ -106,6 +106,8 @@ const CostCalculator = {
     // Total cost
     const total = Math.max(0, subtotal - credits + taxAmount);
 
+    const effectiveRate = usageKwh > 0 ? (total / usageKwh) * 100 : 0;
+
     return {
       total: total,
       breakdown: {
@@ -114,7 +116,7 @@ const CostCalculator = {
         tduCost: tduCost,
         credits: credits,
         tax: taxAmount,
-        effectiveRate: (total / usageKwh) * 100 // cents per kWh
+        effectiveRate: effectiveRate // cents per kWh
       }
     };
   },
@@ -145,12 +147,14 @@ const CostCalculator = {
       totalUsage += usage;
     }
 
+    const effectiveAnnualRate = totalUsage > 0 ? (totalCost / totalUsage) * 100 : 0;
+
     return {
       annualCost: totalCost,
       monthlyCosts: monthlyCosts,
       averageMonthlyCost: totalCost / 12,
       totalUsage: totalUsage,
-      effectiveAnnualRate: (totalCost / totalUsage) * 100 // cents per kWh
+      effectiveAnnualRate: effectiveAnnualRate // cents per kWh
     };
   },
 

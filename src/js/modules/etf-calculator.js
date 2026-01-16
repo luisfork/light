@@ -6,6 +6,34 @@
  */
 
 const ETFCalculator = {
+  normalizeEtfDetails(plan) {
+    if (!plan) return null;
+    let details = plan.etf_details || plan.etfDetails || null;
+    if (!details) return null;
+
+    if (typeof details === 'string') {
+      try {
+        details = JSON.parse(details);
+      } catch {
+        return null;
+      }
+    }
+
+    if (!details || typeof details !== 'object') return null;
+
+    const structure = (details.structure || '').toLowerCase();
+    if (!structure) return null;
+
+    return {
+      structure,
+      perMonthRate: Number.parseFloat(
+        details.per_month_rate ?? details.perMonthRate ?? details.per_month ?? details.rate ?? 0
+      ),
+      flatFee: Number.parseFloat(details.flat_fee ?? details.flatFee ?? details.amount ?? 0),
+      source: details.source || null
+    };
+  },
+
   /**
    * Calculate early termination fee based on remaining contract months
    *
@@ -21,10 +49,95 @@ const ETFCalculator = {
     let etfValue = 0;
     let etfStructure = 'flat';
     let perMonthRate = 0;
+    let hasNoFeeLanguage = false;
+    let isConditionalNoFee = false;
+    let hasUnspecifiedFeeLanguage = false;
 
-    // First check special_terms for per-month patterns
-    if (plan.special_terms) {
-      const terms = plan.special_terms.toLowerCase();
+    const etfDetails = this.normalizeEtfDetails(plan);
+    if (etfDetails) {
+      if (etfDetails.structure === 'none') {
+        return {
+          total: 0,
+          structure: 'none',
+          perMonthRate: 0,
+          monthsRemaining: monthsRemaining
+        };
+      }
+
+      if (etfDetails.structure === 'unknown') {
+        return {
+          total: 0,
+          structure: 'unknown',
+          perMonthRate: 0,
+          monthsRemaining: monthsRemaining
+        };
+      }
+
+      if (etfDetails.structure === 'flat' && Number.isFinite(etfDetails.flatFee)) {
+        return {
+          total: etfDetails.flatFee,
+          structure: 'flat',
+          perMonthRate: 0,
+          monthsRemaining: monthsRemaining
+        };
+      }
+
+      if (etfDetails.structure === 'per-month' && Number.isFinite(etfDetails.perMonthRate)) {
+        return {
+          total: etfDetails.perMonthRate * monthsRemaining,
+          structure: 'per-month',
+          perMonthRate: etfDetails.perMonthRate,
+          monthsRemaining: monthsRemaining
+        };
+      }
+    }
+
+    // First check known text fields for per-month patterns
+    const termsSources = [
+      plan.special_terms,
+      plan.fees_credits,
+      plan.promotion_details,
+      plan.min_usage_fees
+    ]
+      .filter(Boolean)
+      .join(' | ');
+
+    if (termsSources) {
+      const terms = termsSources.toLowerCase().replace(/\s+/g, ' ').trim();
+
+      // Detect explicit no-fee language
+      const noFeePatterns = [
+        /no\s+(?:early\s+)?(?:termination|cancellation)\s+fee/i,
+        /no\s+cancel(?:lation)?\s+fee/i,
+        /no\s+etf\b/i,
+        /without\s+(?:an?\s+)?early\s+termination\s+fee/i,
+        /(?:termination|cancellation)\s+fee\s*(?:is|of)?\s*\$?0\b/i,
+        /fee\s+waived/i,
+        /waiv(?:e|ed)\s+(?:the\s+)?(?:termination|cancellation)\s+fee/i
+      ];
+      hasNoFeeLanguage = noFeePatterns.some((pattern) => pattern.test(terms));
+
+      // Detect conditional no-fee language (e.g., moving)
+      const conditionalNoFeePatterns = [
+        /no\s+(?:early\s+)?(?:termination|cancellation)\s+fee\s+if\s+you\s+move/i,
+        /waiv(?:e|ed)\s+(?:the\s+)?(?:termination|cancellation)\s+fee\s+if\s+you\s+move/i,
+        /no\s+fee\s+for\s+moving/i,
+        /fee\s+waived\s+for\s+moving/i
+      ];
+      isConditionalNoFee = conditionalNoFeePatterns.some((pattern) => pattern.test(terms));
+
+      // Detect unspecified fee language (fee applies but no amount listed)
+      const unspecifiedFeePatterns = [
+        /early\s+termination\s+fee\s+applies/i,
+        /cancellation\s+fee\s+applies/i,
+        /termination\s+fee\s+applies/i,
+        /early\s+termination\s+fee\s+may\s+apply/i,
+        /cancellation\s+fee\s+may\s+apply/i,
+        /termination\s+fee\s+may\s+apply/i,
+        /early\s+termination\s+fee\s+will\s+apply/i,
+        /cancellation\s+fee\s+will\s+apply/i
+      ];
+      hasUnspecifiedFeeLanguage = unspecifiedFeePatterns.some((pattern) => pattern.test(terms));
 
       // Pattern 1: "$X per month remaining" or "$X/month remaining"
       const perMonthMatch = terms.match(
@@ -33,6 +146,20 @@ const ETFCalculator = {
       if (perMonthMatch) {
         perMonthRate = Number.parseFloat(perMonthMatch[1]);
         etfStructure = 'per-month';
+      }
+
+      // Pattern 1b: "20 per month remaining" (no dollar sign)
+      if (!perMonthRate) {
+        const perMonthNoDollarMatch = terms.match(
+          /(\d+(?:\.\d{2})?)\s*(?:per|\/)\s*(?:each\s+)?(?:month|mo)(?:nth)?\s*(?:remaining|left|of\s+(?:the\s+)?(?:contract|term))/i
+        );
+        if (perMonthNoDollarMatch) {
+          const parsed = Number.parseFloat(perMonthNoDollarMatch[1]);
+          if (parsed <= 75) {
+            perMonthRate = parsed;
+            etfStructure = 'per-month';
+          }
+        }
       }
 
       // Pattern 2: "$X times remaining months" or "$X x months remaining"
@@ -109,6 +236,26 @@ const ETFCalculator = {
           etfStructure = 'per-month';
         }
       }
+
+      // Fixed fee parsing if not provided
+      if (!perMonthRate && !plan.early_termination_fee) {
+        const fixedFeeMatch = terms.match(
+          /(?:early\s+termination|termination|cancellation)\s+(?:fee|charge)\s*(?:is|of|:)?\s*\$?(\d+(?:\.\d{2})?)/i
+        );
+        if (fixedFeeMatch) {
+          etfValue = Number.parseFloat(fixedFeeMatch[1]);
+          etfStructure = 'flat';
+        }
+      }
+    }
+
+    if (hasNoFeeLanguage) {
+      return {
+        total: 0,
+        structure: isConditionalNoFee ? 'none-conditional' : 'none',
+        perMonthRate: 0,
+        monthsRemaining: monthsRemaining
+      };
     }
 
     // If we found a per-month pattern, calculate total ETF
@@ -123,19 +270,54 @@ const ETFCalculator = {
     }
 
     // Handle the base ETF value
-    if (!plan.early_termination_fee) {
+    const numericETF = Number.parseFloat(plan.early_termination_fee);
+    const hasExplicitETFValue = Number.isFinite(numericETF) && numericETF > 0;
+    const isZeroOrMissingETF = !Number.isFinite(numericETF) || numericETF === 0;
+
+    if (!hasExplicitETFValue && !etfValue) {
+      // If fee is unspecified but terms indicate a fee applies, mark as unknown
+      if (hasUnspecifiedFeeLanguage) {
+        return {
+          total: 0,
+          structure: 'unknown',
+          perMonthRate: 0,
+          monthsRemaining: monthsRemaining
+        };
+      }
+
+      // If ETF value is 0/missing for longer contracts, treat as unknown unless explicit no-fee language exists
+      if (isZeroOrMissingETF && (plan.term_months || 0) >= 2) {
+        return {
+          total: 0,
+          structure: 'unknown',
+          perMonthRate: 0,
+          monthsRemaining: monthsRemaining
+        };
+      }
+
       return { total: 0, structure: 'none', perMonthRate: 0, monthsRemaining: monthsRemaining };
     }
 
-    etfValue = plan.early_termination_fee;
+    if (!etfValue) {
+      etfValue = Number.isFinite(numericETF) ? numericETF : 0;
+    }
 
-    // Heuristic: If ETF is small ($50 or less) and contract is long (12+ months),
-    // it's likely a per-month fee even if not explicitly stated
-    if (etfValue <= 50 && plan.term_months >= 12) {
+    // Avoid misclassifying small prepaid ETFs as per-month
+    if (etfValue > 0 && plan.is_prepaid) {
       return {
-        total: etfValue * monthsRemaining,
-        structure: 'per-month-inferred',
-        perMonthRate: etfValue,
+        total: etfValue,
+        structure: 'flat',
+        perMonthRate: 0,
+        monthsRemaining: monthsRemaining
+      };
+    }
+
+    // For small ETFs on long contracts without explicit per-month language, mark as unknown
+    if (etfValue <= 50 && (plan.term_months || 0) >= 12) {
+      return {
+        total: 0,
+        structure: 'unknown',
+        perMonthRate: 0,
         monthsRemaining: monthsRemaining
       };
     }
@@ -167,14 +349,17 @@ const ETFCalculator = {
     let displayText;
     let needsConfirmation = false;
 
-    if (result.structure === 'none') {
+    if (result.structure === 'none' || result.structure === 'none-conditional') {
       // Check if special_terms mentions cancellation/termination fees that we couldn't parse
-      if (plan.special_terms && /cancel|terminat|early|etf/i.test(plan.special_terms)) {
+      if (plan.special_terms && /cancel|terminat|early|etf|fee/i.test(plan.special_terms)) {
         displayText = 'See EFL';
         needsConfirmation = true;
       } else {
         displayText = 'None';
       }
+    } else if (result.structure === 'unknown') {
+      displayText = 'See EFL';
+      needsConfirmation = true;
     } else if (result.structure === 'flat') {
       displayText = this.formatCurrency(result.total);
     } else if (result.structure === 'per-month-inferred') {
