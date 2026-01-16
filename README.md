@@ -11,16 +11,17 @@
 Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 [![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fluisfork.github.io%2Flight)](https://luisfork.github.io/light)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Repo Size](https://img.shields.io/github/repo-size/luisfork/light)](https://github.com/luisfork/light)
-![Vanilla JS](https://img.shields.io/badge/vanilla-JavaScript-f7df1e?logo=javascript&logoColor=000)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=fff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
+![Vanilla JS](https://img.shields.io/badge/vanilla-JavaScript-f7df1e?logo=javascript&logoColor=fff)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776ab?logo=python&logoColor=fff)
 ![No Dependencies](https://img.shields.io/badge/dependencies-zero-success)
 ![Playwright Tests](https://img.shields.io/badge/tested%20with-Playwright-45ba4b?logo=playwright)
-![Code Style: Biome](https://img.shields.io/badge/code%20style-Biome-60a5fa?logo=biome)
-![Python: Ruff](https://img.shields.io/badge/python-Ruff-261230?logo=ruff&logoColor=d7ff64)
-![WCAG 2.1 AA](https://img.shields.io/badge/WCAG-2.1%20AA-green)
+![Code Style: Biome](https://img.shields.io/badge/code%20style-Biome-60a5fa?logo=biome&logoColor=fff)
+![Python: Ruff](https://img.shields.io/badge/python-Ruff-261230?logo=ruff&logoColor=fff)
+![WCAG 2.1 AA](https://img.shields.io/badge/WCAG-2.1%20AA-blue)
+
+<!-- [![Repo Size](https://img.shields.io/github/repo-size/luisfork/light)](https://github.com/luisfork/light) -->
+<!-- ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=fff) -->
 
 ---
 
@@ -784,7 +785,7 @@ For questions, issues, or suggestions:
 
 ![Data Updates](https://img.shields.io/badge/data-daily%20updates-brightgreen)
 ![Power to Choose](https://img.shields.io/badge/data%20source-Power%20to%20Choose-blue)
-[![Deploy](https://github.com/luisfork/light/actions/workflows/deploy.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/deploy.yml)
+[![Deploy]****(https://github.com/luisfork/light/actions/workflows/deploy.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/deploy.yml)
 [![Update Plans](https://github.com/luisfork/light/actions/workflows/update-plans.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/update-plans.yml)
 [![Lint](https://github.com/luisfork/light/actions/workflows/lint.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/lint.yml)
 
