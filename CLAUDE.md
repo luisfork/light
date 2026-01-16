@@ -275,7 +275,7 @@ Ensure professional, consistent display:
 
 ### NO Emojis, NO Bento Grids, NO Shadcn Aesthetic
 
-This is a professional financial tool with a sophisticated, Apple-inspired design system:
+This is a professional financial tool with a sophisticated design system:
 
 - **Typography-focused:** San Francisco & New York fonts
 - **Neutral palette:** Ink grays, ambient light effects

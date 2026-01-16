@@ -2,7 +2,7 @@
 
 ## Overview
 
-Light uses a professional, Apple-inspired design system focused on clarity, trustworthiness, and functional depth. Every design decision serves the core mission: helping Texans make informed electricity decisions through transparent, accurate calculations.
+Light uses a professional design system focused on clarity, trustworthiness, and functional depth. Every design decision serves the core mission: helping Texans make informed electricity decisions through transparent, accurate calculations.
 
 ---
 
@@ -19,7 +19,7 @@ Light uses a professional, Apple-inspired design system focused on clarity, trus
 - NO decorative illustrations or icons
 - NO animations except spring physics
 
-### 2. Apple-Inspired Visual System
+### 2. Visual System
 
 **Professional, refined, and familiar.**
 
@@ -50,7 +50,7 @@ Light implements fluid, natural motion through spring-based timing functions. NO
 #### Animation Timing Functions
 
 | Use Case | Cubic Bezier | Character |
-|----------|-------------|-----------|
+| --- | --- | --- |
 | Quick actions | `cubic-bezier(0.21, 1.02, 0.73, 1)` | Fast, responsive |
 | Modal dialogs | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Bouncy, playful |
 | Subtle reveals | `cubic-bezier(0.175, 0.885, 0.32, 1.275)` | Soft anticipation |
@@ -58,10 +58,11 @@ Light implements fluid, natural motion through spring-based timing functions. NO
 | Exit animations | `cubic-bezier(0.4, 0.0, 1, 1)` | Clean departure |
 
 **Prohibited timing functions:**
-- ❌ `linear`
-- ❌ `ease`, `ease-in`, `ease-out`, `ease-in-out`
-- ❌ `steps()`
-- ❌ Custom cubic-bezier without spring characteristics
+
+- `linear`
+- `ease`, `ease-in`, `ease-out`, `ease-in-out`
+- `steps()`
+- Custom cubic-bezier without spring characteristics
 
 ---
 
@@ -183,9 +184,11 @@ Light implements the complete Apple font ecosystem with precise usage guidelines
 ### Font Usage Guidelines
 
 #### San Francisco Pro (SF Pro)
+
 **Purpose:** Primary UI text, body copy, navigation
 
 **Weight Distribution:**
+
 - 300 (Light): Rarely used, reserved for large display text
 - 400 (Regular): Default body text
 - 500 (Medium): Emphasized UI elements, button labels
@@ -193,6 +196,7 @@ Light implements the complete Apple font ecosystem with precise usage guidelines
 - 700 (Bold): Very strong emphasis (use sparingly)
 
 **Elements:**
+
 - Body paragraphs (400)
 - Button labels (500)
 - Form labels (600)
@@ -200,9 +204,11 @@ Light implements the complete Apple font ecosystem with precise usage guidelines
 - Secondary descriptions (400)
 
 #### San Francisco Pro Display
+
 **Purpose:** Large headings (≥20px)
 
 **When to use:**
+
 - Hero titles ≥32px
 - Section headings ≥20px
 - Display text requiring optical sizing
@@ -210,9 +216,11 @@ Light implements the complete Apple font ecosystem with precise usage guidelines
 **Note:** SF Pro Display is designed with wider apertures for large sizes. It provides better legibility at display sizes compared to SF Pro Text.
 
 #### San Francisco Mono (SF Mono)
+
 **Purpose:** Numeric data, tabular information, code
 
 **Critical Usage:**
+
 - Currency values ($1,234.56)
 - Energy rates (12.5¢/kWh)
 - Usage amounts (1,234 kWh)
@@ -223,49 +231,59 @@ Light implements the complete Apple font ecosystem with precise usage guidelines
 - Plan cost displays
 
 **Why SF Mono:**
+
 - Fixed-width characters ensure perfect alignment
 - Tabular numerals maintain consistent spacing
 - Superior legibility for financial data
 - Reduces cognitive load when scanning numbers
 
 #### San Francisco Compact
+
 **Purpose:** Condensed UI elements, table headers, mobile optimization
 
 **When to use:**
+
 - Table column headers (uppercase, 600 weight)
 - Mobile responsive layouts (<768px)
 - Space-constrained interfaces
 - Dense data displays
 
 **Benefits:**
+
 - 10-15% narrower than SF Pro
 - Maintains legibility at small sizes
 - Optimized for data-dense layouts
 
 #### New York
+
 **Purpose:** Editorial headings, serif accent text
 
 **Weight Distribution:**
+
 - 400 (Regular): Standard headings (h3, h4)
 - 500 (Medium): Emphasized headings
 - 600 (Semibold): Primary headings (h1, h2)
 - 700 (Bold): Rare, very strong emphasis
 
 **Elements:**
+
 - Page titles (h1, h2)
 - Section headings (h3, h4)
 - Legal disclaimers (400, smaller size)
 - Footer legal text
 
 #### New York Large
+
 **Purpose:** Hero section display headings
 
 **When to use:**
+
 - Hero titles ≥32px
 - Landing page headlines
 - Feature section headings
 
 **Characteristics:**
+
 - Optimized for large display sizes (≥32px)
 - Enhanced contrast and readability
 - Wider character spacing for visual impact
@@ -274,7 +292,7 @@ Light implements the complete Apple font ecosystem with precise usage guidelines
 
 #### Hierarchy System
 
-```
+```bash
 Hero Title       → New York Large (700, 40-64px)
 Page Heading     → New York (600, 24-32px)
 Section Heading  → SF Pro Display (600, 20-24px)
@@ -325,16 +343,19 @@ font-variant-ligatures: none;
 #### Breakpoints
 
 **Mobile (<640px):**
+
 - Hero: clamp(1.5rem, 5vw, 2rem)
 - Headings: Scale down 1 level
 - Body: 16px (never below 16px for accessibility)
 - Table headers: SF Compact (11px)
 
 **Tablet (640px - 1024px):**
+
 - Hero: clamp(2rem, 5vw, 2.5rem)
 - Standard scale with minor adjustments
 
 **Desktop (>1024px):**
+
 - Full type scale
 - Maximum readability
 
@@ -351,6 +372,7 @@ font-variant-ligatures: none;
 ```
 
 **Strategy:** `font-display: swap`
+
 - Shows fallback font immediately
 - Swaps to custom font when loaded
 - Prevents blank text during font download
@@ -366,7 +388,7 @@ font-variant-ligatures: none;
 
 ### Font File Organization
 
-```
+```bash
 src/assets/fonts/
 ├── san_francisco/
 │   ├── SF-Pro-Text-*.otf        (12 files)
@@ -437,6 +459,7 @@ Light uses **layered shadow systems** instead of harsh drop shadows to create de
 Light uses a **single-surface layout** instead of fragmented card grids.
 
 **Characteristics:**
+
 - Content flows vertically in a single column
 - Sections separated by subtle divider lines
 - NO isolated card containers
@@ -528,6 +551,7 @@ Light uses a **single-surface layout** instead of fragmented card grids.
 ### Button Styles
 
 **Primary Button:**
+
 ```css
 .btn-primary {
     background: var(--color-accent);
@@ -539,6 +563,7 @@ Light uses a **single-surface layout** instead of fragmented card grids.
 ```
 
 **Secondary Button:**
+
 ```css
 .btn-secondary {
     background: transparent;
@@ -604,6 +629,7 @@ When adding new UI components, verify:
 ## Design Philosophy Summary
 
 **Light is:**
+
 - Professional, not playful
 - Functional, not decorative
 - Transparent, not obscure
@@ -611,6 +637,7 @@ When adding new UI components, verify:
 - Data-driven, not emotional
 
 **Light is NOT:**
+
 - Consumer-facing marketing site
 - Dashboard with cards and widgets
 - Flashy, animated experience
@@ -623,6 +650,7 @@ When adding new UI components, verify:
 ### Advanced Animations (Potential)
 
 For future interactive features:
+
 - Gesture-based spring animations
 - Physics-based scroll interactions
 - Magnetic buttons with spring rebound

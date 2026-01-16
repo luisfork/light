@@ -4,7 +4,8 @@
 
 ### Accessibility Improvements
 
-**Enhanced Text Contrast**
+#### Enhanced Text Contrast
+
 - Updated gray text colors for WCAG 2.1 AA compliance
 - Light mode: `#666666` (5.74:1 contrast) and `#757575` (4.54:1 contrast)
 - Dark mode: `#ababab` and `#999999` for enhanced readability
@@ -12,18 +13,21 @@
 
 ### Layout & Component Improvements
 
-**ZIP Code Input Section**
+#### ZIP Code Input Section
+
 - Moved "Valid ZIP" indicator to the right of the input box (horizontal layout)
 - Changed Service Area text from monospace to San Francisco sans-serif font for consistency
 - Improved visual flow and reduced vertical space usage
 
-**Status Indicators**
+#### Status Indicators
+
 - Fixed Unicode checkmark display in "Results ready - scroll down to view" message
 - Changed from double-escaped `\\2713` to proper `\2713` in CSS
 
 ### Data Visualization
 
-**Usage Profile Chart Enhancements**
+#### Usage Profile Chart Enhancements
+
 - Increased chart height from 80px to 140px for better month-to-month distinction
 - Added month name labels below each bar (Jan, Feb, Mar, etc.)
 - Implemented heat-map color scheme based on usage intensity:
@@ -35,12 +39,14 @@
 
 ### Plan Comparison UI
 
-**Contract Length Display**
+#### Contract Length Display
+
 - Changed all "mo" abbreviations to "months" with proper spacing
 - Updated format: `$318.18/3 months` (was `$318.18/3mo`)
 - Applied to plan cards, table rows, and all summary displays
 
-**Filter Dropdowns**
+#### Filter Dropdowns
+
 - Enhanced visual design with:
   - Increased padding and rounded corners (6px radius)
   - Hover states with blue accent border and subtle glow
@@ -48,14 +54,16 @@
   - Subtle box shadow for depth
   - Font weight increased to 500 for better readability
 
-**Quality Grade Badges**
+#### Quality Grade Badges
+
 - Upgraded from flat colors to gradient backgrounds
 - Increased size from 32px to 36px for better visibility
 - Added hover animation (scale 1.05)
 - Implemented colored drop shadows matching grade color
 - Improved font rendering with flexbox centering
 
-**Grade Legend**
+#### Grade Legend
+
 - Enhanced layout with:
   - Larger padding and rounded corners (12px radius)
   - Thicker border separator (2px vs 1px)
@@ -63,7 +71,8 @@
   - Better color contrast for subtitle text
   - Added subtle box shadow for depth
 
-**TIME OF USE Warning Badge**
+#### TIME OF USE Warning Badge
+
 - Added 1.5px border in caution color (orange)
 - Changed icon from "!" to "⚠" warning symbol
 - Increased icon size from 14px to 16px
@@ -72,7 +81,8 @@
 
 ### Section Removals
 
-**Removed "Plans Requiring Caution" Section**
+#### Removed "Plans Requiring Caution" Section
+
 - Eliminated dedicated warning section from results page
 - Plan warnings now displayed inline within plan cards
 - Simplified UI reduces information overload
@@ -82,14 +92,16 @@
 
 ### Usage Calculation
 
-**Annual Usage Accuracy**
+#### Annual Usage Accuracy
+
 - Fixed rounding error causing 11,999 kWh display instead of 12,000 kWh
 - Implemented smart rounding algorithm that ensures sum equals exactly `avgMonthlyKwh × 12`
 - Adjustment applied to highest usage month to preserve seasonal patterns
 
 ### Plan Ranking Algorithm
 
-**F-Grade Plan Ranking Fix**
+#### F-Grade Plan Ranking Fix
+
 - Prevented 0/100 quality score plans from ranking high solely on cost
 - Implemented combined score cap of 40 for F-grade plans
 - Ensures plans with automatic F grades (variable rates, prepaid, time-of-use) rank appropriately
@@ -97,12 +109,14 @@
 
 ### Early Termination Fee (ETF) Detection
 
-**Enhanced Pattern Matching**
+#### Enhanced Pattern Matching
+
 - Added detection for "$X multiplied by the number of months remaining" pattern
 - Improved regex patterns for various fee structure descriptions
 - Better handling of EFL language variations across providers
 
-**Verification Modal Improvements**
+#### Verification Modal Improvements
+
 - Updated document names to official titles:
   - "Residential Terms of Service" (was "Terms of Service")
   - "Your Rights as a Retail Electric Customer" (was "Your Rights as a Customer")
@@ -128,6 +142,7 @@
 ## Documentation
 
 All changes documented in:
+
 - This changelog (`docs/CHANGELOG-2026-01-11.md`)
 - Updated `README.md` with new screenshots and feature descriptions
 - Code comments updated to reflect new behavior
@@ -139,6 +154,7 @@ None. All changes are backward compatible.
 ## Browser Compatibility
 
 Tested and confirmed working on:
+
 - Chrome 131+
 - Safari 18+
 - Firefox 133+

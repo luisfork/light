@@ -10,11 +10,36 @@
 
 Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
+[![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fluisfork.github.io%2Flight)](https://luisfork.github.io/light)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Repo Size](https://img.shields.io/github/repo-size/luisfork/light)](https://github.com/luisfork/light)
+
+![Vanilla JS](https://img.shields.io/badge/vanilla-JavaScript-f7df1e?logo=javascript&logoColor=000)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=fff)
+![Python](https://img.shields.io/badge/Python-3.11%2B-3776ab?logo=python&logoColor=fff)
+![No Dependencies](https://img.shields.io/badge/dependencies-zero-success)
+
+![Playwright Tests](https://img.shields.io/badge/tested%20with-Playwright-45ba4b?logo=playwright)
+![Code Style: Biome](https://img.shields.io/badge/code%20style-Biome-60a5fa?logo=biome)
+![Python: Ruff](https://img.shields.io/badge/python-Ruff-261230?logo=ruff&logoColor=d7ff64)
+![WCAG 2.1 AA](https://img.shields.io/badge/WCAG-2.1%20AA-green)
+
+![Data Updates](https://img.shields.io/badge/data-daily%20updates-brightgreen)
+![Power to Choose](https://img.shields.io/badge/data%20source-Power%20to%20Choose-blue)
+
+[![Deploy](https://github.com/luisfork/light/actions/workflows/deploy.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/deploy.yml)
+[![Update Plans](https://github.com/luisfork/light/actions/workflows/update-plans.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/update-plans.yml)
+[![Lint](https://github.com/luisfork/light/actions/workflows/lint.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/lint.yml)
+
 ---
 
 ## Why *Light*?
 
+<!-- The following is correctly formatted Markdown. Ignore warnings. -->
+
 Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage[^3]. This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms[^4].
+
+<!-- The following is correctly formatted Markdown. Ignore warnings. -->
 
 [^1]: EnergyBot. "The Truth About Texas Bill Credit Electricity Plans." *EnergyBot*, 15 Jan. 2025, [www.energybot.com/blog/bill-credit-electricity-plans.html](https://www.energybot.com/blog/bill-credit-electricity-plans.html).
 
@@ -37,7 +62,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 ---
 
-## Recent Updates (January 12, 2026)
+## Updates
 
 ### Simplified Deduplication System
 
@@ -51,7 +76,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 - **Transparency UI**: Enhanced statistics showing "988 unique plans (1,854 total, 866 duplicates removed)"
 - **Detailed Modal**: Clickable info button explains numeric-only fingerprinting rationale
 
-### Previous Updates (January 11, 2026)
+### Previous Updates
 
 #### UI/UX Enhancements
 
@@ -66,8 +91,6 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 - **Smarter Ranking**: F-grade plans (0/100 quality) now properly rank below acceptable plans regardless of cost
 - **Better ETF Detection**: Enhanced cancelation fee pattern matching for phrases like "multiplied by months remaining"
 - **Consistent Display**: All contract lengths now show as "months" instead of abbreviated "mo" with proper spacing
-
-See [docs/CHANGELOG-2026-01-11.md](docs/CHANGELOG-2026-01-11.md) for January 11 details.
 
 ---
 
@@ -298,7 +321,7 @@ console.log(`Plan count: ${plans.total_plans} → ${current.total_plans}`);
 ```python
 # Load CSV archive for analysis (Python)
 import pandas as pd
-
+****
 # Load specific date
 df = pd.read_csv('data/csv-archive/plans_2026-01-01.csv')
 
@@ -435,14 +458,15 @@ light/
    ```
 
 > [!IMPORTANT]
-> Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
+> Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions.
+> You must use a local HTTP server.
 
 ### Automated UI Testing
 
 *Light* uses **Playwright** for robust automated UI testing. This ensures that core calculation logic, cost formatting, and critical UI components remain stable after code changes.
 
 > [!NOTE]
-> Testing is performed against a real browser engine (Chromium) but remains decoupled from the production code, which stays **100% Vanilla JavaScript**.
+> Testing is performed against a real browser engine (Chromium) but remains decoupled from the production code, which stays **100% *Vanilla* JavaScript**.
 
 ```bash
 # Run all UI tests (headless)
@@ -599,10 +623,7 @@ The quality score (0-100) is calculated from multiple factors:
 | 0-59 | F | Avoid | High risk or variable rates |
 
 > [!TIP]
-**Score Transparency:** Hover over any quality grade to see a detailed breakdown of how the score was calculated (e.g., "Base: 100 | Cost: -5 | Consistent rates: +5").
-
-> [!NOTE]
-**Warning Badges:** Plans with non-fixed rates, prepaid requirements, or time-of-use restrictions display warning badges (VARIABLE, PREPAID, TIME OF USE) and automatically receive an F grade.
+> **Score Transparency:** Hover over any quality grade to see a detailed breakdown of how the score was calculated (e.g., "Base: 100 | Cost: -5 | Consistent rates: +5").
 
 **Table Features:**
 
@@ -611,6 +632,9 @@ The quality score (0-100) is calculated from multiple factors:
 - Best values highlighted in green (lowest cost, lowest rate, best quality)
 - "Lowest" indicator badge on the most affordable plan
 - Tooltips on column headers explaining each metric
+
+> [!NOTE]
+> **Warning Badges:** Plans with non-fixed rates, prepaid requirements, or time-of-use restrictions display warning badges (VARIABLE, PREPAID, TIME OF USE) and automatically receive an F grade.
 
 ### 4. Simplified Duplicate Plan Detection
 
@@ -648,18 +672,21 @@ deduplicatePlans(plans):
 Analysis of 986 plans confirms that plans with identical numeric features (prices, fees, term) always have identical substantive terms. Text extraction (bill credits, special features) adds significant complexity without improving accuracy. If two plans have the same numbers, they ARE duplicates—regardless of marketing text.
 
 **Simplification Benefits:**
+
 - ✓ **100+ lines removed**: Eliminated fragile text parsing and keyword matching
 - ✓ **Language-agnostic**: No bilingual dictionaries to maintain
 - ✓ **Robust**: Numbers don't change with marketing phrases or translations
 - ✓ **Same accuracy**: 100% duplicate detection maintained
 
 **Example from real data (1,854 total plans):**
+
 - 866 duplicates removed (433 language pairs)
 - 97 English-only plans (no Spanish version exists)
 - 25 Spanish-only plans (no English version exists)
 - Result: 988 unique plans displayed
 
 **Transparency Features:**
+
 - UI displays: "988 unique plans (1,854 total, 866 duplicates removed)"
 - Spanish-only plans show blue `SPANISH ONLY` badge with tooltip
 - Clickable info button opens detailed modal explaining numeric-only approach
@@ -713,7 +740,7 @@ Unlike competitors, *Light* maintains unlimited historical archive:
 - **NO shadcn/ui aesthetic**: Custom Apple-inspired design system
 - **NO animations except spring physics**: All transitions use spring-based cubic-bezier timing functions
 - **Sophisticated neutral palette**: Ink grays, ambient light effects
-- **Typography-focused**: Complete Apple font ecosystem (SF Pro, SF Mono, SF Compact, New York, New York Large) with precise usage guidelines
+- **Typography-focused**: Complete Apple font ecosystem with precise usage guidelines
   - **SF Pro**: Primary UI text and body copy (font-weight: 400-700)
   - **SF Pro Display**: Large headings ≥20px with optical sizing
   - **SF Mono**: All numeric and tabular data for superior legibility and alignment
@@ -723,7 +750,7 @@ Unlike competitors, *Light* maintains unlimited historical archive:
 - **Functional depth**: Rich calculations, transparent methodology
 
 > [!TIP]
-> See [**docs/design-philosophy.md**](docs/design-philosophy.md) for comprehensive design guidelines, animation specifications, and implementation checklist.
+> See [**design philosophy**](docs/design-philosophy.md) for comprehensive design guidelines, animation specifications, and implementation checklist.
 
 ### Performance
 

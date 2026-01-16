@@ -1,7 +1,3 @@
----
-description: How to run and test the project locally with real plan data
----
-
 # Local Development Workflow
 
 This workflow explains how to run and test the Light project locally with real electricity plan data.
@@ -76,9 +72,7 @@ The `TEST_FILE` environment variable controls the data source:
 ## Important Notes
 
 1. **GitHub Actions uses live data**: The deployed version at `luisfork.github.io/light` always uses fresh data from the API, fetched daily by GitHub Actions.
-
 2. **Local changes to plans.json are safe**: The `data/plans.json` file is updated by GitHub Actions on deploy. Your local changes won't affect production.
-
 3. **Keep test files in .other/**: The `.other/` directory is for local testing files and is not used by the deployed app.
 
 ## Troubleshooting
