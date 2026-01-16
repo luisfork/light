@@ -6,9 +6,9 @@
   "tdus": [
     {
       "code": "CENTERPOINT",
-      "name": "CenterPoint Energy Houston Electric",
-      "service_area": "Houston metropolitan area",
-      "monthly_base_charge": 4.90,
+      "name": "CenterPoint Energy",
+      "service_area": "Houston Metropolitan Area",
+      "monthly_base_charge": 4.9,
       "per_kwh_rate": 6.0009,
       "effective_date": "2025-12-07",
       "notes": "Largest Houston TDU. Rate includes Resiliency Plan charges."
@@ -16,7 +16,7 @@
     {
       "code": "ONCOR",
       "name": "Oncor Electric Delivery",
-      "service_area": "Dallas-Fort Worth, Midland, Odessa, Waco, Killeen, and surrounding areas",
+      "service_area": "Dallas-Fort Worth Metropolitan Area",
       "monthly_base_charge": 4.23,
       "per_kwh_rate": 5.5833,
       "effective_date": "2025-09-01",
@@ -53,7 +53,7 @@
       "code": "LPL",
       "name": "Lubbock Power & Light",
       "service_area": "City of Lubbock",
-      "monthly_base_charge": 0.00,
+      "monthly_base_charge": 0.0,
       "per_kwh_rate": 6.31,
       "effective_date": "2025-09-01",
       "notes": "Joined competitive market January 2024. No monthly base charge."
