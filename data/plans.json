@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-16T07:23:02.858159+00:00",
+  "last_updated": "2026-01-16T08:53:31.228193+00:00",
   "data_source": "Power to Choose (https://www.powertochoose.org)",
   "total_plans": 1869,
   "disclaimer": "Plan information is subject to change. Always verify details on the official EFL before enrolling.",
@@ -30569,7 +30569,7 @@
       "renewable_pct": 6,
       "is_prepaid": false,
       "is_tou": false,
-      "early_termination_fee": 0.0,
+      "early_termination_fee": null,
       "base_charge_monthly": 0.0,
       "efl_url": "https://ironhorse-storage.s3.us-west-2.amazonaws.com/public/efl/ONC-36-PC-0-100251.pdf",
       "enrollment_url": "https://signup.ironhorsepowerservices.com/ironhorse-ptc/ONC-36-PC-0-100251",
