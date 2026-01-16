@@ -13,6 +13,7 @@ Features:
 """
 
 import csv
+import io
 import json
 import os
 import random
@@ -22,13 +23,39 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import requests
+
+try:
+    import pdfplumber
+except ImportError:  # pragma: no cover - optional dependency for ETF enrichment
+    pdfplumber = None
 
 # Configuration
 MAX_RETRIES = 4
 BASE_DELAY = 2  # Base delay in seconds for exponential backoff
 REQUEST_TIMEOUT = 45  # Timeout in seconds
+
+# Optional EFL ETF extraction
+EFL_ETF_LOOKUP = os.getenv("EFL_ETF_LOOKUP", "1") == "1"
+EFL_ETF_MAX_FETCHES = int(os.getenv("EFL_ETF_MAX_FETCHES", "250"))
+EFL_ETF_TIMEOUT = int(os.getenv("EFL_ETF_TIMEOUT", "20"))
+EFL_ETF_AUTO_ALLOWLIST = os.getenv("EFL_ETF_AUTO_ALLOWLIST", "1") == "1"
+EFL_ETF_ALLOWED_DOMAINS = set(
+    filter(
+        None,
+        [
+            d.strip()
+            for d in os.getenv(
+                "EFL_ETF_ALLOWED_DOMAINS",
+                "api.gotrhythm.com,api.energytexas.com,paylesspower.com,signup.chariotenergy.com",
+            ).split(",")
+        ],
+    )
+)
+EFL_ETF_AUTO_DOMAINS: set[str] = set()
+_efl_etf_cache: dict[str, dict[str, Any] | None] = {}
 
 # Power to Choose endpoints (in order of preference)
 ENDPOINTS = [
@@ -192,9 +219,161 @@ def fetch_plans_data() -> tuple[str, str]:
     sys.exit(1)
 
 
+def register_efl_domain(efl_url: str) -> None:
+    if not EFL_ETF_AUTO_ALLOWLIST or not efl_url:
+        return
+    if not efl_url.startswith(("http://", "https://")):
+        return
+    domain = urlparse(efl_url).netloc.lower()
+    if domain:
+        EFL_ETF_AUTO_DOMAINS.add(domain)
+
+
+def seed_efl_allowlist_from_existing_data(data_path: Path) -> None:
+    if not EFL_ETF_AUTO_ALLOWLIST:
+        return
+    if not data_path.exists():
+        return
+
+    try:
+        with data_path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return
+
+    plans = data.get("plans", []) if isinstance(data, dict) else []
+    if not isinstance(plans, list):
+        return
+
+    for plan in plans:
+        if not isinstance(plan, dict):
+            continue
+        register_efl_domain(plan.get("efl_url", ""))
+
+
+def should_attempt_efl_lookup(efl_url: str) -> bool:
+    if not EFL_ETF_LOOKUP or not efl_url:
+        return False
+    if len(_efl_etf_cache) >= EFL_ETF_MAX_FETCHES:
+        return False
+    if not efl_url.startswith(("http://", "https://")):
+        return False
+    if not EFL_ETF_ALLOWED_DOMAINS and not EFL_ETF_AUTO_DOMAINS:
+        return True
+    domain = urlparse(efl_url).netloc.lower()
+    if any(domain.endswith(allowed) for allowed in EFL_ETF_ALLOWED_DOMAINS):
+        return True
+    if EFL_ETF_AUTO_ALLOWLIST and domain in EFL_ETF_AUTO_DOMAINS:
+        return True
+    return False
+
+
+def extract_etf_from_text(text: str) -> dict[str, Any] | None:
+    if not text:
+        return None
+
+    normalized = re.sub(r"\s+", " ", text).strip().lower()
+
+    no_fee_patterns = [
+        r"no\s+(?:early\s+)?(?:termination|cancellation)\s+fee",
+        r"early\s+termination\s+fee\s*[:\-]?\s*none",
+        r"early\s+termination\s+fee\s*[:\-]?\s*\$?0\b",
+        r"cancellation\s+fee\s*[:\-]?\s*none",
+        r"cancellation\s+fee\s*[:\-]?\s*\$?0\b",
+    ]
+    if any(re.search(pat, normalized) for pat in no_fee_patterns):
+        return {"structure": "none", "source": "efl"}
+
+    per_month_patterns = [
+        r"\$(\d+(?:\.\d{2})?)\s*(?:per|/)\s*(?:each\s+)?(?:month|mo)\s*(?:remaining|left)",
+        r"\$(\d+(?:\.\d{2})?)\s*(?:for\s+each)\s+(?:remaining\s+)?month",
+        r"\$(\d+(?:\.\d{2})?)\s*(?:multiplied\s+by|times|x|×)\s*(?:the\s+)?(?:number\s+of\s+)?months?\s*(?:remaining|left)",
+        r"\$(\d+(?:\.\d{2})?)\s*(?:multiplied\s+by|times|x|×)\s*(?:the\s+)?(?:number\s+of\s+)?months?\s*(?:remaining|left).*?term",
+        r"\$(\d+(?:\.\d{2})?)\s*(?:per|/)\s*(?:month|mo)\s*remaining",
+    ]
+
+    for pat in per_month_patterns:
+        match = re.search(pat, normalized)
+        if match:
+            return {
+                "structure": "per-month",
+                "per_month_rate": float(match.group(1)),
+                "source": "efl",
+            }
+
+    flat_patterns = [
+        r"early\s+(?:termination|cancellation)\s+fee[^\d\$]{0,20}\$?(\d+(?:\.\d{2})?)",
+        r"cancellation\s+fee[^\d\$]{0,20}\$?(\d+(?:\.\d{2})?)",
+    ]
+    for pat in flat_patterns:
+        match = re.search(pat, normalized)
+        if match:
+            return {
+                "structure": "flat",
+                "flat_fee": float(match.group(1)),
+                "source": "efl",
+            }
+
+    if "early termination fee" in normalized or "cancellation fee" in normalized:
+        return {"structure": "unknown", "source": "efl"}
+
+    return None
+
+
+def fetch_etf_from_efl(efl_url: str, session: requests.Session) -> dict[str, Any] | None:
+    if not should_attempt_efl_lookup(efl_url):
+        return None
+    if efl_url in _efl_etf_cache:
+        return _efl_etf_cache[efl_url]
+
+    try:
+        response = session.get(efl_url, timeout=EFL_ETF_TIMEOUT)
+        response.raise_for_status()
+    except requests.RequestException:
+        _efl_etf_cache[efl_url] = None
+        return None
+
+    content_type = response.headers.get("Content-Type", "").lower()
+    text = ""
+
+    if "pdf" in content_type or response.content[:4] == b"%PDF":
+        if not pdfplumber:
+            _efl_etf_cache[efl_url] = None
+            return None
+        try:
+            with pdfplumber.open(io.BytesIO(response.content)) as pdf:
+                pages = pdf.pages[:2]
+                text = "\n".join(page.extract_text() or "" for page in pages)
+        except Exception:
+            _efl_etf_cache[efl_url] = None
+            return None
+    else:
+        text = response.text
+
+    result = extract_etf_from_text(text)
+    _efl_etf_cache[efl_url] = result
+    return result
+
+
+def enrich_plan_with_efl_etf(plan: dict[str, Any], session: requests.Session) -> None:
+    if not plan or not plan.get("efl_url"):
+        return
+    register_efl_domain(plan.get("efl_url"))
+    if plan.get("etf_details"):
+        return
+    etf_value = plan.get("early_termination_fee")
+    if etf_value not in (None, 0, 0.0, "", "0"):
+        return
+
+    etf_details = fetch_etf_from_efl(plan["efl_url"], session)
+    if etf_details:
+        plan["etf_details"] = etf_details
+
+
 def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
     """Parse CSV text into structured plan data."""
     plans = []
+    efl_session = requests.Session()
 
     # Handle potential BOM and normalize line endings
     csv_text = csv_text.lstrip("\ufeff").replace("\r\n", "\n").replace("\r", "\n")
@@ -317,7 +496,7 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
                 "is_tou": get_val(row, "TimeOfUse", "Time Of Use", "Time of Use", "is_tou").upper()
                 in ("TRUE", "YES", "1"),
                 # Fees
-                "early_termination_fee": parse_float(cancel_fee_raw or "0"),
+                "early_termination_fee": parse_float(cancel_fee_raw),
                 "base_charge_monthly": parse_float(
                     get_val(row, "base_charge_monthly") or "0"
                 ),  # Support internal field
@@ -390,6 +569,7 @@ def parse_csv_to_plans(csv_text: str) -> list[dict[str, Any]]:
             if not plan["price_kwh_2000"]:
                 plan["price_kwh_2000"] = plan["price_kwh_1000"]
 
+            enrich_plan_with_efl_etf(plan, efl_session)
             plans.append(plan)
 
         except (ValueError, KeyError, TypeError) as e:
@@ -488,6 +668,7 @@ def parse_json_to_plans(json_text: str) -> list[dict[str, Any]]:
         return []
 
     plans = []
+    efl_session = requests.Session()
 
     for item in plans_data:
         try:
@@ -509,9 +690,7 @@ def parse_json_to_plans(json_text: str) -> list[dict[str, Any]]:
                 "renewable_pct": parse_int(item.get("renewablePct", item.get("renewable", "0"))),
                 "is_prepaid": item.get("isPrepaid", item.get("prepaid", False)),
                 "is_tou": item.get("isTou", item.get("timeOfUse", False)),
-                "early_termination_fee": parse_float(
-                    item.get("etf", item.get("cancellationFee", "0"))
-                ),
+                "early_termination_fee": parse_float(item.get("etf", item.get("cancellationFee"))),
                 "base_charge_monthly": parse_float(
                     item.get("baseCharge", item.get("monthlyCharge", "0"))
                 ),
@@ -528,6 +707,7 @@ def parse_json_to_plans(json_text: str) -> list[dict[str, Any]]:
                     plan["price_kwh_500"] = plan["price_kwh_1000"]
                 if not plan["price_kwh_2000"]:
                     plan["price_kwh_2000"] = plan["price_kwh_1000"]
+                enrich_plan_with_efl_etf(plan, efl_session)
                 plans.append(plan)
 
         except (ValueError, KeyError, TypeError):
@@ -759,6 +939,8 @@ def main() -> None:
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
     output_path = project_root / "data" / "plans.json"
+
+    seed_efl_allowlist_from_existing_data(output_path)
 
     print("=" * 70)
     print("Texas Electricity Plan Fetcher")

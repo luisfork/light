@@ -142,6 +142,12 @@ interface Plan {
 
   // Fees and Charges
   early_termination_fee: number;      // ETF in dollars (may be per-month)
+  etf_details?: {                      // Optional enriched ETF structure (EFL-derived)
+    structure: "flat" | "per-month" | "none" | "unknown";
+    flat_fee?: number;                // Flat fee in dollars
+    per_month_rate?: number;          // Per-month remaining fee in dollars
+    source?: "efl" | string;          // Source of ETF detail
+  };
   base_charge_monthly: number;        // REP base charge in dollars
 
   // Documentation URLs
@@ -469,10 +475,15 @@ assert(early_termination_fee >= 0 && early_termination_fee <= 500);
 **Fee Structure Detection:**
 
 ```javascript
-// Small ETF on long contract → likely per-month-remaining
+// Prefer etf_details when present (EFL-derived)
+if (etf_details) {
+  // Use etf_details.structure and rates directly
+}
+
+// Otherwise, use text parsing and conservative defaults
+// Small ETF on long contract without explicit language → unknown
 if (early_termination_fee <= 50 && term_months >= 12) {
-  // Assume per-month structure: Total ETF = fee × months_remaining
-  // Example: $15/month × 18 months = $270
+  // Mark as unknown unless per-month language is explicit
 }
 
 // Otherwise: Flat fee regardless of timing
@@ -485,6 +496,30 @@ if (early_termination_fee <= 50 && term_months >= 12) {
 - $10-$20: Per-month-remaining (12-36 month contracts)
 - $150-$300: Flat fee (6-12 month contracts)
 - $400+: High penalty (avoid unless specific need)
+
+### etf_details
+
+**Type:** Object (optional)
+**Required:** No
+**Source:** EFL parsing during data fetch
+**Purpose:** Authoritative ETF structure and rate extracted from EFL
+
+**Schema:**
+
+```typescript
+interface EtfDetails {
+  structure: "flat" | "per-month" | "none" | "unknown";
+  flat_fee?: number;           // Required when structure === "flat"
+  per_month_rate?: number;     // Required when structure === "per-month"
+  source?: "efl" | string;     // Source identifier
+}
+```
+
+**Notes:**
+
+- `structure: "unknown"` is used when the EFL mentions a fee but does not disclose a rate.
+- `structure: "none"` is only used when explicitly stated in the EFL.
+- When present, `etf_details` overrides heuristics and ambiguous `early_termination_fee` values.
 
 ### base_charge_monthly
 
@@ -997,6 +1032,20 @@ For programmatic validation:
           "is_prepaid": { "type": "boolean" },
           "is_tou": { "type": "boolean" },
           "early_termination_fee": { "type": "number", "minimum": 0, "maximum": 500 },
+          "etf_details": {
+            "type": "object",
+            "required": ["structure"],
+            "properties": {
+              "structure": {
+                "type": "string",
+                "enum": ["flat", "per-month", "none", "unknown"]
+              },
+              "flat_fee": { "type": "number", "minimum": 0, "maximum": 500 },
+              "per_month_rate": { "type": "number", "minimum": 0, "maximum": 100 },
+              "source": { "type": "string" }
+            },
+            "additionalProperties": true
+          },
           "base_charge_monthly": { "type": "number", "minimum": 0, "maximum": 30 },
           "efl_url": { "type": "string" },
           "enrollment_url": { "type": "string" },
