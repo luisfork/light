@@ -11,7 +11,7 @@ const ContractAnalyzer = {
    * Based on Texas electricity market historical data and ERCOT patterns
    */
   renewalSeasonality: {
-    0: 0.7, // January - expensive (winter peak, heating demand)
+    0: 0.8, // January - expensive (winter peak, heating demand) - HIGH RISK
     1: 0.5, // February - moderate (post-winter)
     2: 0.2, // March - good (spring shoulder)
     3: 0.0, // April - excellent (BEST - lowest demand)

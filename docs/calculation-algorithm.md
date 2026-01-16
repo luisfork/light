@@ -952,13 +952,26 @@ Alternative Terms Suggested:
 
 ## Quality Scoring System
 
-### Purpose
+### Quality Scoring System
 
-Holistic 0-100 score combining cost, volatility, warnings, and plan features for easy comparison. The score provides a comprehensive assessment of plan value and reliability.
+Plans are ranked by a **Multiplicative Value Score**.
 
-### Score Components
+```javascript
+// Combined Score = Cost Efficiency × Quality Factor
+const costScore = 100 - ((plan.annualCost - bestAnnualCost) / costRange) * 100;
+const qualityFactor = Math.max(1, plan.qualityScore) / 100;
 
-The quality score is calculated from multiple factors:
+// Multiplicative Model:
+// - A perfect plan (Quality 100) keeps 100% of its Cost Score.
+// - A risky plan (Quality 60) keeps only 60% of its Cost Score.
+const combinedScore = costScore * qualityFactor;
+```
+
+This ensures that a plan must have **both** a competitive price and high quality to rank at the top. A cheap plan with a bad renewal date (low quality) is heavily discounted.
+
+**Quality Score Components:**
+
+The quality score (0-100) is calculated from multiple factors:
 
 | Factor | Max Impact | Description |
 | --- | --- | --- |
@@ -967,163 +980,23 @@ The quality score is calculated from multiple factors:
 | Volatility Penalty | -25 | Deducted for unpredictable costs |
 | Warning Penalty | -25 | Deducted for risk factors (5 per warning) |
 | Base Charge Penalty | -5 | Deducted for high monthly fees (>$15) |
-| Rate Consistency Bonus | +5 | Added for stable pricing across usage levels |
-| Renewable Bonus | +3 | Added for 100% renewable energy |
-| Flexibility Bonus | +2 | Added for shorter contract terms |
+| Expiration Seasonality | -30 | Deducted for plans expiring in peak Summer/Winter months |
 
-### Formula
+**Automatic F Grade (Score = 0):**
 
-```bash
-Quality Score = Base Score
-              - Cost Penalty
-              - Volatility Penalty
-              - Warning Penalty
-              - Base Charge Penalty
-              + Rate Consistency Bonus
-              + Renewable Bonus
-              + Flexibility Bonus
+- Non-fixed rate plans (VARIABLE, INDEXED)
+- Prepaid plans
+- Time-of-use plans
 
-Clamped to range: 0-100
-```
+**Quality Grades:**
 
-### Automatic F Grade (Score = 0)
-
-Certain plan types automatically receive a score of 0 (F grade):
-
-- **Non-fixed rate plans** (VARIABLE, INDEXED): Price can change unpredictably
-- **Prepaid plans**: Require upfront payment and credit monitoring
-- **Time-of-use plans**: Rates vary by time of day, impractical for most users
-
-### Implementation
-
-```javascript
-function calculateQualityScore(plan, bestAnnualCost, options = {}) {
-    // Initialize score breakdown for transparency
-    const breakdown = {
-        baseScore: 100,
-        costPenalty: 0,
-        volatilityPenalty: 0,
-        warningPenalty: 0,
-        baseChargePenalty: 0,
-        rateConsistencyBonus: 0,
-        renewableBonus: 0,
-        flexibilityBonus: 0,
-        automaticF: false,
-        automaticFReason: null
-    };
-
-    // Automatic F (0) for problematic plan types
-    if (plan.rate_type !== 'FIXED') {
-        breakdown.automaticF = true;
-        breakdown.automaticFReason = `${plan.rate_type} rate - price can change unpredictably`;
-        plan.scoreBreakdown = breakdown;
-        return 0;
-    }
-    if (plan.is_prepaid) {
-        breakdown.automaticF = true;
-        breakdown.automaticFReason = 'Prepaid plan - requires upfront payment';
-        plan.scoreBreakdown = breakdown;
-        return 0;
-    }
-    if (plan.is_tou) {
-        breakdown.automaticF = true;
-        breakdown.automaticFReason = 'Time-of-use plan - rates vary by time';
-        plan.scoreBreakdown = breakdown;
-        return 0;
-    }
-
-    let score = 100;
-
-    // Penalty 1: Cost penalty (0-40 points)
-    if (plan.annualCost > bestAnnualCost && bestAnnualCost > 0) {
-        const costDiffPercent = (plan.annualCost - bestAnnualCost) / bestAnnualCost;
-        breakdown.costPenalty = Math.min(40, Math.round(costDiffPercent * 100));
-        score -= breakdown.costPenalty;
-    }
-
-    // Penalty 2: Volatility penalty (0-25 points)
-    breakdown.volatilityPenalty = Math.round(plan.volatility * 25);
-    score -= breakdown.volatilityPenalty;
-
-    // Penalty 3: Warning penalty (5 points per warning, max 25)
-    const warningCount = plan.warnings.length;
-    breakdown.warningPenalty = Math.min(25, warningCount * 5);
-    score -= breakdown.warningPenalty;
-
-    // Penalty 4: High base charge penalty (0-5 points)
-    if (plan.base_charge_monthly > 15) {
-        breakdown.baseChargePenalty = Math.min(5, Math.round((plan.base_charge_monthly - 15) / 3));
-        score -= breakdown.baseChargePenalty;
-    }
-
-    // Bonus 1: Rate consistency bonus (0-5 points)
-    const maxVariance = calculateRateVariance(plan);
-    if (maxVariance < 0.1) {
-        breakdown.rateConsistencyBonus = 5;
-    } else if (maxVariance < 0.2) {
-        breakdown.rateConsistencyBonus = 2;
-    }
-    score += breakdown.rateConsistencyBonus;
-
-    // Bonus 2: Renewable energy bonus (0-3 points)
-    if (plan.renewable_pct >= 100) {
-        breakdown.renewableBonus = 3;
-    } else if (plan.renewable_pct >= 50) {
-        breakdown.renewableBonus = 1;
-    }
-    score += breakdown.renewableBonus;
-
-    // Bonus 3: Contract flexibility bonus (0-2 points)
-    if (plan.term_months <= 6) {
-        breakdown.flexibilityBonus = 2;
-    } else if (plan.term_months <= 12) {
-        breakdown.flexibilityBonus = 1;
-    }
-    score += breakdown.flexibilityBonus;
-
-    // Store breakdown for UI display
-    plan.scoreBreakdown = breakdown;
-
-    // Clamp to 0-100 range
-    return Math.max(0, Math.min(100, Math.round(score)));
-}
-```
-
-### Score Explanation Function
-
-For transparency, the system can generate a human-readable explanation:
-
-```javascript
-function getScoreExplanation(plan) {
-    const b = plan.scoreBreakdown;
-
-    if (b.automaticF) {
-        return `Automatic F grade: ${b.automaticFReason}`;
-    }
-
-    const parts = [`Base: ${b.baseScore}`];
-
-    if (b.costPenalty > 0) parts.push(`Cost: -${b.costPenalty}`);
-    if (b.volatilityPenalty > 0) parts.push(`Volatility: -${b.volatilityPenalty}`);
-    if (b.warningPenalty > 0) parts.push(`Warnings: -${b.warningPenalty}`);
-    if (b.baseChargePenalty > 0) parts.push(`Base fee: -${b.baseChargePenalty}`);
-    if (b.rateConsistencyBonus > 0) parts.push(`Consistent rates: +${b.rateConsistencyBonus}`);
-    if (b.renewableBonus > 0) parts.push(`Renewable: +${b.renewableBonus}`);
-    if (b.flexibilityBonus > 0) parts.push(`Flexibility: +${b.flexibilityBonus}`);
-
-    return parts.join(' | ');
-}
-```
-
-### Grade Interpretation
-
-| Score | Grade | Description | Tooltip |
+| Score | Grade | Description | Meaning |
 | --- | --- | --- | --- |
-| 90-100 | A | Excellent | Top-tier plan with competitive pricing, stable rates, and minimal risk |
-| 80-89 | B | Good | Good overall value with reasonable pricing and acceptable risk |
-| 70-79 | C | Acceptable | Moderate value with some concerns; review details before enrolling |
-| 60-69 | D | Caution | Below-average value with notable drawbacks; compare with better options |
-| 0-59 | F | Avoid | High risk or poor value; variable rates, prepaid, or TOU plans fall here |
+| 90-100 | A | Excellent | Top-tier plan with competitive pricing, stable rates |
+| 80-89 | B | Good | Good overall value with reasonable pricing |
+| 70-79 | C | Acceptable | Moderate value; review details carefully |
+| 60-69 | D | Caution | Below-average with notable drawbacks |
+| 0-59 | F | Avoid | High risk or variable rates |
 
 ### Combined Ranking Score
 

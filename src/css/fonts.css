@@ -155,6 +155,55 @@
   font-display: swap;
 }
 
+/* New York Small - For smaller text sizes */
+@font-face {
+  font-family: "New York Small";
+  src: url("../assets/fonts/new_york/NewYorkSmall-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New York Small";
+  src: url("../assets/fonts/new_york/NewYorkSmall-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New York Small";
+  src: url("../assets/fonts/new_york/NewYorkSmall-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New York Small";
+  src: url("../assets/fonts/new_york/NewYorkSmall-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New York Small";
+  src: url("../assets/fonts/new_york/NewYorkSmall-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New York Small";
+  src: url("../assets/fonts/new_york/NewYorkSmall-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 /* New York - Serif Font */
 
 @font-face {

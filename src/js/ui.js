@@ -305,16 +305,23 @@ const UI = {
       const freshness = await API.getDataFreshness();
 
       if (this.elements.totalPlansCount) {
-        // Show unique plan count (after deduplication)
-        this.elements.totalPlansCount.textContent = freshness.totalPlans.toLocaleString();
-
-        // Add tooltip with full details
+        // Show unique plan count prominently with original count in smaller text
         if (freshness.duplicateCount > 0) {
-          this.elements.totalPlansCount.setAttribute(
-            'title',
-            `${freshness.originalPlanCount.toLocaleString()} total plans, ` +
-              `${freshness.duplicateCount} duplicates removed`
-          );
+          this.elements.totalPlansCount.innerHTML = `
+            ${freshness.totalPlans.toLocaleString()}
+            <span style="font-size: 0.5em; font-weight: 400; color: var(--color-text-muted); display: block; margin-top: 2px;">
+              (${freshness.originalPlanCount.toLocaleString()} total, ${freshness.duplicateCount.toLocaleString()} duplicate${freshness.duplicateCount !== 1 ? 's' : ''} removed)
+            </span>
+          `;
+          this.elements.totalPlansCount.setAttribute('title', 'Click for deduplication details');
+          this.elements.totalPlansCount.style.cursor = 'help';
+
+          // Add click handler to show deduplication modal
+          this.elements.totalPlansCount.addEventListener('click', () => {
+            this.showDeduplicationInfo();
+          });
+        } else {
+          this.elements.totalPlansCount.textContent = freshness.totalPlans.toLocaleString();
         }
       }
 
@@ -609,7 +616,13 @@ const UI = {
         return;
       }
 
-      const rankedPlans = rankPlans(tduPlans, monthlyUsage, this.state.tdu);
+      // Use PlanRanker if available, otherwise fallback to legacy rankPlans
+      const rankingFunction =
+        typeof PlanRanker !== 'undefined' && PlanRanker.rankPlans
+          ? PlanRanker.rankPlans.bind(PlanRanker)
+          : rankPlans;
+
+      const rankedPlans = rankingFunction(tduPlans, monthlyUsage, this.state.tdu);
       this.state.rankedPlans = rankedPlans;
 
       this.displayResults(rankedPlans, monthlyUsage);
@@ -664,10 +677,35 @@ const UI = {
 
   displayResults(plans, monthlyUsage) {
     this.displayUsageProfile(monthlyUsage);
-    this.displayTopPlans(plans.slice(0, 5));
+    this.displayTopPlans(plans);
     this.displayWarningPlans(plans.filter((p) => p.isGimmick).slice(0, 3));
     this.displayDeduplicationStats();
-    this.displayComparisonTable(plans);
+
+    // Reset sort state and display table in default order (by combined score, highest first)
+    this.sortState = {
+      column: null,
+      direction: 'desc'
+    };
+
+    // Ensure plans are sorted by combined score descending (highest first) with robust tie-breaking
+    const sortedPlans = [...plans].sort((a, b) => {
+      // 1. Combined Score (Descending)
+      const scoreDiff = (b.combinedScore || 0) - (a.combinedScore || 0);
+      if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
+
+      // 2. Annual Cost (Ascending)
+      const costDiff = (a.annualCost || 0) - (b.annualCost || 0);
+      if (Math.abs(costDiff) > 0.01) return costDiff;
+
+      // 3. Quality Score (Descending)
+      const qualityDiff = (b.qualityScore || 0) - (a.qualityScore || 0);
+      if (qualityDiff !== 0) return qualityDiff;
+
+      // 4. Plan Name (Ascending)
+      return (a.plan_name || '').localeCompare(b.plan_name || '');
+    });
+
+    this.displayComparisonTable(sortedPlans);
 
     if (this.elements.resultsCount) {
       this.elements.resultsCount.textContent = plans.length;
@@ -734,11 +772,19 @@ const UI = {
   displayTopPlans(plans) {
     if (!this.elements.topPlans) return;
 
+    // Only show plans with acceptable quality (grade C or better, score >= 70)
+    // This prevents F-grade gimmick plans from appearing in top recommendations
+    const acceptablePlans = plans.filter((p) => (p.qualityScore || 0) >= 70);
+
+    // If no acceptable plans, fall back to showing top 5 regardless of quality
+    const displayPlans =
+      acceptablePlans.length >= 5 ? acceptablePlans.slice(0, 5) : plans.slice(0, 5);
+
     // Get total plans count for ranking context
     const totalPlans = this.state.rankedPlans?.length || plans.length;
-    const bestPlan = plans[0];
+    const bestPlan = displayPlans[0];
 
-    this.elements.topPlans.innerHTML = plans
+    this.elements.topPlans.innerHTML = displayPlans
       .map((plan, i) => {
         const grade =
           typeof getQualityGrade === 'function'
@@ -759,7 +805,9 @@ const UI = {
 
         // Calculate savings vs worst plan in top 5
         const savingsVsLast =
-          i === 0 && plans.length > 1 ? plans[plans.length - 1].annualCost - plan.annualCost : null;
+          i === 0 && displayPlans.length > 1
+            ? displayPlans[displayPlans.length - 1].annualCost - plan.annualCost
+            : null;
 
         // Calculate difference from #1
         const diffFromBest = i > 0 ? plan.annualCost - bestPlan.annualCost : 0;
@@ -955,16 +1003,22 @@ const UI = {
 
             <h4 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); color: var(--color-text);">How We Detect Duplicates</h4>
             <p style="margin-bottom: var(--space-4); color: var(--color-text-muted);">
-              We create a "fingerprint" for each plan based on:
+              We create a "fingerprint" for each plan using objective, numeric features only:
             </p>
             <ul style="margin: 0 0 var(--space-4) var(--space-4); padding: 0; list-style: disc; color: var(--color-text-muted);">
               <li>Provider name and TDU service area</li>
               <li>Rate type (Fixed, Variable, etc.)</li>
-              <li>Pricing at 500, 1000, and 2000 kWh</li>
-              <li>Contract term length</li>
-              <li>Early termination fee and base charge</li>
-              <li>Renewable percentage, prepaid status, time-of-use status</li>
+              <li>Pricing at 500, 1000, and 2000 kWh usage levels</li>
+              <li>Contract term length (months)</li>
+              <li>Early termination fee amount</li>
+              <li>Monthly base charge</li>
+              <li>Renewable energy percentage</li>
+              <li>Prepaid plan flag (yes/no)</li>
+              <li>Time-of-use plan flag (yes/no)</li>
             </ul>
+            <p style="margin-bottom: var(--space-4); padding: var(--space-2); background: var(--color-surface-sunken); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--color-text-muted);">
+              <strong style="color: var(--color-text);">Why numeric-only?</strong> Analysis of 986 plans confirms that plans with identical numeric features always have identical terms. Text extraction adds complexity without improving accuracy.
+            </p>
 
             <h4 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); color: var(--color-text);">Which Version Do We Keep?</h4>
             <p style="margin-bottom: var(--space-2); color: var(--color-text-muted);">
@@ -1070,10 +1124,32 @@ const UI = {
   displayComparisonTable(plans) {
     if (!this.elements.comparisonBody) return;
 
-    // Calculate best values for highlighting
-    const bestValues = this.calculateBestValues(plans);
+    // If no sort column is selected, ensure plans are sorted by combined score descending
+    // with deterministic tie-breakers
+    let displayPlans = plans;
+    if (!this.sortState.column) {
+      displayPlans = [...plans].sort((a, b) => {
+        // 1. Combined Score (Descending) - Primary ranking metric
+        const scoreDiff = (b.combinedScore || 0) - (a.combinedScore || 0);
+        if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
 
-    this.elements.comparisonBody.innerHTML = plans
+        // 2. Annual Cost (Ascending) - Cheaper is better
+        const costDiff = (a.annualCost || 0) - (b.annualCost || 0);
+        if (Math.abs(costDiff) > 0.01) return costDiff;
+
+        // 3. Quality Score (Descending) - Higher quality is better
+        const qualityDiff = (b.qualityScore || 0) - (a.qualityScore || 0);
+        if (qualityDiff !== 0) return qualityDiff;
+
+        // 4. Plan Name (Ascending) - Alphabetical stability
+        return (a.plan_name || '').localeCompare(b.plan_name || '');
+      });
+    }
+
+    // Calculate best values for highlighting
+    const bestValues = this.calculateBestValues(displayPlans);
+
+    this.elements.comparisonBody.innerHTML = displayPlans
       .map((plan, _i) => {
         const grade =
           typeof getQualityGrade === 'function'
@@ -1102,7 +1178,7 @@ const UI = {
         // Get contract expiration analysis
         const expirationAnalysis =
           typeof ContractAnalyzer !== 'undefined' && ContractAnalyzer.calculateContractExpiration
-            ? ContractAnalyzer.calculateContractExpiration(termMonths, new Date())
+            ? ContractAnalyzer.calculateContractExpiration(new Date(), termMonths)
             : { riskLevel: 'low', renewalSeason: 'Optimal' };
 
         // Check if this plan has best values
@@ -1111,37 +1187,52 @@ const UI = {
         const isBestQuality = plan.qualityScore === bestValues.highestQuality;
         const isLowestFee = plan.early_termination_fee === bestValues.lowestFee;
 
+        // Badge Logic
+        const variableBadge = isNonFixed
+          ? `<span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>`
+          : '';
+        const prepaidBadge = plan.is_prepaid
+          ? '<span class="rate-type-badge rate-type-badge-prepaid">PREPAID</span>'
+          : '';
+        const touBadge = plan.is_tou
+          ? '<span class="rate-type-badge rate-type-badge-tou">TIME OF USE</span>'
+          : '';
+
+        const badRenewalBadge =
+          expirationAnalysis.riskLevel === 'high'
+            ? `<span class="bad-renewal-badge" title="Expires during expensive peak season">RENEWAL MONTH</span>`
+            : '';
+
         return `
-            <tr class="${rowClass}" data-plan-id="${plan.plan_id}">
+            <tr class="${rowClass}" data-plan-id="${plan.plan_id}" onclick="UI.showPlanModal('${plan.plan_id}')">
                 <td class="col-grade">
-                    <span class="quality-grade ${grade.class}" title="${scoreExplanation}" aria-label="Quality grade ${grade.letter}: ${grade.description} (${plan.qualityScore || 0} out of 100)">
-                        ${grade.letter}
-                    </span>
-                    <span class="quality-score ${isBestQuality ? 'best-value' : ''}">${plan.qualityScore || 0}</span>
+                    <div class="grade-content-wrapper">
+                        <span class="quality-grade ${grade.class}" title="${scoreExplanation}" aria-label="Quality grade ${grade.letter}">
+                            ${grade.letter}
+                        </span>
+                        <span class="quality-score ${isBestQuality ? 'best-value' : ''}">${plan.qualityScore || 0}</span>
+                    </div>
                 </td>
-                <td>
+                <td class="col-provider">
                     <div class="provider-cell">
                         <span class="provider-name">${this.escapeHtml(plan.rep_name)}</span>
-                        ${isNonFixed ? `<span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>` : ''}
                     </div>
                 </td>
                 <td>
                     <div class="plan-name-cell">
                         <span>${this.escapeHtml(plan.plan_name)}</span>
-                        ${plan.is_prepaid ? '<span class="rate-type-badge rate-type-badge-prepaid">PREPAID</span>' : ''}
-                        ${plan.is_tou ? '<span class="rate-type-badge rate-type-badge-tou">TIME OF USE</span>' : ''}
-                        ${plan.is_spanish_only ? '<span class="rate-type-badge rate-type-badge-language" title="This plan is only available in Spanish (no English version offered)">SPANISH ONLY</span>' : ''}
+                        <div class="plan-badges">
+                            ${variableBadge}
+                            ${prepaidBadge}
+                            ${touBadge}
+                            ${badRenewalBadge}
+                        </div>
                     </div>
                 </td>
                 <td><span class="term-badge">${plan.term_months} months</span></td>
                 <td class="col-contract-end" data-sort-value="${contractEndDate.getTime()}">
-                    <div class="contract-end-wrapper">
+                    <div class="contract-end-wrapper" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
                         <span class="contract-end-date">${endDateFormatted}</span>
-                        ${
-                          expirationAnalysis.riskLevel === 'high'
-                            ? `<span class="contract-end-warning" title="Expires during expensive renewal season (rates 15-40% higher)" style="color: var(--color-caution); margin-left: 4px;">⚠</span>`
-                            : ''
-                        }
                     </div>
                 </td>
                 <td class="col-annual">
@@ -1155,7 +1246,7 @@ const UI = {
                     ${(plan.renewable_pct || 0) >= 100 ? '<span class="renewable-100">100%</span>' : `${plan.renewable_pct || 0}%`}
                 </td>
                 <td class="col-etf ${isLowestFee ? 'best-value' : ''}">${this.formatETF(plan)}</td>
-                <td><button class="btn-view" onclick="UI.showPlanModal('${plan.plan_id}')">View</button></td>
+                <td><button class="btn-view" onclick="event.stopPropagation(); UI.showPlanModal('${plan.plan_id}')">View</button></td>
             </tr>
             `;
       })
@@ -1253,7 +1344,9 @@ const UI = {
       filtered = filtered.filter((p) => (p.renewable_pct || 0) >= minPct);
     }
 
-    // Apply sorting if a column is selected
+    // Apply sorting
+    // If a column is selected, sort by that column
+    // Otherwise, maintain default sort by combined score descending
     if (this.sortState.column) {
       const dir = this.sortState.direction === 'asc' ? 1 : -1;
       filtered.sort((a, b) => {
@@ -1311,6 +1404,13 @@ const UI = {
         }
         return (aVal - bVal) * dir;
       });
+    } else {
+      // Default sort: combined score descending (highest first)
+      filtered.sort((a, b) => {
+        const aScore = a.combinedScore || 0;
+        const bScore = b.combinedScore || 0;
+        return bScore - aScore;
+      });
     }
 
     this.displayComparisonTable(filtered);
@@ -1332,7 +1432,6 @@ const UI = {
             <p class="modal-provider">
                 ${this.escapeHtml(plan.rep_name)}
                 <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
-                ${plan.is_spanish_only ? '<span class="rate-type-badge rate-type-badge-language" title="This plan is only available in Spanish">SPANISH ONLY</span>' : ''}
             </p>
 
             ${
@@ -1438,9 +1537,15 @@ const UI = {
   },
 
   closeModal() {
-    if (this.elements.modalBackdrop) {
-      this.elements.modalBackdrop.hidden = true;
-      document.body.style.overflow = '';
+    if (this.elements.modalBackdrop && !this.elements.modalBackdrop.hidden) {
+      this.elements.modalBackdrop.classList.add('modal-out');
+
+      // Wait for animation to finish (matches CSS duration of 0.2s)
+      setTimeout(() => {
+        this.elements.modalBackdrop.hidden = true;
+        this.elements.modalBackdrop.classList.remove('modal-out');
+        document.body.style.overflow = '';
+      }, 200);
     }
   },
 

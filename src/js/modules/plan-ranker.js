@@ -22,8 +22,8 @@ const PlanRanker = {
    * Scoring weight configuration
    */
   SCORING_WEIGHTS: {
-    costEfficiency: 0.85, // 85% weight on cost
-    quality: 0.15 // 15% weight on quality
+    costEfficiency: 0.30, // Heavily reduced to ensure visual grade consistency
+    quality: 0.70 // Dominant factor: Grade A plans should almost always beat Grade B
   },
 
   /**
@@ -34,7 +34,7 @@ const PlanRanker = {
     volatilityPenalty: { max: 25, label: 'Price Stability' },
     warningPenalty: { max: 25, perItem: 5, label: 'Risk Factors' },
     baseChargePenalty: { max: 5, threshold: 15, label: 'Fee Structure' },
-    rateConsistencyBonus: { max: 5, label: 'Rate Consistency' }
+    expirationPenalty: { max: 25, label: 'Expiration Seasonality' }
   },
 
   /**
@@ -120,14 +120,26 @@ const PlanRanker = {
       // Quality score already on 0-100 scale
       const qualityScore = plan.qualityScore;
 
-      // Combined weighted score: 85% cost efficiency + 15% quality
-      // BUT: F-grade plans (quality = 0) receive heavy penalty to prevent high ranking
-      let combinedScore = Math.round(costScore * 0.85 + qualityScore * 0.15);
+      // NEW SCORING SYSTEM: Multiplicative Value Scoring
+      // Instead of adding Cost + Quality, we use Quality as a multiplier for the Cost Score.
+      // This ensures that a "cheap" plan with "poor" quality (e.g., risky renewal) is heavily discounted.
+      // Example: 
+      // - Perfect Plan: Cost 100 * Quality 1.0 = 100
+      // - Risky Plan: Cost 100 * Quality 0.7 = 70
+      // - Expensive Safe Plan: Cost 80 * Quality 1.0 = 80
+      // Result: Expensive Safe Plan (80) beats Cheap Risky Plan (70).
+      
+      const qualityFactor = Math.max(1, qualityScore) / 100;
+      let combinedScore = costScore * qualityFactor;
 
-      // Apply severe penalty to F-grade plans (quality score = 0)
-      // This ensures they rank below all acceptable plans regardless of cost
-      if (qualityScore === 0) {
-        combinedScore = Math.min(combinedScore, 40); // Cap F-grade plans at 40 combined score
+      // Apply penalties based on quality tiers to improve ranking stability
+      if (qualityScore < 60) {
+        // F-Grade (Avoid): Severe penalty, strictly at bottom
+        // Still allow sorting within F-grade by cost
+        combinedScore = (qualityScore - 1000) + (costScore * 0.1);
+      } else if (qualityScore < 70) {
+        // D-Grade (Caution): Apply a flat penalty to the final score to separate from C-tier
+        combinedScore -= 10;
       }
 
       plan.combinedScore = combinedScore;
@@ -179,7 +191,7 @@ const PlanRanker = {
       volatilityPenalty: 0,
       warningPenalty: 0,
       baseChargePenalty: 0,
-      rateConsistencyBonus: 0,
+      expirationPenalty: 0,
       automaticF: false,
       automaticFReason: null
     };
@@ -233,21 +245,20 @@ const PlanRanker = {
       score -= breakdown.baseChargePenalty;
     }
 
-    // Bonus 1: Low rate variance bonus (0-5 points)
-    // Plans with consistent rates across usage levels get bonus
-    const rate500 = plan.price_kwh_500;
-    const rate1000 = plan.price_kwh_1000;
-    const rate2000 = plan.price_kwh_2000;
-    const maxVariance = Math.max(
-      Math.abs(rate500 - rate1000) / rate1000,
-      Math.abs(rate2000 - rate1000) / rate1000
-    );
-    if (maxVariance < 0.1) {
-      breakdown.rateConsistencyBonus = 5;
-    } else if (maxVariance < 0.2) {
-      breakdown.rateConsistencyBonus = 2;
+    // Penalty 5: Expiration Seasonality Penalty (0-30 points)
+    // Critical: Penalize plans that expire during peak demand months (Summer/Winter)
+    // This ensures the algorithm accounts for "optimal renewal months vs mad renewal months"
+    if (_options.contractStartDate && plan.term_months) {
+      const expiration = this.calculateContractExpiration(_options.contractStartDate, plan.term_months);
+      
+      if (expiration.riskLevel === 'high') { // Summer/Winter peak (e.g., July/Aug/Jan)
+        breakdown.expirationPenalty = 30; // Increased penalty for high risk
+        score -= 30;
+      } else if (expiration.riskLevel === 'medium') { // Shoulder peaks (e.g., June/Dec)
+        breakdown.expirationPenalty = 15;
+        score -= 15;
+      }
     }
-    score += breakdown.rateConsistencyBonus;
 
     // Store breakdown on plan for UI display
     plan.scoreBreakdown = breakdown;
@@ -287,8 +298,8 @@ const PlanRanker = {
     if (b.baseChargePenalty > 0) {
       parts.push(`Base fee: -${b.baseChargePenalty}`);
     }
-    if (b.rateConsistencyBonus > 0) {
-      parts.push(`Consistent rates: +${b.rateConsistencyBonus}`);
+    if (b.expirationPenalty > 0) {
+      parts.push(`Expiration risk: -${b.expirationPenalty}`);
     }
 
     return parts.join(' | ');
@@ -683,6 +694,11 @@ const PlanRanker = {
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = PlanRanker;
+}
+
+// Browser environment support
+if (typeof window !== 'undefined') {
+  window.PlanRanker = PlanRanker;
 }
 
 // Also export individual functions for backwards compatibility

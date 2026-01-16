@@ -87,7 +87,7 @@ python scripts/archive_to_csv.py
 User Input → Usage Estimator → Cost Calculator → Plan Ranker → UI Display
      ↓              ↓                  ↓              ↓
 ZIP Code      Seasonal         Monthly Cost    Combined Score
-Usage Type    Multipliers      (12 months)     (85% cost + 15% quality)
+Usage Type    Multipliers      (12 months)     (Multiplicative Value Score)
 ```
 
 ### Modular JavaScript Architecture
@@ -141,10 +141,11 @@ Usage Type    Multipliers      (12 months)     (85% cost + 15% quality)
 6. Add local sales tax
 7. Sum all 12 months for annual cost
 
-// Combined score (85% cost + 15% quality):
+// Combined score (Multiplicative Value Model):
 costScore = 100 - ((annualCost - bestCost) / (worstCost - bestCost)) * 100
 qualityScore = calculateQualityScore(plan)  // 0-100
-combinedScore = (costScore * 0.85) + (qualityScore * 0.15)
+combinedScore = costScore * (Math.max(1, qualityScore) / 100)
+// F-grade plans (score < 60) get severe penalty (-1000)
 ```
 
 ### Quality Scoring System
@@ -163,10 +164,11 @@ combinedScore = (costScore * 0.85) + (qualityScore * 0.15)
 - Volatility penalty: Up to -25 (unpredictable costs)
 - Warning penalty: -5 per warning, max -25
 - Base charge penalty: Up to -5 (high monthly fees >$15)
+- Expiration Seasonality: Up to -30 (plans expiring in peak Summer/Winter months)
 
 **Bonuses:**
 
-- Rate consistency: +5 (stable pricing across usage tiers)
+- None (Strictly penalty-based scoring for risk reduction)
 
 ### Seasonal Usage Multipliers
 
@@ -204,12 +206,38 @@ else:
 
 ### Duplicate Plan Detection
 
-Power to Choose lists identical plans in English and Spanish. We fingerprint and deduplicate:
+Power to Choose lists identical plans in English and Spanish. We use simple, robust numeric fingerprinting to detect and remove duplicates:
 
 ```javascript
-fingerprint = hash(rep_name + tdu_area + prices + term + fees)
-Keep English version, remove Spanish duplicate
+// Numeric-only fingerprint (11 fields):
+fingerprint = hash({
+  rep_name,           // Provider name (uppercase, normalized)
+  tdu_area,           // TDU service area
+  rate_type,          // FIXED, VARIABLE, etc.
+  p500,               // Price at 500 kWh (rounded to 3 decimals)
+  p1000,              // Price at 1000 kWh (rounded to 3 decimals)
+  p2000,              // Price at 2000 kWh (rounded to 3 decimals)
+  term_months,        // Contract length
+  etf,                // Early termination fee (rounded to 2 decimals)
+  base_charge,        // Monthly base charge (rounded to 2 decimals)
+  renewable_pct,      // Renewable energy percentage
+  prepaid,            // Prepaid flag (boolean)
+  tou                 // Time-of-use flag (boolean)
+})
+
+// Preference scoring (higher = preferred):
+score = 100
+  + 50 if language === 'English'
+  - 50 if language === 'Spanish'
+  - penalties for Spanish characters (ñ, á, é, etc.)
+  - penalties for longer names
+  - penalties for special characters
+
+// Keep English version, remove Spanish duplicate
 ```
+
+**Why Numeric-Only?**
+Analysis of 986 plans confirms that plans with identical numeric features (prices, fees, term, etc.) always have identical substantive terms. Text extraction (bill credits, special features) adds significant complexity without improving accuracy. Plans that appear identical numerically ARE identical—regardless of how the marketing text describes them.
 
 ### Provider Name Formatting
 

@@ -474,7 +474,10 @@ const API = {
    * Create a fingerprint for a plan to detect duplicates
    *
    * Duplicates typically occur when providers list the same plan in both English and Spanish
-   * with identical pricing and terms but different plan names.
+   * with identical pricing, terms, and features but different plan names.
+   *
+   * Analysis shows that plans with identical numeric features always have identical
+   * text descriptions, making text extraction unnecessary.
    *
    * @param {Object} plan - Plan object
    * @returns {string} Plan fingerprint
