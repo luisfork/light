@@ -22,12 +22,6 @@ Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 ![Python: Ruff](https://img.shields.io/badge/python-Ruff-261230?logo=ruff&logoColor=d7ff64)
 ![WCAG 2.1 AA](https://img.shields.io/badge/WCAG-2.1%20AA-green)
 
-![Data Updates](https://img.shields.io/badge/data-daily%20updates-brightgreen)
-![Power to Choose](https://img.shields.io/badge/data%20source-Power%20to%20Choose-blue)
-[![Deploy](https://github.com/luisfork/light/actions/workflows/deploy.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/deploy.yml)
-[![Update Plans](https://github.com/luisfork/light/actions/workflows/update-plans.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/update-plans.yml)
-[![Lint](https://github.com/luisfork/light/actions/workflows/lint.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/lint.yml)
-
 ---
 
 ## Why *Light*?
@@ -787,5 +781,11 @@ For questions, issues, or suggestions:
 - **Pull Requests:** <https://github.com/luisfork/light/pulls>
 
 ---
+
+![Data Updates](https://img.shields.io/badge/data-daily%20updates-brightgreen)
+![Power to Choose](https://img.shields.io/badge/data%20source-Power%20to%20Choose-blue)
+[![Deploy](https://github.com/luisfork/light/actions/workflows/deploy.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/deploy.yml)
+[![Update Plans](https://github.com/luisfork/light/actions/workflows/update-plans.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/update-plans.yml)
+[![Lint](https://github.com/luisfork/light/actions/workflows/lint.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/lint.yml)
 
 **Last Updated**: January 2026
