@@ -305,23 +305,25 @@ const UI = {
   async updateHeroMetrics() {
     try {
       const freshness = await API.getDataFreshness();
+      this.state.freshness = freshness;
 
       if (this.elements.totalPlansCount) {
         // Show unique plan count prominently with original count in smaller text
         if (freshness.duplicateCount > 0) {
           this.elements.totalPlansCount.innerHTML = `
-            ${freshness.totalPlans.toLocaleString()}
-            <span style="font-size: 0.5em; font-weight: 400; color: var(--color-text-muted); display: block; margin-top: 2px;">
-              (${freshness.originalPlanCount.toLocaleString()} total, ${freshness.duplicateCount.toLocaleString()} duplicate${freshness.duplicateCount !== 1 ? 's' : ''} removed)
+            <span class="metric-value-main">${freshness.totalPlans.toLocaleString()}</span>
+            <span class="metric-subvalue">
+              ${freshness.originalPlanCount.toLocaleString()} total • ${freshness.duplicateCount.toLocaleString()} duplicate${freshness.duplicateCount !== 1 ? 's' : ''} removed
             </span>
+            <button type="button" class="metric-link">Deduplication details</button>
           `;
-          this.elements.totalPlansCount.setAttribute('title', 'Click for deduplication details');
-          this.elements.totalPlansCount.style.cursor = 'help';
-
-          // Add click handler to show deduplication modal
-          this.elements.totalPlansCount.addEventListener('click', () => {
-            this.showDeduplicationInfo();
-          });
+          const metricTrigger = this.elements.totalPlansCount.querySelector('.metric-link');
+          if (metricTrigger) {
+            metricTrigger.addEventListener('click', (event) => {
+              event.preventDefault();
+              this.showDeduplicationInfo(freshness);
+            });
+          }
         } else {
           this.elements.totalPlansCount.textContent = freshness.totalPlans.toLocaleString();
         }
@@ -647,6 +649,10 @@ const UI = {
       this.displayResults(rankedPlans, monthlyUsage);
 
       this.elements.resultsSection.hidden = false;
+      this.elements.resultsSection.classList.remove('is-visible');
+      requestAnimationFrame(() => {
+        this.elements.resultsSection.classList.add('is-visible');
+      });
       if (this.elements.calculationStatus) {
         this.elements.calculationStatus.hidden = true;
       }
@@ -763,23 +769,27 @@ const UI = {
 
     // Render chart with month names and color-coded intensity
     if (this.elements.usageChart) {
-      const maxHeight = 100; // Increased height for better visibility
+      const maxHeight = 120; // Increased height for better visibility
       const min = Math.min(...monthlyUsage);
+
+      this.elements.usageChart.setAttribute('role', 'img');
+      this.elements.usageChart.setAttribute('aria-label', 'Monthly electricity usage by month');
 
       this.elements.usageChart.innerHTML = monthlyUsage
         .map((usage, i) => {
           const height = max > 0 ? (usage / max) * maxHeight : 4;
           // Calculate intensity (0-1) for color coding
           const intensity = max > min ? (usage - min) / (max - min) : 0.5;
-          // Assign intensity class: high (red), medium-high (orange), medium (yellow), low (blue)
-          let intensityClass = 'intensity-low';
-          if (intensity >= 0.75) intensityClass = 'intensity-high';
-          else if (intensity >= 0.5) intensityClass = 'intensity-medium-high';
-          else if (intensity >= 0.25) intensityClass = 'intensity-medium';
+          // Assign intensity class: very-low (blue), low (green), medium (yellow), medium-high (orange), high (red)
+          let intensityClass = 'intensity-very-low';
+          if (intensity >= 0.8) intensityClass = 'intensity-high';
+          else if (intensity >= 0.6) intensityClass = 'intensity-medium-high';
+          else if (intensity >= 0.4) intensityClass = 'intensity-medium';
+          else if (intensity >= 0.2) intensityClass = 'intensity-low';
 
           return `
             <div class="bar-container">
-              <div class="bar ${intensityClass}" style="height: ${height}px" title="${monthNames[i]}: ${Math.round(usage).toLocaleString()} kWh"></div>
+              <div class="bar ${intensityClass}" style="height: ${height}px" title="${monthNames[i]}: ${Math.round(usage).toLocaleString()} kWh" aria-label="${monthNames[i]} ${Math.round(usage).toLocaleString()} kWh"></div>
               <div class="bar-label">${monthNames[i]}</div>
             </div>
           `;
@@ -957,29 +967,20 @@ const UI = {
 
     // Always show the stats, even if no duplicates found
     const statsHTML = `
-      <div class="deduplication-stats" style="margin-top: var(--space-3); padding: var(--space-3); background: var(--color-surface-sunken); border-radius: var(--radius-md); font-size: var(--text-sm); color: var(--color-text-muted);">
-        <div style="display: flex; align-items: center; gap: var(--space-2);">
-          <span class="plan-count" style="font-weight: 600; color: var(--color-text); font-size: var(--text-base);">
+      <div class="deduplication-stats" role="region" aria-label="Duplicate plan detection">
+        <div class="deduplication-stats-row">
+          <span class="plan-count">
             ${totalPlans.toLocaleString()} unique plan${totalPlans !== 1 ? 's' : ''}
           </span>
-          ${
-            duplicateCount > 0
-              ? `
-            <span class="duplicate-info" style="color: var(--color-text-muted);">
-              (${originalCount.toLocaleString()} total, ${duplicateCount.toLocaleString()} duplicate${duplicateCount !== 1 ? 's' : ''} removed)
-            </span>
-          `
-              : `
-            <span class="duplicate-info" style="color: var(--color-text-muted);">
-              (${originalCount.toLocaleString()} total)
-            </span>
-          `
-          }
-          <button
-            class="info-tooltip-trigger"
-            aria-label="Information about duplicate detection"
-            style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; padding: 0; background: var(--color-accent); color: white; border: none; border-radius: 50%; font-size: 11px; font-weight: 700; cursor: help; flex-shrink: 0;">
-            i
+          <span class="duplicate-info">
+            ${
+              duplicateCount > 0
+                ? `${originalCount.toLocaleString()} total • ${duplicateCount.toLocaleString()} duplicate${duplicateCount !== 1 ? 's' : ''} removed`
+                : `${originalCount.toLocaleString()} total`
+            }
+          </span>
+          <button class="deduplication-trigger" type="button" aria-label="Deduplication details">
+            Details
           </button>
         </div>
       </div>
@@ -989,11 +990,11 @@ const UI = {
     tableInfoBar.insertAdjacentHTML('afterend', statsHTML);
 
     // Add click handler for info tooltip
-    const tooltipTrigger = document.querySelector('.deduplication-stats .info-tooltip-trigger');
+    const tooltipTrigger = document.querySelector('.deduplication-stats .deduplication-trigger');
     if (tooltipTrigger) {
       tooltipTrigger.addEventListener('click', (e) => {
         e.preventDefault();
-        this.showDeduplicationInfo();
+        this.showDeduplicationInfo(this.state.data);
       });
     }
   },
@@ -1001,30 +1002,31 @@ const UI = {
   /**
    * Show detailed deduplication information in a modal-like overlay
    */
-  showDeduplicationInfo() {
-    const duplicateCount = this.state.data.duplicate_count || 0;
-    const orphanedEnglish = this.state.data.orphaned_english_count || 0;
-    const orphanedSpanish = this.state.data.orphaned_spanish_count || 0;
+  showDeduplicationInfo(sourceData = null) {
+    const data = sourceData || this.state.data || this.state.freshness || {};
+    const duplicateCount = data.duplicate_count ?? data.duplicateCount ?? 0;
+    const orphanedEnglish = data.orphaned_english_count ?? data.orphanedEnglishCount ?? 0;
+    const orphanedSpanish = data.orphaned_spanish_count ?? data.orphanedSpanishCount ?? 0;
     const languagePairs = Math.floor(duplicateCount / 2);
 
     const modalHTML = `
-      <div class="deduplication-modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: var(--space-4);">
-        <div class="deduplication-modal" style="background: var(--color-surface); border-radius: var(--radius-lg); max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: var(--shadow-2xl); padding: var(--space-6);">
-          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-4);">
-            <h3 style="margin: 0; font-size: var(--text-xl); font-weight: 600; color: var(--color-text);">Duplicate Plan Detection</h3>
-            <button class="close-modal" style="background: none; border: none; font-size: var(--text-2xl); line-height: 1; cursor: pointer; color: var(--color-text-muted); padding: 0; width: 32px; height: 32px;">&times;</button>
+      <div class="deduplication-modal-backdrop" role="dialog" aria-modal="true" aria-label="Duplicate plan detection">
+        <div class="deduplication-modal">
+          <div class="deduplication-modal-header">
+            <h3 class="deduplication-modal-title">Duplicate Plan Detection</h3>
+            <button class="deduplication-modal-close" aria-label="Close">&times;</button>
           </div>
 
-          <div style="color: var(--color-text); line-height: 1.6;">
-            <p style="margin-bottom: var(--space-4);">
-              Many electricity providers list identical plans in both <strong>English and Spanish</strong> on Power to Choose. These plans have the same pricing, terms, and features, but different plan names and documentation URLs.
+          <div class="deduplication-modal-body">
+            <p class="deduplication-lede">
+              Many providers list identical plans in both <strong>English and Spanish</strong> on Power to Choose. These plans share pricing, terms, and features but have different names and documentation links.
             </p>
 
-            <h4 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); color: var(--color-text);">How We Detect Duplicates</h4>
-            <p style="margin-bottom: var(--space-4); color: var(--color-text-muted);">
-              We create a "fingerprint" for each plan using objective, numeric features only:
+            <h4 class="deduplication-section-title">How We Detect Duplicates</h4>
+            <p class="deduplication-section-text">
+              We create a numeric fingerprint using objective plan features only:
             </p>
-            <ul style="margin: 0 0 var(--space-4) var(--space-4); padding: 0; list-style: disc; color: var(--color-text-muted);">
+            <ul class="deduplication-list">
               <li>Provider name and TDU service area</li>
               <li>Rate type (Fixed, Variable, etc.)</li>
               <li>Pricing at 500, 1000, and 2000 kWh usage levels</li>
@@ -1035,32 +1037,32 @@ const UI = {
               <li>Prepaid plan flag (yes/no)</li>
               <li>Time-of-use plan flag (yes/no)</li>
             </ul>
-            <p style="margin-bottom: var(--space-4); padding: var(--space-2); background: var(--color-surface-sunken); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--color-text-muted);">
-              <strong style="color: var(--color-text);">Why numeric-only?</strong> Analysis of 986 plans confirms that plans with identical numeric features always have identical terms. Text extraction adds complexity without improving accuracy.
-            </p>
+            <div class="deduplication-note">
+              <strong>Why numeric-only?</strong> Analysis of 986 plans confirms that identical numeric features always map to identical terms.
+            </div>
 
-            <h4 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); color: var(--color-text);">Which Version Do We Keep?</h4>
-            <p style="margin-bottom: var(--space-2); color: var(--color-text-muted);">
-              When duplicates are found, we prefer the <strong>English version</strong> based on:
+            <h4 class="deduplication-section-title">Which Version Do We Keep?</h4>
+            <p class="deduplication-section-text">
+              When duplicates are found, we keep the English version based on:
             </p>
-            <ul style="margin: 0 0 var(--space-4) var(--space-4); padding: 0; list-style: disc; color: var(--color-text-muted);">
+            <ul class="deduplication-list">
               <li>Explicit language field (English vs Spanish)</li>
               <li>Absence of Spanish characters (ñ, á, é, í, ó, ú)</li>
-              <li>Shorter plan names (English versions are typically more concise)</li>
+              <li>Shorter plan names</li>
               <li>Fewer special characters</li>
             </ul>
 
-            <h4 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); color: var(--color-text);">Language Distribution</h4>
-            <p style="margin-bottom: var(--space-3); color: var(--color-text-muted);">
-              Not all plans have both English and Spanish versions. Some providers only offer certain plans in one language:
+            <h4 class="deduplication-section-title">Language Distribution</h4>
+            <p class="deduplication-section-text">
+              Not all plans have both English and Spanish versions. Some appear in only one language:
             </p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-4);">
+            <div class="deduplication-grid">
               ${
                 languagePairs > 0
                   ? `
-                <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
-                  <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-text);">${languagePairs.toLocaleString()}</div>
-                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">Language Pairs</div>
+                <div class="deduplication-stat">
+                  <div class="deduplication-stat-value">${languagePairs.toLocaleString()}</div>
+                  <div class="deduplication-stat-label">Language Pairs</div>
                 </div>
               `
                   : ''
@@ -1068,9 +1070,9 @@ const UI = {
               ${
                 orphanedEnglish > 0
                   ? `
-                <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
-                  <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-text);">${orphanedEnglish.toLocaleString()}</div>
-                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">English Only</div>
+                <div class="deduplication-stat">
+                  <div class="deduplication-stat-value">${orphanedEnglish.toLocaleString()}</div>
+                  <div class="deduplication-stat-label">English Only</div>
                 </div>
               `
                   : ''
@@ -1078,9 +1080,9 @@ const UI = {
               ${
                 orphanedSpanish > 0
                   ? `
-                <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
-                  <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-accent);">${orphanedSpanish.toLocaleString()}</div>
-                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">Spanish Only</div>
+                <div class="deduplication-stat">
+                  <div class="deduplication-stat-value">${orphanedSpanish.toLocaleString()}</div>
+                  <div class="deduplication-stat-label">Spanish Only</div>
                 </div>
               `
                   : ''
@@ -1089,9 +1091,9 @@ const UI = {
             ${
               orphanedSpanish > 0
                 ? `
-              <p style="margin-bottom: var(--space-4); font-size: var(--text-sm); color: var(--color-text-muted); background: var(--color-surface-sunken); padding: var(--space-2); border-radius: var(--radius-sm); border-left: 3px solid var(--color-accent);">
-                <strong style="color: var(--color-text);">Note:</strong> ${orphanedSpanish.toLocaleString()} plan${orphanedSpanish !== 1 ? 's are' : ' is'} marked <span style="background: var(--color-accent); color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600;">SPANISH ONLY</span> because no English equivalent exists for this provider and service area.
-              </p>
+              <div class="deduplication-note deduplication-note-accent">
+                <strong>Note:</strong> ${orphanedSpanish.toLocaleString()} plan${orphanedSpanish !== 1 ? 's are' : ' is'} marked as Spanish-only because no English equivalent exists for the same provider and service area.
+              </div>
             `
                 : ''
             }
@@ -1099,10 +1101,8 @@ const UI = {
             ${
               duplicateCount > 0
                 ? `
-              <div style="background: var(--color-surface-sunken); padding: var(--space-3); border-radius: var(--radius-md); margin-top: var(--space-4);">
-                <p style="margin: 0; font-size: var(--text-sm); color: var(--color-text-muted);">
-                  <strong style="color: var(--color-text);">${duplicateCount.toLocaleString()} duplicate plan${duplicateCount !== 1 ? 's' : ''}</strong> removed from this dataset to ensure you see only unique options.
-                </p>
+              <div class="deduplication-summary">
+                <strong>${duplicateCount.toLocaleString()} duplicate plan${duplicateCount !== 1 ? 's' : ''}</strong> removed so you see only unique options.
               </div>
             `
                 : ''
@@ -1116,8 +1116,8 @@ const UI = {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
     // Add close handlers
-    const overlay = document.querySelector('.deduplication-modal-overlay');
-    const closeBtn = document.querySelector('.deduplication-modal .close-modal');
+    const overlay = document.querySelector('.deduplication-modal-backdrop');
+    const closeBtn = document.querySelector('.deduplication-modal .deduplication-modal-close');
 
     const closeModal = () => {
       overlay.remove();
@@ -1219,7 +1219,7 @@ const UI = {
 
         const badRenewalBadge =
           expirationAnalysis.riskLevel === 'high'
-            ? `<span class="bad-renewal-badge" title="Expires during expensive peak season">RENEWAL MONTH</span>`
+            ? `<span class="bad-renewal-badge" title="Expires during expensive peak season">RENEWAL</span>`
             : '';
 
         return `

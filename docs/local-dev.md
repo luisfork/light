@@ -72,6 +72,16 @@ TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py
 uv run python scripts/fetch_plans.py
 ```
 
+**Optional EFL ETF enrichment controls:**
+
+- `EFL_ETF_LOOKUP=1` enable EFL parsing (default on)
+- `EFL_ETF_MAX_FETCHES=250` cap EFL fetches per run
+- `EFL_ETF_TIMEOUT=20` seconds per EFL request
+- `EFL_ETF_AUTO_ALLOWLIST=1` seed allowlist from existing `data/plans.json`
+- `EFL_ETF_ALLOWED_DOMAINS=...` comma-separated allowlist overrides
+
+EFL parsing uses `pdfplumber` and only stores `etf_details` (no PDFs saved).
+
 The `TEST_FILE` environment variable controls the data source:
 
 - **Set**: Uses the specified local CSV file

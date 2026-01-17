@@ -1,5 +1,9 @@
 # Early Termination Fee (ETF) Detection and Data Enrichment Implementation Plan from Electricity Facts Label (EFL) Documents
 
+**Status:** Implemented (January 2026)
+
+This plan is now in production. The data fetch pipeline enriches plan records with EFL-derived `etf_details`, and the UI displays “See EFL” when the fee structure is unknown or ambiguous.
+
 ## Summary
 
 Improve early termination fee (ETF) (also known as cancellation fee) accuracy by enriching plan data with authoritative ETF details from the Electricity Facts Label (EFL) document during the data-fetch pipeline and using those details in the UI. This avoids guessing when Power to Choose fields are missing or ambiguous.

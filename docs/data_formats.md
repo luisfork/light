@@ -44,6 +44,7 @@ The `fetch_plans.py` script standardizes incoming data into a consistent diction
 | `price_kwh_1000` | `float` | Price in cents at 1000 kWh usage | `[kwh1000]`, `Price/kWh 1000` |
 | `price_kwh_2000` | `float` | Price in cents at 2000 kWh usage | `[kwh2000]`, `Price/kWh 2000` |
 | `early_termination_fee`| `float` | ETF in dollars | `[CancelFee]` or parsed from text |
+| `etf_details` | `object` | Optional EFL-derived ETF details | Parsed from EFL PDF/HTML |
 | `renewable_pct` | `int` | Percentage of renewable energy (0-100) | `[Renewable]`, `Renewable Perc` |
 | `is_prepaid` | `bool` | Whether the plan is prepaid | `[PrePaid]`, `Prepaid` |
 | `is_tou` | `bool` | Whether it is a Time-of-Use plan | `[TimeOfUse]`, `Time Of Use` |
@@ -58,7 +59,8 @@ The `fetch_plans.py` script performs significant normalization:
 2. **TDU Normalization**: Maps various TDU names (e.g., "AEP TEXAS CENTRAL COMPANY", "AEP Central") to internal codes (`AEP_CENTRAL`, `ONCOR`, etc.).
 3. **Price Parsing**: Converts values to floats. Handles formatted strings like `$0.16` or `16.5%`.
 4. **Fee Extraction**: If the `CancelFee` column is missing (common in Zip code exports), strictly parses the `Pricing Details` text using Regex to find "Cancellation Fee: $XXX".
-5. **Deduplication**: Performed client-side in `src/js/api.js` using numeric-only plan fingerprints (provider, TDU area, rate type, prices, term, ETF, base charge, renewable %, prepaid flag, TOU flag). This removes English/Spanish duplicates without text parsing.
+5. **EFL ETF Enrichment (Optional)**: When ETF values are missing or zero, `fetch_plans.py` may fetch the EFL document and store a small `etf_details` object with `structure` and rates. No PDFs are stored.
+6. **Deduplication**: Performed client-side in `src/js/api.js` using numeric-only plan fingerprints (provider, TDU area, rate type, prices, term, ETF, base charge, renewable %, prepaid flag, TOU flag). This removes English/Spanish duplicates without text parsing.
 
 ## Tips
 

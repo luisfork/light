@@ -48,7 +48,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 - **Revealing bill credit traps**: Shows how many months you'll miss those credits
 - **Ranking by annual cost**: Not misleading "advertised rates"
 - **Analyzing contract expiration timing**: Warns when renewals fall during expensive peak seasons
-- **Properly calculating early termination fees (ETF)**: Accounts for per-month-remaining ETF structures
+- **Properly calculating early termination fees (ETF)**: Uses EFL-derived `etf_details` when available and handles per-month-remaining structures
 
 **Core Principle:** Empowering Texans to make informed electricity decisions by calculating true monthly and annual costs based on actual usage patterns and optimal contract timing.
 
@@ -98,7 +98,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 - **Contract Expiration Analysis**: Identifies when contracts expire during expensive renewal periods and suggests optimal contract lengths
 - **Gimmick Detection**: Identifies and warns about bill credit traps and time-of-use plans
 - **Provider Name Formatting**: All provider names displayed in clean, professional uppercase format
-- **Early Termination Fee (ETF) Calculation**: Properly handles per-month-remaining early termination fees (ETF)
+- **Early Termination Fee (ETF) Calculation**: Prefers EFL-derived `etf_details`, supports per-month-remaining fees, and flags unknowns as “See EFL”
 - **Duplicate Plan Detection**: Simple numeric fingerprinting automatically removes duplicate English/Spanish versions (11 objective fields, no text parsing)
 - **Quality Scoring System**: 0-100 scoring with penalties and bonuses for plan features, transparent score breakdowns on hover
 - **Best Value Indicators**: Visual highlighting of lowest cost, best rate, and highest quality plans in comparison table
@@ -161,7 +161,7 @@ Example: A 12-month contract starting in July expires in July (expensive). *Ligh
 
 ### Early Termination Fee (ETF) Calculation
 
-Many plans charge $10-20 per month remaining instead of flat fees. *Light* properly calculates:
+Many plans charge $10-20 per month remaining instead of flat fees. *Light* prioritizes EFL-derived `etf_details` when present and falls back to conservative text parsing when not. If the EFL mentions a fee but does not disclose a rate, the UI shows “See EFL” instead of guessing.
 
 ```javascript
 // Per-month-remaining ETF (common for 12-36 month contracts):
@@ -226,6 +226,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 - Renewable energy percentage
 - Prepaid/Time-of-use indicators
 - Early termination fee (ETF)
+- EFL-derived ETF details (optional `etf_details`)
 - EFL (Electricity Facts Label) URL
 - Enrollment URL
 - Promotional details and special terms
@@ -550,26 +551,33 @@ If expiration score ≥ 0.8: "High Risk" warning
 
 ### 2. Early Termination Fee (ETF) Calculation with Verification
 
-Many comparison tools incorrectly display per-month ETFs as flat fees. *Light* properly calculates ETFs and alerts users when verification is needed:
+Many comparison tools incorrectly display per-month ETFs as flat fees. *Light* uses EFL-derived `etf_details` when available, otherwise applies conservative text parsing and marks ambiguous cases as unknown:
 
 ```javascript
 detectETFStructure(plan):
+  // EFL overrides
+  if plan.etf_details:
+    return plan.etf_details.structure
+
   // Detection with multiple regex patterns
   if special_terms matches "per month remaining|multiplied by|for each month":
     return "per-month-remaining"
+
+  // Small fee on long term without explicit language → unknown
   if fee ≤ $50 AND term ≥ 12 months:
-    return "per-month-remaining"
-  else:
-    return "flat"
+    return "unknown"
+
+  return "flat"
 
 calculateETF(plan, monthsRemaining):
   if structure == "per-month-remaining":
     return baseFee × monthsRemaining
-  else:
-    return baseFee
+  if structure == "unknown":
+    return 0
+  return baseFee
 ```
 
-**User Verification Feature:** When ETF structure is automatically detected (not explicitly stated), *Light* displays an info icon that opens a verification modal reminding users to check the official Electricity Facts Label (EFL), Terms of Service (TOS), and "Your Rights as a Customer" documents for exact cancellation terms.
+**User Verification Feature:** When ETF structure is unknown or automatically detected, *Light* displays an info icon that opens a verification modal reminding users to check the official Electricity Facts Label (EFL), Terms of Service (TOS), and "Your Rights as a Customer" documents for exact cancellation terms.
 
 ### 3. Quality Scoring System
 
@@ -787,7 +795,6 @@ For questions, issues, or suggestions:
 
 ![Data Updates](https://img.shields.io/badge/data-daily%20updates-brightgreen)
 ![Power to Choose](https://img.shields.io/badge/data%20source-Power%20to%20Choose-blue)
-[![Deploy]****(https://github.com/luisfork/light/actions/workflows/deploy.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/deploy.yml)
 [![Update Plans](https://github.com/luisfork/light/actions/workflows/update-plans.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/update-plans.yml)
 [![Lint](https://github.com/luisfork/light/actions/workflows/lint.yml/badge.svg)](https://github.com/luisfork/light/actions/workflows/lint.yml)
 

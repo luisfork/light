@@ -165,6 +165,12 @@ Processed and normalized plan data used by the calculator.
       "is_prepaid": "boolean",
       "is_tou": "boolean",
       "early_termination_fee": "float",
+      "etf_details": {
+        "structure": "flat|per-month|none|unknown",
+        "flat_fee": "float (optional)",
+        "per_month_rate": "float (optional)",
+        "source": "string (optional)"
+      },
       "base_charge_monthly": "float",
       "efl_url": "string",
       "enrollment_url": "string",
@@ -191,6 +197,7 @@ Processed and normalized plan data used by the calculator.
 4. **Boolean Conversion**: `PrepaidYN` → `is_prepaid`, `TimeOfUseYN` → `is_tou`
 
 5. **Base Charge Extraction**: Parsed from `Fees` field, default 0 if not specified
+6. **EFL ETF Enrichment (Optional)**: When ETF values are missing/zero, the fetch job may parse the EFL and store `etf_details` for authoritative structure
 
 **Field Specifications:**
 
@@ -209,6 +216,7 @@ Processed and normalized plan data used by the calculator.
 | `is_prepaid` | Yes | false | Boolean |
 | `is_tou` | Yes | false | Boolean |
 | `early_termination_fee` | Yes | 0 | 0-500 (dollars) |
+| `etf_details` | No | null | EFL-derived structure/rates (optional) |
 | `base_charge_monthly` | Yes | 0 | 0-30 (dollars) |
 | `efl_url` | No | "" | Valid URL or empty |
 | `enrollment_url` | No | "" | Valid URL or empty |

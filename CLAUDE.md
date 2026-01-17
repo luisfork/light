@@ -14,10 +14,10 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ```bash
 # Install Python dependencies (using uv - preferred)
-uv pip install --system requests beautifulsoup4 lxml
+uv pip install --system requests beautifulsoup4 lxml pdfplumber
 
 # Or using pip
-pip install requests beautifulsoup4 lxml
+pip install requests beautifulsoup4 lxml pdfplumber
 
 # Populate test data from cached CSV (for offline development)
 TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py
@@ -81,6 +81,16 @@ uv run python scripts/fetch_tdu_rates.py
 # Archive current plans to CSV
 python scripts/archive_to_csv.py
 ```
+
+**EFL ETF enrichment controls (optional):**
+
+- `EFL_ETF_LOOKUP=1` enable EFL parsing (default on)
+- `EFL_ETF_MAX_FETCHES=250` cap EFL fetches per run
+- `EFL_ETF_TIMEOUT=20` seconds per EFL request
+- `EFL_ETF_AUTO_ALLOWLIST=1` seed allowlist from existing `data/plans.json`
+- `EFL_ETF_ALLOWED_DOMAINS=...` comma-separated allowlist overrides
+
+EFL parsing requires `pdfplumber` and only stores a small `etf_details` object (no PDFs saved).
 
 ## Architecture
 
@@ -193,16 +203,19 @@ Texas-specific patterns based on real consumption data:
 
 ### ETF (Early Termination Fee) Calculation
 
-Many plans charge per-month-remaining, NOT flat fees:
+Many plans charge per-month-remaining, NOT flat fees. The calculator prioritizes EFL-derived `etf_details` when available and treats ambiguous cases as unknown:
 
 ```javascript
 // Detection logic:
-if (fee ≤ $50 AND term ≥ 12 months) → per-month-remaining
+if (plan.etf_details) → use etf_details.structure
 if (special_terms includes "per month remaining") → per-month-remaining
+if (fee ≤ $50 AND term ≥ 12 months WITHOUT explicit language) → unknown
 
 // Calculation:
 if (per-month-remaining):
   totalETF = baseFee × monthsRemaining
+else if (unknown):
+  totalETF = 0  // UI shows “See EFL”
 else:
   totalETF = baseFee
 ```

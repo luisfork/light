@@ -844,13 +844,25 @@ function identifyWarnings(plan, userUsage, contractStartDate = null) {
 
 ```javascript
 function calculateEarlyTerminationFee(plan, monthsRemaining) {
+    // EFL-derived details override heuristics
+    if (plan.etf_details) {
+        if (plan.etf_details.structure === 'none') return 0;
+        if (plan.etf_details.structure === 'unknown') return 0; // UI shows "See EFL"
+        if (plan.etf_details.structure === 'per-month') {
+            return plan.etf_details.per_month_rate * monthsRemaining;
+        }
+        if (plan.etf_details.structure === 'flat') {
+            return plan.etf_details.flat_fee;
+        }
+    }
+
     if (!plan.early_termination_fee) return 0;
 
     const etfValue = plan.early_termination_fee;
 
-    // Heuristic 1: Small ETF on long contract = per-month structure
+    // Heuristic 1: Small ETF on long contract without explicit language = unknown
     if (etfValue <= 50 && plan.term_months >= 12) {
-        return etfValue * monthsRemaining;
+        return 0;
     }
 
     // Heuristic 2: Check special_terms for explicit mention
@@ -867,6 +879,8 @@ function calculateEarlyTerminationFee(plan, monthsRemaining) {
     return etfValue;
 }
 ```
+
+When the ETF is unknown, the UI shows “See EFL” instead of implying a $0 fee.
 
 ### Examples
 
