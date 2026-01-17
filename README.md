@@ -29,7 +29,7 @@ Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 <!-- The following is correctly formatted Markdown. Ignore warnings. -->
 
-Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage[^3]. This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms[^4].
+Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage.[^3] This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms.[^4]
 
 <!-- The following is correctly formatted Markdown. Ignore warnings. -->
 

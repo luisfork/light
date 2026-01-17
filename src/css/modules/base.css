@@ -1,0 +1,222 @@
+/**
+ * Texas Electricity Calculator
+ * Professional, functionally deep interface design
+ * No bento grids, no card borders, diffused ambient light
+ *
+ * Design Philosophy (Developer Notes)
+ * - Unitary surface: avoid card/bento layouts; use section dividers and spacing hierarchy.
+ * - ZERO decorative elements: no icons/emojis/illustrations; every pixel conveys data.
+ * - No badges/pills/marketing chrome; prefer text-first hierarchy and subtle separators.
+ * - Apple-inspired typography: New York for headings, SF Pro for body, SF Mono for numbers.
+ * - Spring-only motion: use the --transition-* variables; avoid ease/linear timing.
+ * - Ambient light depth: prefer soft glows and gradients over heavy shadows.
+ * - Mobile-first, data-dense layouts; preserve readability and scanning.
+ *
+ * Typography: San Francisco and New York font families
+ * © Apple Inc. All rights reserved.
+ */
+
+/* Import font declarations */
+@import url("../fonts.css");
+
+/* CSS Variables & Design Tokens */
+
+:root {
+  /* Color System - Apple Developer Color Specifications (Light Mode) */
+  --color-ink: #1a1a1a;
+  --color-ink-secondary: #666666;
+  /* Gray - Enhanced contrast (WCAG AA compliant: 5.74:1) */
+  --color-ink-tertiary: #757575;
+  /* Gray - Enhanced contrast (WCAG AA compliant: 4.54:1) */
+  --color-ink-muted: #757575;
+  /* Gray - Enhanced contrast (WCAG AA compliant: 4.54:1) */
+
+  --color-surface: #ffffff;
+  --color-surface-raised: #f2f2f7;
+  /* Gray (6) */
+  --color-surface-sunken: #e5e5ea;
+  /* Gray (5) */
+  --color-surface-overlay: rgba(255, 255, 255, 0.95);
+
+  --color-border-subtle: rgba(0, 0, 0, 0.06);
+  --color-border-medium: rgba(0, 0, 0, 0.12);
+
+  /* Accent colors - Apple System Colors (Light Mode) */
+  --color-accent: #0088ff;
+  /* Blue: rgb(0, 136, 255) */
+  --color-accent-hover: #0077e6;
+  --color-accent-muted: rgba(0, 136, 255, 0.08);
+
+  --color-positive: #34c759;
+  /* Green: rgb(52, 199, 89) */
+  --color-positive-muted: rgba(52, 199, 89, 0.08);
+
+  --color-positive-ink: #1f7a3a;
+  --color-caution-ink: #b45309;
+  --color-negative-ink: #b42318;
+
+  --color-caution: #ff8d28;
+  /* Orange: rgb(255, 141, 40) */
+  --color-caution-muted: rgba(255, 141, 40, 0.08);
+
+  --color-negative: #ff383c;
+  /* Red: rgb(255, 56, 60) */
+  --color-negative-muted: rgba(255, 56, 60, 0.08);
+
+  /* Usage Profile Chart Colors (Blue → Green → Yellow → Orange → Red) */
+  --usage-high-start: #ff383c;
+  --usage-high-end: #d81f28;
+  --usage-medium-high-start: #ff8d28;
+  --usage-medium-high-end: #d56e1a;
+  --usage-medium-start: #ffcc00;
+  --usage-medium-end: #d9a900;
+  --usage-low-start: #34c759;
+  --usage-low-end: #248a3d;
+  --usage-very-low-start: #0088ff;
+  --usage-very-low-end: #0066cc;
+  --usage-chart-bg-start: rgba(0, 0, 0, 0.02);
+  --usage-chart-bg-end: rgba(0, 0, 0, 0);
+  --usage-chart-grid: rgba(0, 0, 0, 0.05);
+  --usage-bar-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --usage-bar-shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.12);
+
+  /* Typography - SF Pro, SF Mono, SF Compact, New York (Apple-exclusive fonts) */
+  --font-system: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display:
+    "SF Pro Display", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "SF Mono", -apple-system, BlinkMacSystemFont, system-ui, monospace;
+  --font-compact: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-compact-display:
+    "SF Compact Display", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-serif: "New York Small", "New York", -apple-system, BlinkMacSystemFont, system-ui, serif;
+  --font-serif-large:
+    "New York", "New York Large", -apple-system, BlinkMacSystemFont, system-ui, serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Layout */
+  --max-width-content: 960px;
+  --max-width-wide: 1200px;
+
+  /* Transitions - Spring Physics (cubic-bezier) */
+  --transition-fast: 0.15s cubic-bezier(0.21, 1.02, 0.73, 1);
+  --transition-base: 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-slow: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Ambient light effects (layered gradients instead of box-shadow) */
+  --glow-subtle:
+    0 0 0 1px var(--color-border-subtle), 0 1px 3px rgba(0, 0, 0, 0.02),
+    0 4px 12px rgba(0, 0, 0, 0.03);
+  --glow-medium:
+    0 0 0 1px var(--color-border-subtle), 0 2px 6px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(0, 0, 0, 0.05);
+  --glow-strong:
+    0 0 0 1px var(--color-border-subtle), 0 4px 12px rgba(0, 0, 0, 0.04),
+    0 16px 48px rgba(0, 0, 0, 0.06);
+  --glow-accent:
+    0 0 0 1px rgba(0, 136, 255, 0.15), 0 4px 16px rgba(0, 136, 255, 0.08),
+    0 12px 32px rgba(0, 136, 255, 0.04);
+
+  /* Shadow system for depth hierarchy */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+/* Reset & Base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-system);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--color-ink);
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-sunken) 100%);
+  min-height: 100vh;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Typography */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--color-ink-secondary);
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+/* ... existing code ... */
+
+.copyright {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  margin-top: var(--space-2);
+  opacity: 0.8;
+}

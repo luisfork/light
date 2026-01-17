@@ -1167,6 +1167,7 @@ const UI = {
 
     // Calculate best values for highlighting
     const bestValues = this.calculateBestValues(displayPlans);
+    const annualCostThreshold = this.getCostPercentileThreshold(displayPlans, 0.1);
 
     this.elements.comparisonBody.innerHTML = displayPlans
       .map((plan, _i) => {
@@ -1199,6 +1200,18 @@ const UI = {
           typeof ContractAnalyzer !== 'undefined' && ContractAnalyzer.calculateContractExpiration
             ? ContractAnalyzer.calculateContractExpiration(new Date(), termMonths)
             : { riskLevel: 'low', renewalSeason: 'Optimal' };
+
+        const planScore = plan.combinedScore ?? plan.qualityScore ?? 0;
+        const isTopCheapest =
+          Number.isFinite(annualCostThreshold) &&
+          Number.isFinite(plan.annualCost) &&
+          plan.annualCost <= annualCostThreshold;
+        const annualHighlightClass = planScore >= 80 && isTopCheapest ? 'text-positive' : '';
+        const contractRiskClass = expirationAnalysis.riskLevel === 'high' ? 'text-negative' : '';
+        const renewablePct = plan.renewable_pct ?? 0;
+        const renewableClass =
+          renewablePct >= 80 ? 'text-positive' : renewablePct <= 33.3 ? 'text-negative' : '';
+        const annualRateSubtext = this.formatRateSafe(plan.effectiveRate);
 
         // Check if this plan has best values
         const isBestCost = plan.annualCost === bestValues.lowestCost;
@@ -1251,18 +1264,19 @@ const UI = {
                 <td><span class="term-badge">${plan.term_months} months</span></td>
                 <td class="col-contract-end" data-sort-value="${contractEndDate.getTime()}">
                     <div class="contract-end-wrapper" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-                        <span class="contract-end-date">${endDateFormatted}</span>
+                    <span class="contract-end-date ${contractRiskClass}">${endDateFormatted}</span>
                     </div>
                 </td>
                 <td class="col-annual">
-                    <span class="cost-value ${isBestCost ? 'best-value' : ''}">${formatCurrency(plan.annualCost)}</span>
-                    ${isBestCost ? '<span class="best-indicator">Lowest</span>' : ''}
-                    ${termMonths !== 12 ? `<span class="term-cost-label">${formatCurrency(contractTotalCost)} (${termMonths} months)</span>` : ''}
+                  <span class="cost-value ${annualHighlightClass}">${this.formatCurrencySafe(plan.annualCost)}</span>
+                  ${isBestCost ? '<span class="best-indicator">Lowest</span>' : ''}
+                  ${termMonths !== 12 ? `<span class="term-cost-label">${this.formatCurrencySafe(contractTotalCost)} (${termMonths} months)</span>` : ''}
+                  <span class="cost-subtext">${annualRateSubtext}</span>
                 </td>
-                <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
-                <td class="col-rate"><span class="rate-value ${isBestRate ? 'best-value' : ''}">${formatRate(plan.effectiveRate)}</span></td>
+                <td class="col-monthly">${this.formatCurrencySafe(plan.averageMonthlyCost)}</td>
+                <td class="col-rate"><span class="rate-value ${isBestRate ? 'best-value' : ''}">${this.formatRateSafe(plan.effectiveRate)}</span></td>
                 <td class="col-renewable">
-                    ${(plan.renewable_pct || 0) >= 100 ? '<span class="renewable-100">100%</span>' : `${plan.renewable_pct || 0}%`}
+                  <span class="renewable-value ${renewableClass}">${renewablePct}%</span>
                 </td>
                 <td class="col-etf ${isLowestFee ? 'best-value' : ''}">${this.formatETF(plan)}</td>
                 <td><button class="btn-view" onclick="event.stopPropagation(); UI.showPlanModal('${plan.plan_id}')">View</button></td>
@@ -1273,6 +1287,36 @@ const UI = {
 
     // Add click handlers for sortable column headers
     this.attachTableSortHandlers();
+  },
+
+  /**
+   * Calculate the annual cost threshold for the cheapest percentile of plans
+   * @param {Object[]} plans
+   * @param {number} percentile - Decimal percentile (e.g., 0.1 for cheapest 10%)
+   * @returns {number|null}
+   */
+  getCostPercentileThreshold(plans, percentile) {
+    if (!plans || plans.length === 0) return null;
+    const costs = plans
+      .map((plan) => plan.annualCost)
+      .filter((value) => Number.isFinite(value))
+      .sort((a, b) => a - b);
+
+    if (!costs.length) return null;
+    const count = Math.max(1, Math.ceil(costs.length * percentile));
+    return costs[count - 1];
+  },
+
+  formatCurrencySafe(amount) {
+    const value = Number(amount);
+    if (!Number.isFinite(value)) return '—';
+    return typeof formatCurrency === 'function' ? formatCurrency(value) : `$${value.toFixed(2)}`;
+  },
+
+  formatRateSafe(rate) {
+    const value = Number(rate);
+    if (!Number.isFinite(value)) return '—';
+    return typeof formatRate === 'function' ? formatRate(value) : `${value.toFixed(2)}¢/kWh`;
   },
 
   /**

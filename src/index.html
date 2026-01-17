@@ -9,7 +9,7 @@
           content="Texas, Texas power, Texas electricity, electricity plans, power to choose, electricity rates, Texas energy, energy plans, energy plan, power plans, power plan, ERCOT">
     <meta name="author" content="Light Project">
     <title>Light — Texas Electricity Cost Calculator</title>
-    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/bundle.css">
   </head>
   <body>
     <div class="page-wrapper">
@@ -336,7 +336,13 @@
           <!-- Results Section -->
           <section class="results-section" id="results-section" hidden>
             <div class="results-header">
-              <h2 class="results-title">Plan Analysis Results</h2>
+              <div class="step-header step-header-results">
+                <span class="step-indicator">3</span>
+                <div class="step-title-group">
+                  <h2 class="step-title">Plan Results</h2>
+                  <p class="step-subtitle">Your usage profile matched with live market pricing</p>
+                </div>
+              </div>
               <p class="results-subtitle">
                 <span id="results-count">--</span> fixed-rate plans analyzed for your usage pattern
               </p>
@@ -364,28 +370,19 @@
             <div class="recommendations" id="recommendations">
               <div class="section-header-enhanced">
                 <h3 class="section-heading">Lowest Cost Plans</h3>
-                <div class="section-info-box">
-                  <div class="info-box-header">
-                    <span class="info-box-title">How Plans Are Ranked</span>
-                  </div>
-                  <div class="info-box-content">
-                    <p>
-                      Plans are ranked using a <strong>combined score</strong> that weighs two factors:
-                    </p>
-                    <ul class="info-box-list">
-                      <li>
-                        <strong>85% Cost Efficiency</strong> - Lower annual cost relative to other plans scores higher
-                      </li>
-                      <li>
-                        <strong>15% Quality Factors</strong> - Rate stability, fee structure, renewable energy, and
-                        contract flexibility
-                      </li>
-                    </ul>
-                    <p class="info-box-note">
-                      Quality grades (A-F) reflect plan reliability and risk. Variable/indexed rate plans automatically
-                      receive an F grade due to price unpredictability.
-                    </p>
-                  </div>
+                <div class="ranking-notes">
+                  <p class="ranking-title">How plans are ranked</p>
+                  <p>
+                    Each plan receives a combined score that balances cost performance with stability and transparency.
+                  </p>
+                  <ul class="ranking-list">
+                    <li><strong>85% Cost efficiency</strong> — lower annual cost ranks higher.</li>
+                    <li><strong>15% Quality factors</strong> — rate stability, fee structure, renewable share, and contract flexibility.</li>
+                  </ul>
+                  <p class="ranking-note">
+                    Quality grades (A–F) summarize reliability and risk. Variable and indexed-rate plans are graded F due
+                    to price volatility.
+                  </p>
                 </div>
               </div>
               <div class="plan-list" id="top-plans"></div>
@@ -458,7 +455,7 @@
                 </div>
               </div>
               <div class="table-info-bar">
-                <span class="table-tip">Tip: Click column headers to sort. Green values indicate best-in-class.</span>
+                <span class="table-tip">Click column headers to sort. Highlighted values indicate standout performance for your profile.</span>
               </div>
               <div class="table-wrapper">
                 <table class="comparison-table" id="comparison-table">
@@ -517,39 +514,37 @@
       <section class="methodology-section" id="methodology">
         <div class="methodology-inner">
           <h2 class="methodology-title">Calculation Methodology</h2>
+          <p class="methodology-intro">
+            We model costs the same way your bill is calculated—month by month—so the results reflect real-world usage,
+            not marketing averages.
+          </p>
           <div class="methodology-content">
             <div class="method-item">
               <h3 class="method-heading">Seasonal Usage Modeling</h3>
               <p class="method-text">
-                Texas electricity consumption varies dramatically by season. Summer months (June-September) typically see
-                40-80% higher usage due to air conditioning. We apply empirically-derived seasonal multipliers to your
-                average usage to create a realistic 12-month profile that accurately reflects when you'll use more or less
-                electricity.
+                Texas demand swings sharply across the year. We apply evidence-based seasonal multipliers to build a
+                realistic 12‑month usage profile from your inputs, capturing summer peaks and winter baseload.
               </p>
             </div>
             <div class="method-item">
               <h3 class="method-heading">Complete Cost Accounting</h3>
               <p class="method-text">
-                The advertised rate on Power to Choose shows cost at exactly 1,000 kWh. This obscures the true cost for
-                most users. We calculate monthly bills at your actual usage level, incorporating the energy rate, TDU
-                delivery charges, base fees, and applicable taxes to determine your real annual cost for each plan.
+                Advertised rates are often shown at a single usage point. We calculate each month using your actual
+                usage, including energy charges, TDU delivery fees, base charges, credits, and applicable taxes.
               </p>
             </div>
             <div class="method-item">
-              <h3 class="method-heading">Bill Credit Analysis</h3>
+              <h3 class="method-heading">Bill Credit Eligibility</h3>
               <p class="method-text">
-                Many plans advertise low rates that depend on bill credits triggered only when usage falls within a narrow
-                range (often 1,000-2,000 kWh). We analyze your usage pattern month-by-month to determine how many months
-                you would actually qualify for these credits, calculating the real annual cost rather than the optimistic
-                scenario.
+                Bill credits only apply within narrow usage bands. We evaluate eligibility month by month and incorporate
+                credits only when your usage qualifies.
               </p>
             </div>
             <div class="method-item">
               <h3 class="method-heading">Data Transparency</h3>
               <p class="method-text">
-                All plan data is sourced directly from the PUCT Power to Choose database and updated daily. TDU delivery
-                rates are updated when utilities file new tariffs. This project is open source and accepts no commissions
-                or payments from any electricity provider.
+                Plans are sourced directly from the PUCT Power to Choose dataset and refreshed daily. TDU delivery rates
+                are updated when tariffs change. This project is open source and accepts no commissions or payments.
               </p>
             </div>
           </div>
