@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
 
 const projectRoot = path.resolve(__dirname, '..');
 const cssDir = path.join(projectRoot, 'src', 'css');
@@ -8,10 +8,10 @@ const modulesDir = path.join(cssDir, 'modules');
 const hasModules = fs.existsSync(modulesDir);
 const moduleFiles = hasModules
   ? fs
-      .readdirSync(modulesDir)
-      .filter((file) => file.endsWith('.css'))
-      .sort()
-      .map((file) => path.join(modulesDir, file))
+    .readdirSync(modulesDir)
+    .filter((file) => file.endsWith('.css'))
+    .sort()
+    .map((file) => path.join(modulesDir, file))
   : [];
 
 const sources =

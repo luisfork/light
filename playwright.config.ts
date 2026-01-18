@@ -1,8 +1,8 @@
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
 process.env.PLAYWRIGHT_RUNNING = '1';
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './tests/ui',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
