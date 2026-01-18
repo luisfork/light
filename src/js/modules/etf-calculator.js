@@ -355,7 +355,7 @@ const ETFCalculator = {
         displayText = 'See EFL';
         needsConfirmation = true;
       } else {
-        displayText = 'None';
+        displayText = 'No fee';
       }
     } else if (result.structure === 'unknown') {
       displayText = 'See EFL';

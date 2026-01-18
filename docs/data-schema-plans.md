@@ -404,6 +404,9 @@ assert(renewable_pct >= 0 && renewable_pct <= 100);
 - 50-99%: Majority renewable
 - 100%: Fully renewable (wind/solar credits)
 
+**UI Warning Badge:**
+Plans with `renewable_pct < 33.33` display a "⚠︎ LOW RENEWABLE" warning badge. The 33.33% threshold (1/3) represents the approximate baseline renewable content of the Texas grid.
+
 **User Filter:**
 Allows filtering to plans with ≥50% or 100% renewable content.
 
@@ -624,9 +627,13 @@ if (terms_url !== '') {
 - Minimum usage requirements: "Minimum 500 kWh per month or $25 fee"
 - Auto-renewal terms: "Automatically renews at variable rate"
 - Promotional conditions: "Rate valid for first 12 months only"
+- **New customer restrictions**: "This offer is for new customers only"
 
 **Parsing:**
-Used by `calculateBillCredits()` and warning detection functions.
+Used by `calculateBillCredits()`, warning detection, and new-customer-only badge detection.
+
+**New Customer Detection:**
+The UI scans `special_terms`, `promotion_details`, `fees_credits`, `min_usage_fees`, and `plan_name` for explicit "new customers only" phrases (English and Spanish) to display the NEW CUSTOMERS ONLY warning badge.
 
 ### promotion_details
 
@@ -670,6 +677,9 @@ Promotions often have eligibility requirements and redemption complexities. Not 
 - "$25 fee if usage below 500 kWh"
 - "Minimum 1000 kWh usage required"
 - "No minimum usage requirement"
+
+**UI Warning Badge:**
+Plans with `min_usage_fees === "TRUE"` display a "⚠︎ MIN USAGE FEE" warning badge. This alerts users to potential penalties for low electricity consumption.
 
 **Impact:**
 Penalizes low-usage customers. Important for apartments and seasonal properties.

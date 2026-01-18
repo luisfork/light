@@ -19,6 +19,48 @@
 
 const PlanRanker = {
   /**
+   * Detect plans that are explicitly marked as for new customers only.
+   *
+   * IMPORTANT: Uses conservative phrase matching to avoid false-positives.
+   * This may produce false-negatives if the REP uses uncommon wording.
+   *
+   * @param {Object} plan - Plan object
+   * @returns {boolean} True when explicit "new customers only" language is found
+   */
+  isNewCustomerOnly(plan) {
+    const text = [
+      plan.special_terms,
+      plan.promotion_details,
+      plan.fees_credits,
+      plan.min_usage_fees,
+      plan.plan_name
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    if (!text) {
+      return false;
+    }
+
+    const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    const patterns = [
+      /\bnew customers? only\b/,
+      /\bfor new customers? only\b/,
+      /\bis for new customers? only\b/,
+      /\bthis .{0,20}is for new customers? only\b/,
+      /\bsolo para nuevos clientes\b/,
+      /\bsolo nuevos clientes\b/,
+      /\bsolo para clientes nuevos\b/,
+      /\bsolo clientes nuevos\b/,
+      /\bes solo para nuevos clientes\b/,
+      /\bes para nuevos clientes solamente\b/
+    ];
+
+    return patterns.some((pattern) => pattern.test(normalized));
+  },
+  /**
    * Scoring weight configuration
    */
   SCORING_WEIGHTS: {
@@ -67,6 +109,7 @@ const PlanRanker = {
 
     // Calculate metrics for all plans first
     const rankedPlans = plans.map((plan) => {
+      const isNewCustomerOnly = this.isNewCustomerOnly(plan);
       const annualResult = calculator.calculateAnnualCost(userUsage, plan, tduRates, localTaxRate);
       const volatility = this.calculateVolatility(plan, userUsage);
       const warnings = this.identifyWarnings(plan, userUsage, contractStartDate);
@@ -86,7 +129,8 @@ const PlanRanker = {
         volatility: volatility,
         warnings: warnings,
         isGimmick: warnings.length > 0 || volatility > 0.3,
-        isNonFixed: plan.rate_type !== 'FIXED'
+        isNonFixed: plan.rate_type !== 'FIXED',
+        is_new_customer_only: isNewCustomerOnly
       };
     });
 

@@ -16,17 +16,20 @@ User identified that the enhanced fingerprinting system had a **language-depende
 ### Real-World Impact
 
 **Analysis of 986 plans:**
+
 - 815 plans have special_terms
 - **8 English/Spanish pairs** with mismatched extraction found
 - **16 plans affected** (would NOT be detected as duplicates)
 
 **Breakdown by Provider:**
+
 - CleanSky Energy: 2 pairs
 - Discount Power: 2 pairs
 - CIRRO ENERGY: 1 pair
 - DIRECT ENERGY: 3 pairs
 
 **All affected by:** "NEW_ONLY" indicator
+
 - English: "This offer is for new customers only" → `"NEW_ONLY"`
 - Spanish: "Sólo para nuevos clientes" → `""` (empty)
 - **Result**: Different fingerprints, NOT detected as duplicates
@@ -69,7 +72,7 @@ if (
 
 ### Unit Test
 
-```
+```bash
 Plan 5: Saver 24 (English)
   Special Terms: This offer is for new customers only
   Extraction: "NEW_ONLY"
@@ -84,6 +87,7 @@ Plan 6: Ahorrador 24 (Spanish)
 ### Real-World Validation
 
 Re-running the analysis script on actual data confirms:
+
 - All 8 pairs now extract matching indicators
 - English: "NEW_ONLY" → Spanish: "NEW_ONLY"
 - Fingerprints now match correctly
@@ -161,6 +165,7 @@ Re-running the analysis script on actual data confirms:
 ### 3. Normalized Indicators
 
 All special features map to consistent English indicators:
+
 - Simplifies fingerprint comparison
 - Enables future feature additions
 - Language-independent storage
@@ -168,6 +173,7 @@ All special features map to consistent English indicators:
 ### 4. Comprehensive Keyword Lists
 
 Covers multiple Spanish variants:
+
 - Formal: "nuevos clientes"
 - Informal: "solo nuevos"
 - With/without accents: "sólo" / "solo"
@@ -191,6 +197,7 @@ if (
 ### Additional Languages
 
 If Power to Choose adds more languages:
+
 - Add keywords to existing conditionals
 - Maintain same indicator names
 - No changes to fingerprint structure

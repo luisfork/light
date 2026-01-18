@@ -44,7 +44,7 @@ These prices include TDU delivery charges—they represent your total expected c
 - **Early termination fee**: Flat amount or per-month-remaining formula
 - **Renewable content**: Percentage from renewable sources (Texas average ~33%)
 
-Calculate your expected bill: multiply energy charge by your kWh, add base charge, add TDU charges (both fixed and per-kWh components), then subtract any bill credits you’ll actually qualify for.
+Calculate your expected bill: multiply the EFL's all-inclusive rate (which already includes TDU charges) by your kWh, add the REP base charge, then subtract any bill credits you'll actually qualify for. Note: The three price tiers shown on EFLs (500/1000/2000 kWh) are total average prices including TDU delivery—you don't add TDU charges separately.
 
 ---
 

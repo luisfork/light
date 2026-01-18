@@ -68,7 +68,7 @@ Identifies key differentiators from `special_terms` field:
 
 ### Test Case: 4 Plans with Same Rates
 
-```
+```bash
 Plan 1: Simple Rate 12 (English)
   - Fees: $50 credit at 1000 kWh
   - Special: None
@@ -94,13 +94,13 @@ Plan 4: Free Weekends 12 (English)  [UNIQUE]
 
 **Before:**
 
-```
+```bash
 486 Plans Analyzed
 ```
 
 **After:**
 
-```
+```bash
 486                           ← Large, prominent
 (986 total, 500 duplicates removed)  ← Smaller subtitle
 [Clickable for details]

@@ -43,7 +43,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 *Light* calculates true costs by:
 
-- **Including ALL fees**: Energy charges, TDU delivery, base fees, and taxes
+- **Using all-inclusive rates**: Plan rates already include TDU delivery charges per Texas EFL requirements, plus REP base fees and local taxes
 - **Accounting for seasonal usage**: Texas summers use 40-80% more electricity than shoulder months
 - **Revealing bill credit traps**: Shows how many months you'll miss those credits
 - **Ranking by annual cost**: Not misleading "advertised rates"
@@ -72,7 +72,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 - **Improved Accessibility**: Enhanced text contrast for WCAG 2.1 AA compliance (5.74:1 and 4.54:1 ratios)
 - **Better Visualization**: Redesigned usage chart with 75% taller bars, month labels, and heat-map color coding (red=high, orange=medium-high, yellow=medium, blue=low)
-- **Polished Components**: Upgraded grade badges with gradients, enhanced dropdown styling, and improved TIME OF USE warning badges
+- **Polished Components**: Upgraded grade badges with gradients, enhanced dropdown styling, and improved warning badges (TIME OF USE, NEW CUSTOMERS ONLY, LOW RENEWABLE, MIN USAGE FEE)
 - **Cleaner Layout**: Moved ZIP validation indicator horizontal, removed redundant "Plans Requiring Caution" section
 - **Fixed Precision**: Annual usage now displays exactly 12,000 kWh (was 11,999 kWh due to rounding)
 
@@ -94,9 +94,12 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
   - Quick estimate by home size
   - Average monthly usage
   - Detailed 12-month pattern for maximum accuracy
-- **Accurate Cost Calculation**: Includes energy, TDU delivery, base charges, and ZIP-based local taxes
+- **Accurate Cost Calculation**: Uses all-inclusive plan rates (which include TDU delivery per EFL requirements), REP base charges, and ZIP-based local taxes
 - **Contract Expiration Analysis**: Identifies when contracts expire during expensive renewal periods and suggests optimal contract lengths
 - **Gimmick Detection**: Identifies and warns about bill credit traps and time-of-use plans
+- **Low Renewable Detection**: Flags plans with less than 33% renewable energy content
+- **Minimum Usage Fee Detection**: Warns about plans that charge penalties for low usage
+- **New Customer Only Detection**: Conservative phrase matching flags plans restricted to new customers
 - **Provider Name Formatting**: All provider names displayed in clean, professional uppercase format
 - **Early Termination Fee (ETF) Calculation**: Prefers EFL-derived `etf_details`, supports per-month-remaining fees, and flags unknowns as “See EFL”
 - **Duplicate Plan Detection**: Simple numeric fingerprinting automatically removes duplicate English/Spanish versions (11 objective fields, no text parsing)
@@ -125,11 +128,17 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 ```javascript
 // For each month of the year:
 1. Interpolate energy rate based on your usage (500/1000/2000 kWh tiers)
-2. Add TDU delivery charges (base + per-kWh)
-3. Add REP base charge
-4. Subtract bill credits (only if you qualify that month)
-5. Add local sales tax
-6. Sum all 12 months for annual cost
+   Note: Plan rates already include TDU delivery charges per EFL requirements
+2. Add REP base charge
+3. Subtract bill credits (only if you qualify that month)
+4. Add local sales tax
+5. Sum all 12 months for annual cost
+
+// TDU charges are used for:
+- ZIP code validation and service area detection
+- Geographic filtering (only show plans for your TDU)
+- User education (display your TDU rates before calculation)
+- Breakdown transparency (tracked separately but not added to totals)
 
 // Then calculate combined score (Multiplicative Value Model):
 - Cost score: 100 for lowest cost, scaled down for higher costs
@@ -263,6 +272,16 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 | Lubbock Power & Light | $0.00 | 6.31¢ | Sep 1, 2025 |
 
 **Implementation:** TDU rates stored in `data/tdu-rates.json` and updated manually when PUCT approves rate changes.
+
+**How TDU Charges Are Used:**
+
+TDU delivery charges serve three purposes in the Light calculator:
+
+1. **Geographic Filtering**: ZIP code validation identifies your TDU area, then filters plans to show only those available in your service territory
+2. **User Education**: Before calculating costs, the interface displays your TDU's name, monthly base charge, and per-kWh delivery rate for transparency
+3. **Reference Tracking**: TDU costs are calculated and stored in the breakdown object for potential display, but are **not added to totals** because Texas EFL requirements mandate that all advertised plan rates already include TDU charges
+
+This approach avoids double-counting while maintaining full transparency about delivery costs.
 
 ### Local Tax Rates
 
@@ -636,7 +655,7 @@ The quality score (0-100) is calculated from multiple factors:
 - Tooltips on column headers explaining each metric
 
 > [!NOTE]
-> **Warning Badges:** Plans with non-fixed rates, prepaid requirements, or time-of-use restrictions display warning badges (VARIABLE, PREPAID, TIME OF USE) and automatically receive an F grade.
+> **Warning Badges:** Plans with non-fixed rates, prepaid requirements, time-of-use restrictions, or new-customer-only eligibility display warning badges (VARIABLE, PREPAID, TIME OF USE, NEW CUSTOMERS ONLY) and may receive quality penalties. Non-fixed, prepaid, and TOU plans automatically receive an F grade. New-customer-only detection is text-based and conservative, so false negatives are possible but false positives are avoided.
 
 ### 4. Simplified Duplicate Plan Detection
 

@@ -644,6 +644,15 @@ const UI = {
       const rankedPlans = rankingFunction(tduPlans, monthlyUsage, this.state.tdu, {
         localTaxRate: this.state.localTaxRate || 0
       });
+
+      // Pre-calculate contract end timestamps for consistent sorting
+      const now = new Date();
+      for (const plan of rankedPlans) {
+        const endDate = new Date(now);
+        endDate.setMonth(endDate.getMonth() + (plan.term_months || 0));
+        plan.contractEndTimestamp = endDate.getTime();
+      }
+
       this.state.rankedPlans = rankedPlans;
 
       this.displayResults(rankedPlans, monthlyUsage);
@@ -1172,8 +1181,7 @@ const UI = {
         const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
         // Calculate contract end date (assuming enrollment today)
-        const contractEndDate = new Date();
-        contractEndDate.setMonth(contractEndDate.getMonth() + termMonths);
+        const contractEndDate = new Date(plan.contractEndTimestamp || Date.now());
         const endDateFormatted = contractEndDate.toLocaleDateString('en-US', {
           month: 'short',
           year: 'numeric'
@@ -1197,16 +1205,14 @@ const UI = {
         const renewablePct = plan.renewable_pct ?? 0;
         const renewableClass =
           renewablePct >= 80 ? 'text-positive' : renewablePct <= 33.3 ? 'text-negative' : '';
-        const annualSubtext =
-          termMonths !== 12
-            ? `${this.formatCurrencySafe(contractTotalCost)} (${termMonths} months)`
-            : `${this.formatCurrencySafe(plan.averageMonthlyCost)}/mo avg`;
+        const annualSubtext = `${this.formatCurrencySafe(contractTotalCost)} (${termMonths} months)`;
 
         // Check if this plan has best values
         const isBestCost = plan.annualCost === bestValues.lowestCost;
         const isBestRate = plan.effectiveRate === bestValues.lowestRate;
         const isBestQuality = plan.qualityScore === bestValues.highestQuality;
-        const isLowestFee = this.getETFSortValue(plan) === bestValues.lowestFee;
+        const etfInfo = this.getETFInfo(plan);
+        const isLowestFee = etfInfo.displayText === 'No fee';
 
         // Badge Logic
         const variableBadge = isNonFixed
@@ -1222,6 +1228,17 @@ const UI = {
         const badRenewalBadge =
           expirationAnalysis.riskLevel === 'high'
             ? `<span class="bad-renewal-badge" title="Expires during expensive peak season">⚠︎ BAD RENEWAL MONTH</span>`
+            : '';
+        const newCustomerBadge = plan.is_new_customer_only
+          ? '<span class="rate-type-badge rate-type-badge-new-customer" title="Plan requires new customer enrollment">⚠︎ NEW CUSTOMERS ONLY</span>'
+          : '';
+        const lowRenewableBadge =
+          renewablePct < 33.33
+            ? '<span class="rate-type-badge rate-type-badge-low-renewable" title="Less than 33% renewable energy">⚠︎ LOW RENEWABLE CONTENT</span>'
+            : '';
+        const minUsageFeeBadge =
+          plan.min_usage_fees === 'TRUE'
+            ? '<span class="rate-type-badge rate-type-badge-min-usage" title="Minimum usage fees apply">⚠︎ MINIMUM USAGE FEE</span>'
             : '';
 
         return `
@@ -1246,7 +1263,10 @@ const UI = {
                             ${variableBadge}
                             ${prepaidBadge}
                             ${touBadge}
+                            ${newCustomerBadge}
                             ${badRenewalBadge}
+                            ${lowRenewableBadge}
+                            ${minUsageFeeBadge}
                         </div>
                     </div>
                 </td>
@@ -1420,13 +1440,9 @@ const UI = {
             bVal = b.term_months || 0;
             break;
           case 'contractEnd': {
-            // Sort by contract end date (calculated from term_months)
-            const dateA = new Date();
-            dateA.setMonth(dateA.getMonth() + (a.term_months || 0));
-            const dateB = new Date();
-            dateB.setMonth(dateB.getMonth() + (b.term_months || 0));
-            aVal = dateA.getTime();
-            bVal = dateB.getTime();
+            // Sort by pre-calculated contract end timestamp
+            aVal = a.contractEndTimestamp || 0;
+            bVal = b.contractEndTimestamp || 0;
             break;
           }
           case 'monthly':
@@ -1446,9 +1462,13 @@ const UI = {
             bVal = (b.plan_name || '').toLowerCase();
             return aVal < bVal ? -dir : aVal > bVal ? dir : 0;
           case 'cancelFee':
-            // Sort by ETF amount, treating 'None' as 0
+            // Sort by ETF amount, treating 'No fee' as 0 and 'See EFL' as highest
             aVal = this.getETFSortValue(a);
             bVal = this.getETFSortValue(b);
+            // Handle Infinity comparisons properly
+            if (aVal === Number.POSITIVE_INFINITY && bVal === Number.POSITIVE_INFINITY) return 0;
+            if (aVal === Number.POSITIVE_INFINITY) return dir;
+            if (bVal === Number.POSITIVE_INFINITY) return -dir;
             break;
           default:
             return 0;
@@ -1478,116 +1498,137 @@ const UI = {
     const termMonths = plan.term_months || 12;
     const contractTotalCost = plan.averageMonthlyCost * termMonths;
 
+    // Build cost summary stats - conditionally include contract total for non-12-month terms
+    const costStats = [
+      {
+        value: formatCurrency(plan.annualCost),
+        label: 'Annual Cost',
+        highlight: true
+      }
+    ];
+
+    if (termMonths !== 12) {
+      costStats.push({
+        value: `${formatCurrency(contractTotalCost)}`,
+        sublabel: `(${termMonths} mo)`,
+        label: 'Contract Total',
+        highlight: false
+      });
+    }
+
+    costStats.push(
+      {
+        value: formatCurrency(plan.averageMonthlyCost),
+        label: 'Monthly Average',
+        highlight: false
+      },
+      { value: formatRate(plan.effectiveRate), label: 'Effective Rate', highlight: false }
+    );
+
     this.elements.modalBody.innerHTML = `
-            <h2 class="modal-title">${this.escapeHtml(plan.plan_name)}</h2>
-            <p class="modal-provider">
-                ${this.escapeHtml(plan.rep_name)}
-                <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
-            </p>
+      <header class="modal-header-group">
+        <h2 class="modal-title">${this.escapeHtml(plan.plan_name)}</h2>
+        <p class="modal-provider">
+          ${this.escapeHtml(plan.rep_name)}
+          <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
+        </p>
+      </header>
 
-            ${
-              isNonFixed
-                ? `
-            <div class="non-fixed-warning" style="margin-bottom: var(--space-4);">
-                <span class="non-fixed-warning-icon">!</span>
-                <span class="non-fixed-warning-text"><strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly more during peak demand periods. Fixed-rate plans provide more budget certainty.</span>
+      ${
+        isNonFixed
+          ? `
+      <div class="modal-section">
+        <div class="modal-variable-alert">
+          <span class="modal-alert-indicator"></span>
+          <p class="modal-alert-text">
+            <strong>${plan.rate_type} Rate Plan:</strong> Your rate can change based on market conditions. You may pay significantly more during peak demand periods. Fixed-rate plans provide more budget certainty.
+          </p>
+        </div>
+      </div>
+      `
+          : ''
+      }
+
+      <div class="modal-section">
+        <h3 class="modal-section-title">Cost Summary</h3>
+        <div class="modal-grid">
+          ${costStats
+            .map(
+              (stat) => `
+            <div class="modal-stat">
+              <span class="modal-stat-value${stat.highlight ? ' highlight' : ''}">${stat.value}${stat.sublabel ? `<span class="modal-stat-sublabel">${stat.sublabel}</span>` : ''}</span>
+              <span class="modal-stat-label">${stat.label}</span>
             </div>
-            `
-                : ''
-            }
+          `
+            )
+            .join('')}
+        </div>
+      </div>
 
-            <div class="modal-section">
-                <h3 class="modal-section-title">Cost Summary</h3>
-                <div class="modal-grid">
-                    <div class="modal-stat">
-                        <span class="modal-stat-value highlight">${formatCurrency(plan.annualCost)}</span>
-                        <span class="modal-stat-label">Annual Cost</span>
-                    </div>
-                    ${
-                      termMonths !== 12
-                        ? `
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${formatCurrency(contractTotalCost)} (${termMonths} months)</span>
-                        <span class="modal-stat-label">Contract Total</span>
-                    </div>
-                    `
-                        : ''
-                    }
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${formatCurrency(plan.averageMonthlyCost)}</span>
-                        <span class="modal-stat-label">Monthly Average</span>
-                    </div>
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${formatRate(plan.effectiveRate)}</span>
-                        <span class="modal-stat-label">Effective Rate</span>
-                    </div>
-                </div>
-            </div>
+      <div class="modal-section">
+        <h3 class="modal-section-title">Plan Details</h3>
+        <div class="modal-grid">
+          <div class="modal-stat">
+            <span class="modal-stat-value">${plan.term_months}<span class="modal-stat-unit">months</span></span>
+            <span class="modal-stat-label">Contract Term</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-value">${this.renderETFModalValue(plan)}</span>
+            <span class="modal-stat-label">Cancellation Fee</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-value">${plan.renewable_pct || 0}<span class="modal-stat-unit">%</span></span>
+            <span class="modal-stat-label">Renewable Energy</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-value">${plan.is_tou ? 'Yes' : 'No'}</span>
+            <span class="modal-stat-label">Time-of-Use</span>
+          </div>
+        </div>
+      </div>
 
-            <div class="modal-section">
-                <h3 class="modal-section-title">Plan Details</h3>
-                <div class="modal-grid">
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${plan.term_months} months</span>
-                        <span class="modal-stat-label">Contract Term</span>
-                    </div>
-                    <div class="modal-stat">
-                      <span class="modal-stat-value">${this.renderETFModalValue(plan)}</span>
-                      <span class="modal-stat-label">Cancellation Fee</span>
-                    </div>
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${plan.renewable_pct || 0}%</span>
-                        <span class="modal-stat-label">Renewable Energy</span>
-                    </div>
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${plan.is_tou ? 'Yes' : 'No'}</span>
-                        <span class="modal-stat-label">Time-of-Use</span>
-                    </div>
-                </div>
-            </div>
+      <div class="modal-section">
+        <h3 class="modal-section-title">Advertised Rates</h3>
+        <div class="modal-grid">
+          <div class="modal-stat">
+            <span class="modal-stat-value">${formatRate(plan.price_kwh_500)}</span>
+            <span class="modal-stat-label">At 500 kWh</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-value">${formatRate(plan.price_kwh_1000)}</span>
+            <span class="modal-stat-label">At 1,000 kWh</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-value">${formatRate(plan.price_kwh_2000)}</span>
+            <span class="modal-stat-label">At 2,000 kWh</span>
+          </div>
+        </div>
+      </div>
 
-            <div class="modal-section">
-                <h3 class="modal-section-title">Advertised Rates</h3>
-                <div class="modal-grid">
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${formatRate(plan.price_kwh_500)}</span>
-                        <span class="modal-stat-label">At 500 kWh</span>
-                    </div>
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${formatRate(plan.price_kwh_1000)}</span>
-                        <span class="modal-stat-label">At 1,000 kWh</span>
-                    </div>
-                    <div class="modal-stat">
-                        <span class="modal-stat-value">${formatRate(plan.price_kwh_2000)}</span>
-                        <span class="modal-stat-label">At 2,000 kWh</span>
-                    </div>
-                </div>
-            </div>
+      ${
+        plan.warnings.length > 0
+          ? `
+      <div class="modal-section">
+        <h3 class="modal-section-title">Warnings</h3>
+        <div class="modal-warnings">
+          ${plan.warnings.map((w) => `<p class="modal-warning">${this.escapeHtml(w)}</p>`).join('')}
+        </div>
+      </div>
+      `
+          : ''
+      }
 
-            ${
-              plan.warnings.length > 0
-                ? `
-                <div class="modal-section">
-                    <h3 class="modal-section-title">Warnings</h3>
-                    <div class="modal-warnings">
-                        ${plan.warnings.map((w) => `<div class="modal-warning">${this.escapeHtml(w)}</div>`).join('')}
-                    </div>
-                </div>
-            `
-                : ''
-            }
+      <div class="modal-section">
+        <div class="modal-legal-reminder">
+          <strong>Verify cancellation terms:</strong> Always confirm details in the Electricity Facts Label (EFL), Residential Terms of Service, and Your Rights as a Retail Electric Customer documents. Contact the REP directly if terms are unclear.
+        </div>
+      </div>
 
-            <div class="modal-section">
-              <div class="etf-reminder">
-                <strong>Verify cancellation terms:</strong> Always confirm details in the Electricity Facts Label (EFL), Residential Terms of Service, and Your Rights as a Retail Electric Customer documents. Contact the REP directly if terms are unclear.
-              </div>
-            </div>
-
-            <div class="modal-actions">
-                ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn monthsdal-btn-primary">View EFL</a>` : ''}
-                ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="modal-btn monthsdal-btn-secondary">Enroll</a>` : ''}
-            </div>
-        `;
+      <nav class="modal-actions" aria-label="Plan actions">
+        ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener noreferrer" class="modal-btn modal-btn-primary">View EFL</a>` : ''}
+        ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener noreferrer" class="modal-btn modal-btn-secondary">Enroll</a>` : ''}
+      </nav>
+    `;
 
     this.elements.modalBackdrop.hidden = false;
     document.body.style.overflow = 'hidden';
@@ -1657,8 +1698,12 @@ const UI = {
 
   getETFSortValue(plan) {
     const etfInfo = this.getETFInfo(plan);
-    if (!etfInfo || etfInfo.structure === 'none') return 0;
-    if (etfInfo.structure === 'unknown') return Number.POSITIVE_INFINITY;
+    // "See EFL" / unknown fees should sort to the end
+    if (!etfInfo || etfInfo.structure === 'unknown' || etfInfo.needsConfirmation) {
+      return Number.POSITIVE_INFINITY;
+    }
+    // "No fee" plans have structure 'none' or 'none-conditional' without needsConfirmation
+    if (etfInfo.structure === 'none' || etfInfo.structure === 'none-conditional') return 0;
     if (etfInfo.structure === 'flat') return etfInfo.total || 0;
     return etfInfo.exampleTotal || etfInfo.total || 0;
   },

@@ -308,6 +308,8 @@ Example (Oncor, 1,000 kWh):
   = $60.06
 ```
 
+**Important:** When you see plan rates advertised on Power to Choose or EFLs, those rates **already include TDU charges**. Texas law requires all advertised prices to be all-inclusive. The TDU cost formula above is useful for understanding delivery charges, but you don't add it separately when calculating your bill—it's already baked into the plan's per-kWh rate.
+
 ### TDU Cost as Percentage of Total Bill
 
 At typical usage (1,000 kWh) and average retail rate (12¢/kWh):
@@ -318,7 +320,7 @@ TDU Charges = $60
 TDU Percentage = 50%
 ```
 
-**Insight:** Half your bill is TDU delivery charges, which are identical across all REPs in your area. This is why comparing true total costs (not just "energy rates") is critical.
+**Insight:** About half your bill represents TDU delivery charges, which are identical across all REPs in your area. Since plan rates on EFLs already include these charges, comparing plans based on their advertised all-inclusive rates automatically accounts for delivery costs. This is why using true total costs from EFLs (rather than trying to isolate "energy-only" rates) gives accurate comparisons.
 
 ---
 

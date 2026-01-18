@@ -110,7 +110,7 @@ function interpolateRate(usageKwh, plan) {
 1. Usage (750) is between 500 and 1000
 2. Calculate interpolation ratio:
 
-   ```
+   ```bash
    ratio = (750 - 500) / (1000 - 500)
          = 250 / 500
          = 0.5
@@ -118,7 +118,7 @@ function interpolateRate(usageKwh, plan) {
 
 3. Interpolate rate:
 
-   ```
+   ```bash
    rate = 13.5 + (10.2 - 13.5) × 0.5
         = 13.5 + (-3.3 × 0.5)
         = 13.5 - 1.65
@@ -130,7 +130,7 @@ function interpolateRate(usageKwh, plan) {
 1. Usage (1500) is between 1000 and 2000
 2. Calculate ratio:
 
-   ```
+   ```bash
    ratio = (1500 - 1000) / (2000 - 1000)
          = 500 / 1000
          = 0.5
@@ -138,7 +138,7 @@ function interpolateRate(usageKwh, plan) {
 
 3. Interpolate:
 
-   ```
+   ```bash
    rate = 10.2 + (9.8 - 10.2) × 0.5
         = 10.2 + (-0.4 × 0.5)
         = 10.2 - 0.2
@@ -169,14 +169,17 @@ For transparency, we chose linear interpolation.
 ### Formula
 
 ```bash
-Total Monthly Cost = Energy Cost + TDU Cost + Base Cost - Credits + Tax
+Total Monthly Cost = Energy Cost + Base Cost - Credits + Tax
 
 Where:
   Energy Cost = Usage (kWh) × Interpolated Rate (¢/kWh) ÷ 100
-  TDU Cost = TDU Base Charge + (Usage × TDU Per-kWh Rate ÷ 100)
+    Note: Plan rates already include TDU charges per EFL requirements
   Base Cost = REP Monthly Base Charge
   Credits = Bill Credit Amount (if usage qualifies)
-  Tax = (Energy + Base + TDU - Credits) × Local Tax Rate
+  Tax = (Energy + Base - Credits) × Local Tax Rate
+
+TDU Cost (tracked separately for transparency, NOT added to total):
+  TDU Cost = TDU Base Charge + (Usage × TDU Per-kWh Rate ÷ 100)
 ```
 
 ### Implementation
@@ -184,10 +187,11 @@ Where:
 ```javascript
 function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
     // Step 1: Calculate energy charges
+    // Plan rates already include TDU charges per EFL requirements
     const energyRate = interpolateRate(usageKwh, plan);  // cents/kWh
     const energyCost = (usageKwh * energyRate) / 100;    // Convert to dollars
 
-    // Step 2: Add TDU delivery charges
+    // Step 2: Calculate TDU cost (for transparency only, NOT added to total)
     const tduCost = tduRates.monthly_base_charge +
                     (usageKwh * tduRates.per_kwh_rate / 100);
 
@@ -211,7 +215,7 @@ function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
         breakdown: {
             energyCost: energyCost,
             baseCost: baseCost,
-            tduCost: tduCost,
+            tduCost: tduCost,  // Tracked separately for reference
             credits: credits,
             tax: taxAmount,
             effectiveRate: usageKwh > 0 ? (total / usageKwh * 100) : 0  // cents per kWh
@@ -234,62 +238,64 @@ function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
 
 1. **Interpolate energy rate:**
 
-   ```
+   ```bash
    Ratio = (1200 - 1000) / (2000 - 1000) = 200/1000 = 0.2
    Rate = 10.0 + (9.5 - 10.0) × 0.2 = 10.0 - 0.1 = 9.9¢/kWh
    ```
 
 2. **Energy cost:**
 
-   ```
+   ```bash
    Energy = 1200 kWh × 9.9¢/kWh ÷ 100 = $118.80
+   Note: This 9.9¢ rate already includes TDU charges per EFL requirements
    ```
 
-3. **TDU cost:**
+3. **TDU cost (calculated for reference only):**
 
-   ```
+   ```bash
    TDU = $4.23 + (1200 × 5.58¢ ÷ 100)
        = $4.23 + $66.96
        = $71.19
+   This is already included in the 9.9¢ rate above, not added separately
    ```
 
 4. **Base cost:**
 
-   ```
+   ```bash
    Base = $9.95
    ```
 
 5. **Subtotal:**
 
-   ```
+   ```bash
    Subtotal = $118.80 + $9.95 = $128.75
    ```
 
 6. **Credits:**
 
-   ```
+   ```bash
    Credits = $0 (no bill credit applicable)
    ```
 
 7. **Tax:**
 
-   ```
+   ```bash
    Tax = ($128.75 - $0) × 0.02 = $2.58
    ```
 
 8. **Total:**
 
-   ```
+   ```bash
    Total = $128.75 - $0 + $2.58 = $131.33
    ```
 
 9. **Effective Rate:**
 
-   ```
+   ```bash
    Effective = $131.33 ÷ 1200 kWh × 100 = 10.94¢/kWh
    ```
 
-**Note:** Effective rate (10.94¢) is higher than interpolated energy rate (9.9¢) because it includes TDU charges, base fee, and tax.
+**Note:** Effective rate (10.94¢) is higher than interpolated energy rate (9.9¢) because it includes the REP base fee and sales tax. TDU charges are already embedded in the 9.9¢ energy rate per Texas EFL requirements.
 
 ---
 
@@ -745,6 +751,51 @@ function rankPlans(plans, userUsage, tduRates, options = {}) {
 3. **High Early Termination Fees**: Expensive to exit contract
 4. **Rate Volatility**: Prices vary dramatically with usage
 5. **Contract Expiration Timing**: Renewal during expensive season
+6. **New Customers Only**: Plan restricted to new customer enrollment
+
+### Warning Badges
+
+The UI displays visual warning badges for plans with specific restrictions:
+
+| Badge | Condition | Impact |
+| --- | --- | --- |
+| `VARIABLE` / `INDEXED` | `rate_type !== 'FIXED'` | Auto F grade |
+| `PREPAID` | `is_prepaid === true` | Auto F grade |
+| `TIME OF USE` | `is_tou === true` | Auto F grade |
+| `NEW CUSTOMERS ONLY` | Explicit phrase detected in text fields | Badge only (no grade penalty) |
+| `BAD RENEWAL MONTH` | Contract expires July/August/January | Score penalty |
+
+### New Customer Only Detection
+
+Plans are flagged as new-customer-only using conservative phrase matching:
+
+```javascript
+function isNewCustomerOnly(plan) {
+  const text = [
+    plan.special_terms,
+    plan.promotion_details,
+    plan.fees_credits,
+    plan.min_usage_fees,
+    plan.plan_name
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const patterns = [
+    /\bnew customers? only\b/,
+    /\bfor new customers? only\b/,
+    /\bis for new customers? only\b/,
+    /\bthis .{0,20}is for new customers? only\b/,
+    /\bsolo para nuevos clientes\b/,
+    /\bsolo nuevos clientes\b/,
+    /\bes solo para nuevos clientes\b/
+  ];
+
+  return patterns.some(pattern => pattern.test(normalized));
+}
+```
+
+**Design Decision:** Conservative matching prevents false positives. If a REP uses non-standard phrasing, the badge will not appear (false negative), but users will never see the badge on plans that are available to existing customers.
 
 ### Implementation
 
@@ -1077,13 +1128,19 @@ This ensures a plan must be both competitively priced and high quality to rank w
 
 **Solution:** Included in results but automatically receive quality score of 0 (F grade) and display "TIME OF USE" warning badge. These plans require behavior changes most users cannot achieve.
 
-### 9. Prepaid Plans
+### 9. New Customers Only Plans
+
+**Issue:** Some plans are restricted to new customers only and cannot be selected by existing customers switching plans with the same provider.
+
+**Solution:** Plans with explicit "new customers only" language in `special_terms`, `promotion_details`, or `plan_name` display a "NEW CUSTOMERS ONLY" warning badge. Detection uses conservative phrase matching (English and Spanish) to avoid false positives—only explicit phrases like "This offer is for new customers only" or "Solo para nuevos clientes" trigger the badge. Plans without this explicit language will not display the badge (false negatives preferred over false positives).
+
+### 10. Prepaid Plans
 
 **Issue:** Different payment structure with prepayment requirements and potential service interruptions.
 
 **Solution:** Included in results but automatically receive quality score of 0 (F grade) and display "PREPAID" warning badge. Users can still view these plans in the complete comparison table if they specifically want prepaid options.
 
-### 10. Duplicate Plans (English/Spanish)
+### 11. Duplicate Plans (English/Spanish)
 
 **Issue:** Many providers list identical plans in both English and Spanish versions. While feature-identical, they have different plan names, documentation URLs, and language fields.
 

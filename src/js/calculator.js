@@ -277,6 +277,48 @@ function detectTDU(zipCode, tduList) {
 }
 
 /**
+ * Detect plans explicitly marked as for new customers only.
+ *
+ * IMPORTANT: Conservative matching to avoid false-positives.
+ *
+ * @param {Object} plan - Plan object
+ * @returns {boolean}
+ */
+function isNewCustomerOnlyPlan(plan) {
+  const text = [
+    plan.special_terms,
+    plan.promotion_details,
+    plan.fees_credits,
+    plan.min_usage_fees,
+    plan.plan_name
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  if (!text) {
+    return false;
+  }
+
+  const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const patterns = [
+    /\bnew customers? only\b/,
+    /\bfor new customers? only\b/,
+    /\bis for new customers? only\b/,
+    /\bthis .{0,20}is for new customers? only\b/,
+    /\bsolo para nuevos clientes\b/,
+    /\bsolo nuevos clientes\b/,
+    /\bsolo para clientes nuevos\b/,
+    /\bsolo clientes nuevos\b/,
+    /\bes solo para nuevos clientes\b/,
+    /\bes para nuevos clientes solamente\b/
+  ];
+
+  return patterns.some((pattern) => pattern.test(normalized));
+}
+
+/**
  * Rank plans by annual cost and identify gimmicks
  *
  * Ranking system with quality scoring and penalties for bad plan features
@@ -292,6 +334,7 @@ function rankPlans(plans, userUsage, tduRates, options = {}) {
 
   // Calculate metrics for all plans first
   const rankedPlans = plans.map((plan) => {
+    const isNewCustomerOnly = isNewCustomerOnlyPlan(plan);
     const annualResult = calculateAnnualCost(userUsage, plan, tduRates, localTaxRate);
     const volatility = calculateVolatility(plan, userUsage);
     const warnings = identifyWarnings(plan, userUsage, contractStartDate);
@@ -305,7 +348,8 @@ function rankPlans(plans, userUsage, tduRates, options = {}) {
       totalUsage: annualResult.totalUsage,
       volatility: volatility,
       warnings: warnings,
-      isGimmick: warnings.length > 0 || volatility > 0.3
+      isGimmick: warnings.length > 0 || volatility > 0.3,
+      is_new_customer_only: isNewCustomerOnly
     };
   });
 

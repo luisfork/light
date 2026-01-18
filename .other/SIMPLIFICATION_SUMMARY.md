@@ -3,6 +3,7 @@
 ## User Feedback & Critical Analysis
 
 **User Questions:**
+
 1. Which fields are used in fingerprinting?
 2. Would it make sense to only use numeric fields?
 3. Isn't keyword extraction a weak implementation?
@@ -13,6 +14,7 @@
 ## Data Analysis
 
 ### File Inspected
+
 **Path:** `/Users/luis/Desktop/light/data/plans.json`
 **Format:** JSON (1.1 MB)
 **Total Plans:** 986
@@ -21,7 +23,7 @@
 
 Analysis script tested all 986 plans for the necessity of text extraction:
 
-```
+```bash
 Total plans: 986
 Unique numeric fingerprints: 986
 Groups with same numerics but different text: 0
@@ -55,6 +57,7 @@ fingerprint = {
 ```
 
 **Text Extraction Complexity:**
+
 - 95 lines of code for `normalizeBillCredits()` and `normalizeSpecialTerms()`
 - Bilingual keyword matching (English + Spanish)
 - Regular expressions for dollar amounts and kWh thresholds
@@ -86,6 +89,7 @@ fingerprint = {
 ```
 
 **Simplification Benefits:**
+
 - **-95 lines of code removed**
 - **-2 fields** from fingerprint
 - **Zero maintenance** for keywords
@@ -100,6 +104,7 @@ fingerprint = {
 **After:** Lines 485-506 (22 lines, numeric-only)
 
 **Removed:**
+
 - `normalizeBillCredits()` function (25 lines)
 - `normalizeSpecialTerms()` function (48 lines)
 - `credits` field from fingerprint
@@ -111,6 +116,7 @@ fingerprint = {
 **After:** Lines 591-629 (39 lines, numeric-only)
 
 **Removed:**
+
 - `normalize_bill_credits()` function (22 lines)
 - `normalize_special_terms()` function (54 lines)
 - `credits` field from fingerprint
@@ -139,7 +145,7 @@ fingerprint = {
 
 ### Mock Data Test
 
-```
+```bash
 Input Plans:
   1. Simple Rate 12 (English) - TXU ENERGY
   2. Tarifa Simple 12 (Spanish) - TXU ENERGY [identical numerics]
@@ -158,7 +164,7 @@ SUCCESS: Simplified numeric-only fingerprinting works correctly!
 
 ### Real Data Validation
 
-```
+```bash
 Total plans: 986
 Unique numeric fingerprints: 986
 Duplicates removed: 0 (data already deduplicated)
@@ -171,6 +177,7 @@ Duplicates removed: 0 (data already deduplicated)
 ## Code Quality
 
 All code passes linting:
+
 - ✓ JavaScript: Biome check (no errors)
 - ✓ Python: Ruff check (no errors)
 - ✓ Implementations match (JS and Python identical logic)
@@ -187,12 +194,14 @@ All code passes linting:
 ### 2. Robustness
 
 **Text extraction vulnerabilities:**
+
 - New marketing phrases require code updates
 - Typos in data break keyword matching
 - Translation variations cause mismatches
 - Regular expressions are brittle
 
 **Numeric comparison advantages:**
+
 - Numbers are language-agnostic
 - No keyword maintenance required
 - Floating-point normalization handles precision
@@ -201,12 +210,14 @@ All code passes linting:
 ### 3. Maintainability
 
 **Removed:**
+
 - 95+ lines of fragile text parsing
 - Bilingual keyword dictionaries
 - Regular expression patterns
 - Special case handling
 
 **Impact:**
+
 - Easier onboarding for new developers
 - Fewer edge cases to test
 - No language expansion needed
@@ -215,6 +226,7 @@ All code passes linting:
 ### 4. Performance
 
 While negligible in practice, numeric comparison is faster than:
+
 - Regex matching on multiple fields
 - String normalization (uppercase, trim)
 - Array sorting and joining
@@ -245,11 +257,13 @@ While negligible in practice, numeric comparison is faster than:
 ### Don't Over-Engineer
 
 **Initial approach:**
+
 - Assumed text extraction was necessary
 - Built complex bilingual keyword system
 - Added 95+ lines of parsing code
 
 **Reality:**
+
 - Dataset analysis showed text extraction had zero value
 - Simpler approach works perfectly
 - Complexity was unnecessary from the start
@@ -259,6 +273,7 @@ While negligible in practice, numeric comparison is faster than:
 **Key insight:** Analysis of 986 real plans proved that numeric fields are sufficient.
 
 **Before assuming complexity is needed:**
+
 1. Analyze actual data
 2. Test simple approach first
 3. Add complexity only when proven necessary

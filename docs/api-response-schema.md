@@ -140,7 +140,7 @@ Returns available plan types and categories.
 
 ## Internal Data Schemas
 
-### plans.json Structure
+### `plans.json` Structure
 
 Processed and normalized plan data used by the calculator.
 
@@ -226,7 +226,7 @@ Processed and normalized plan data used by the calculator.
 | `fees_credits` | No | "" | Free-text |
 | `min_usage_fees` | No | "" | Free-text |
 
-### tdu-rates.json Structure
+### `tdu-rates.json` Structure
 
 TDU delivery charges updated semi-annually (March 1, September 1).
 
@@ -267,7 +267,7 @@ TDU delivery charges updated semi-annually (March 1, September 1).
 - **September 1**: Typically 3-8% increase (higher summer demand)
 - Source: PUCT tariff filings (puc.texas.gov/industry/electric/rates/tdarchive.aspx)
 
-### local-taxes.json Structure
+### `local-taxes.json` Structure
 
 ZIP code to TDU mapping and local tax rates.
 
@@ -312,15 +312,15 @@ ZIP code to TDU mapping and local tax rates.
 
 ## Calculation Function Responses
 
-### calculateMonthlyCost() Response
+### `calculateMonthlyCost()` Response
 
 ```javascript
 {
   total: 127.45,                    // Total monthly bill (dollars)
   breakdown: {
-    energyCost: 95.50,              // Energy charges from REP (dollars)
+    energyCost: 115.95,             // Energy charges from REP (dollars) - includes TDU per EFL
     baseCost: 9.95,                 // Monthly base charge (dollars)
-    tduCost: 60.23,                 // TDU delivery charges (dollars)
+    tduCost: 60.23,                 // TDU delivery charges (for reference only, NOT added to total)
     credits: 0.00,                  // Bill credits applied (dollars)
     tax: 2.55,                      // Local sales tax (dollars)
     effectiveRate: 12.75            // Total cost ÷ usage (cents/kWh)
@@ -328,7 +328,7 @@ ZIP code to TDU mapping and local tax rates.
 }
 ```
 
-### calculateAnnualCost() Response
+### `calculateAnnualCost()` Response
 
 ```javascript
 {
@@ -342,7 +342,7 @@ ZIP code to TDU mapping and local tax rates.
 }
 ```
 
-### rankPlans() Response
+### `rankPlans()` Response
 
 ```javascript
 [
@@ -369,7 +369,7 @@ ZIP code to TDU mapping and local tax rates.
 ]
 ```
 
-### calculateContractExpiration() Response
+### `calculateContractExpiration()` Response
 
 ```javascript
 {
@@ -413,7 +413,7 @@ ZIP code to TDU mapping and local tax rates.
 | November | 0.2 | Good |
 | December | 0.6 | Moderate to expensive |
 
-### calculateEarlyTerminationFee() Response
+### `calculateEarlyTerminationFee()` Response
 
 Returns single number (float) representing total ETF in dollars.
 
@@ -543,24 +543,16 @@ const CACHE_CONFIG = {
 
 ---
 
-## Changelog
-
-### Version 2.0 (January 2026)
+## Maintenance Log
 
 - Added contract expiration analysis fields to rankPlans response
 - ETF calculation to detect per-month-remaining structures
 - Added `qualityScore` field to ranked plans (0-100 scale)
 - Provider name formatting now uppercase with suffixes removed
 - Added duplicate plan detection for English/Spanish versions
-
-### Version 1.5 (December 2025)
-
 - Added CenterPoint rate update (Dec 7, 2025 effective date)
 - Quality scoring system improvements
 - Improved bill credit parsing for complex threshold rules
-
-### Version 1.0 (September 2025)
-
 - Initial schema documentation
 - Power to Choose API integration
 - Core calculation functions defined

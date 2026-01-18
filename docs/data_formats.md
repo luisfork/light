@@ -62,6 +62,17 @@ The `fetch_plans.py` script performs significant normalization:
 5. **EFL ETF Enrichment (Optional)**: When ETF values are missing or zero, `fetch_plans.py` may fetch the EFL document and store a small `etf_details` object with `structure` and rates. No PDFs are stored.
 6. **Deduplication**: Performed client-side in `src/js/api.js` using numeric-only plan fingerprints (provider, TDU area, rate type, prices, term, ETF, base charge, renewable %, prepaid flag, TOU flag). This removes English/Spanish duplicates without text parsing.
 
+## Client-Side Detection (Not in API)
+
+Some plan characteristics are detected client-side via text parsing because the Power to Choose API does not provide formal fields:
+
+| Feature | Detection Method | Fields Scanned |
+| :--- | :--- | :--- |
+| **New Customers Only** | Conservative phrase matching | `special_terms`, `promotion_details`, `fees_credits`, `min_usage_fees`, `plan_name` |
+| **Bill Credits** | Regex for dollar amounts and usage thresholds | `special_terms` |
+
+**Important:** New-customer-only detection uses conservative patterns (e.g., "for new customers only", "solo para nuevos clientes") to avoid false positives. Plans with non-standard phrasing may not be flagged.
+
 ## Tips
 
 * **Testing**: When testing the extraction logic, you can point the `fetch_plans.py` script to a local CSV using the `TEST_FILE` environment variable.
