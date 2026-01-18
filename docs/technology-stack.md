@@ -96,7 +96,7 @@ src/assets/fonts/
   - `requests`: HTTP client for Power to Choose API
   - `beautifulsoup4`: HTML parsing for EFL extraction
   - `lxml`: XML/HTML parser (faster than html.parser)
-  - `pdfplumber`: PDF text extraction for ETF details
+  - `pydantic`: Data validation with type safety (NEW)
 
 ### Data Scripts
 
@@ -122,24 +122,32 @@ src/assets/fonts/
 
 ## Development Tools
 
-### JavaScript Tooling
+### JavaScript/TypeScript Tooling
 
 - **Runtime**: Bun (preferred) or Node.js 18+
+- **TypeScript**: Strict mode enabled with all null safety checks (NEW)
+  - Source: `src/ts/`
+  - Compiled output: `src/js/`
+  - Config: `tsconfig.json`
 - **Linter**: Biome (`biome.json`)
   - Enforces consistent code style
   - JSON validation
   - Import sorting
 - **Testing**:
-  - Unit: `node:test` runner via Bun
+  - Unit: `bun test` runner
   - UI: Playwright (Chromium)
   - Location: `tests/unit/`, `tests/ui/`
 
 ### Python Tooling
 
-- **Linter**: Ruff (`ruff.toml`, `pyproject.toml`)
+- **Linter**: Ruff (`pyproject.toml`)
   - Fast Python linter and formatter
   - Replaces Black, isort, Flake8
-- **Type Checking**: None (pragmatic approach)
+- **Type Checker**: mypy (`pyproject.toml`) (NEW)
+  - Strict mode enabled
+  - All scripts require full type annotations
+- **Validation**: Pydantic models for all data structures (NEW)
+  - `scripts/models/__init__.py`
 
 ### Build & Deployment
 

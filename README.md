@@ -420,9 +420,8 @@ light/
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 18+ (optional, bun preferred)
+- Bun (preferred) or Node.js 18+
 - `uv` package manager (or pip)
-- `bun` (preferred) or `npm`
 
 ### Installation
 
@@ -437,10 +436,10 @@ light/
 
    ```bash
    # Using uv (recommended):
-   uv pip install --system requests beautifulsoup4 lxml
+   uv sync
 
    # Or using pip:
-   pip install requests beautifulsoup4 lxml
+   pip install -r requirements.txt
    ```
 
 3. **Populate test data**
@@ -452,18 +451,31 @@ light/
    TEST_FILE=.other/power-to-choose-offers.csv uv run python scripts/fetch_plans.py
    ```
 
-4. **Install JavaScript dependencies**
+4. **Install JavaScript/TypeScript dependencies**
 
    ```bash
    bun install
    bunx playwright install --with-deps chromium
    ```
 
-5. **Serve locally**
+5. **Build TypeScript (if making changes to src/ts/)**
+
+   ```bash
+   # Full build (TypeScript + CSS)
+   bun run build
+
+   # TypeScript only
+   bun run build:ts
+
+   # Type checking only (no output)
+   bun run typecheck
+   ```
+
+6. **Serve locally**
 
    ```bash
    # Start local server (from project root)
-   python -m http.server 8000
+   bun run dev
 
    # Open http://localhost:8000/src/ in your browser
    ```
@@ -471,6 +483,35 @@ light/
 > [!IMPORTANT]
 > Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions.
 > You must use a local HTTP server.
+
+### TypeScript Build Process
+
+The codebase is being migrated from JavaScript to TypeScript for improved type safety:
+
+- **Source files**: `src/ts/` (TypeScript modules)
+- **Compiled output**: `src/js/` (compiled JavaScript for browser)
+- **Configuration**: `tsconfig.json` with strict mode enabled
+
+```bash
+# Available scripts
+bun run build        # Build TypeScript + CSS
+bun run build:ts     # Build TypeScript only
+bun run typecheck    # Type check without emitting files
+bun run test         # Type check + unit tests + UI tests
+bun run dev          # Start local development server
+```
+
+### Python Type Checking
+
+Python scripts use strict type hints (PEP 484) and are validated with mypy:
+
+```bash
+# Run type checker on Python scripts
+uv run mypy scripts/
+
+# Install dev dependencies (includes mypy)
+uv sync --all-extras
+```
 
 ### Automated Testing
 

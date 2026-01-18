@@ -1,38 +1,42 @@
 {
   "name": "light",
   "version": "1.0.0",
-  "description": "<!-- markdownlint-disable MD053 -->",
-  "main": "index.js",
+  "description": "Texas Electricity Plan Finder - Free, unbiased electricity plan comparison tool",
+  "main": "src/js/ui.js",
+  "type": "module",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "build:css": "node scripts/build-css.js",
-    "test": "npm run test:unit && npm run test:ui",
-    "test:unit": "node --test tests/unit",
-    "test:ui": "playwright test"
+    "build": "bun run build:ts && bun run build:css",
+    "build:ts": "tsc",
+    "build:css": "bun run scripts/build-css.js",
+    "typecheck": "tsc --noEmit",
+    "test": "bun run typecheck && bun run test:unit && bun run test:ui",
+    "test:unit": "bun test tests/unit",
+    "test:ui": "bunx playwright test",
+    "dev": "python3 -m http.server 8000"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/luisfork/light.git"
   },
-  "keywords": [],
+  "keywords": [
+    "texas",
+    "electricity",
+    "calculator",
+    "energy",
+    "plans"
+  ],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/luisfork/light/issues"
   },
   "homepage": "https://github.com/luisfork/light#readme",
-  "bun": {
-    "test": {
-      "exclude": [
-        "tests/ui/**"
-      ]
-    }
-  },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "@types/node": "^25.0.6"
+    "@types/node": "^25.0.6",
+    "typescript": "^5.9.3"
   }
 }
