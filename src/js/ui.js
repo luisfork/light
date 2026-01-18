@@ -815,17 +815,6 @@ const UI = {
 
     this.elements.topPlans.innerHTML = displayPlans
       .map((plan, i) => {
-        const grade =
-          typeof getQualityGrade === 'function'
-            ? getQualityGrade(plan.qualityScore || 0)
-            : { letter: '-', description: 'N/A', class: 'grade-na', tooltip: '', shortDesc: '' };
-
-        // Get score explanation for tooltip
-        const scoreExplanation =
-          typeof getScoreExplanation === 'function' && plan.scoreBreakdown
-            ? getScoreExplanation(plan)
-            : `Quality score: ${plan.qualityScore || 0}/100`;
-
         // Get rank description
         const rankDesc =
           typeof getRankDescription === 'function'
@@ -858,10 +847,6 @@ const UI = {
                         ${i === 0 && savingsVsLast ? `<span class="rank-savings">Save up to ${formatCurrency(savingsVsLast)}/yr</span>` : ''}
                         ${diffFromBest > 0 ? `<span class="rank-diff">+${formatCurrency(diffFromBest)}/yr vs #1</span>` : ''}
                     </div>
-                    <div class="grade-info" title="${scoreExplanation}">
-                        <span class="plan-item-grade ${grade.class}" aria-label="${grade.description} grade (${plan.qualityScore || 0} out of 100)">${grade.letter}</span>
-                        <span class="grade-desc">${grade.shortDesc || grade.description}</span>
-                    </div>
                 </div>
                 ${
                   isNonFixed
@@ -876,8 +861,7 @@ const UI = {
                     <div>
                         <div class="plan-item-name">${this.escapeHtml(plan.plan_name)}</div>
                         <div class="plan-item-provider">
-                            ${this.escapeHtml(plan.rep_name)}
-                            <span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>
+                      ${this.escapeHtml(plan.rep_name)}
                         </div>
                     </div>
                     <div class="plan-item-cost">
@@ -1201,7 +1185,9 @@ const UI = {
             ? ContractAnalyzer.calculateContractExpiration(new Date(), termMonths)
             : { riskLevel: 'low', renewalSeason: 'Optimal' };
 
-        const planScore = plan.combinedScore ?? plan.qualityScore ?? 0;
+        const planScore = Number.isFinite(plan.qualityScore)
+          ? plan.qualityScore
+          : (plan.combinedScore ?? 0);
         const isTopCheapest =
           Number.isFinite(annualCostThreshold) &&
           Number.isFinite(plan.annualCost) &&
@@ -1211,7 +1197,10 @@ const UI = {
         const renewablePct = plan.renewable_pct ?? 0;
         const renewableClass =
           renewablePct >= 80 ? 'text-positive' : renewablePct <= 33.3 ? 'text-negative' : '';
-        const annualRateSubtext = this.formatRateSafe(plan.effectiveRate);
+        const annualSubtext =
+          termMonths !== 12
+            ? `${this.formatCurrencySafe(contractTotalCost)} (${termMonths} months)`
+            : `${this.formatCurrencySafe(plan.averageMonthlyCost)}/mo avg`;
 
         // Check if this plan has best values
         const isBestCost = plan.annualCost === bestValues.lowestCost;
@@ -1221,18 +1210,18 @@ const UI = {
 
         // Badge Logic
         const variableBadge = isNonFixed
-          ? `<span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">${plan.rate_type}</span>`
+          ? `<span class="rate-type-badge rate-type-badge-${plan.rate_type.toLowerCase()}">⚠︎ ${plan.rate_type}</span>`
           : '';
         const prepaidBadge = plan.is_prepaid
-          ? '<span class="rate-type-badge rate-type-badge-prepaid">PREPAID</span>'
+          ? '<span class="rate-type-badge rate-type-badge-prepaid">⚠︎ PREPAID</span>'
           : '';
         const touBadge = plan.is_tou
-          ? '<span class="rate-type-badge rate-type-badge-tou">TIME OF USE</span>'
+          ? '<span class="rate-type-badge rate-type-badge-tou">⚠︎ TIME OF USE</span>'
           : '';
 
         const badRenewalBadge =
           expirationAnalysis.riskLevel === 'high'
-            ? `<span class="bad-renewal-badge" title="Expires during expensive peak season">RENEWAL</span>`
+            ? `<span class="bad-renewal-badge" title="Expires during expensive peak season">⚠︎ BAD RENEWAL MONTH</span>`
             : '';
 
         return `
@@ -1250,8 +1239,8 @@ const UI = {
                         <span class="provider-name">${this.escapeHtml(plan.rep_name)}</span>
                     </div>
                 </td>
-                <td>
-                    <div class="plan-name-cell">
+                <td class="col-plan">
+                  <div class="plan-name-cell">
                         <span>${this.escapeHtml(plan.plan_name)}</span>
                         <div class="plan-badges">
                             ${variableBadge}
@@ -1263,15 +1252,14 @@ const UI = {
                 </td>
                 <td><span class="term-badge">${plan.term_months} months</span></td>
                 <td class="col-contract-end" data-sort-value="${contractEndDate.getTime()}">
-                    <div class="contract-end-wrapper" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-                    <span class="contract-end-date ${contractRiskClass}">${endDateFormatted}</span>
-                    </div>
+                  <div class="contract-end-wrapper">
+                  <span class="contract-end-date ${contractRiskClass}">${endDateFormatted}</span>
+                  </div>
                 </td>
                 <td class="col-annual">
                   <span class="cost-value ${annualHighlightClass}">${this.formatCurrencySafe(plan.annualCost)}</span>
                   ${isBestCost ? '<span class="best-indicator">Lowest</span>' : ''}
-                  ${termMonths !== 12 ? `<span class="term-cost-label">${this.formatCurrencySafe(contractTotalCost)} (${termMonths} months)</span>` : ''}
-                  <span class="cost-subtext">${annualRateSubtext}</span>
+                  <span class="cost-subtext">${annualSubtext}</span>
                 </td>
                 <td class="col-monthly">${this.formatCurrencySafe(plan.averageMonthlyCost)}</td>
                 <td class="col-rate"><span class="rate-value ${isBestRate ? 'best-value' : ''}">${this.formatRateSafe(plan.effectiveRate)}</span></td>
@@ -1642,7 +1630,7 @@ const UI = {
           <span class="etf-info-icon"
                 title="Fee structure detected automatically. Click for verification guidance."
                 onclick="UI.showETFVerificationModal(event)"
-                style="cursor: pointer; margin-left: 4px; color: var(--color-accent); font-weight: 600;">ⓘ</span>
+                style="cursor: pointer; margin-left: 4px; color: var(--color-accent); font-weight: 600;"></span>
         `;
     }
 

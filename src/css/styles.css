@@ -1045,13 +1045,13 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 0 var(--space-2);
+  padding: 0;
   border-top: 1px solid var(--color-border-subtle);
   border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .plan-item {
-  padding: var(--space-6) var(--space-2);
+  padding: var(--space-6) 0;
   background: transparent;
   border-bottom: 1px solid var(--color-border-subtle);
   transition: background-color var(--transition-fast);
@@ -1062,7 +1062,7 @@ textarea {
 }
 
 .plan-item:hover {
-  background: rgba(0, 0, 0, 0.02);
+  background: rgba(0, 0, 0, 0.015);
 }
 
 .plan-item-rank {
@@ -1071,10 +1071,10 @@ textarea {
   align-items: center;
   font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--color-ink-secondary);
+  color: var(--color-ink-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .plan-item-grade {
@@ -1140,7 +1140,7 @@ textarea {
   font-family: var(--font-mono);
   font-size: var(--text-xl);
   font-weight: 700;
-  color: var(--color-positive);
+  color: var(--color-positive-ink);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1221,6 +1221,7 @@ textarea {
 .btn-plan-efl:hover {
   transform: translateY(-1px);
   box-shadow: var(--glow-accent);
+  color: var(--color-surface);
 }
 
 /* Warning Plans */
@@ -1479,13 +1480,19 @@ textarea {
 .comparison-table .col-provider {
   width: 90px;
 }
+.comparison-table .col-plan {
+  /* Ensure the plan-name wrapper can stretch to the row height for true vertical centering. */
+  height: 100%;
+}
 .comparison-table .col-contract-end {
-  width: 110px;
+  width: 120px;
+  text-align: center;
+  text-transform: uppercase;
 }
 .comparison-table .col-annual {
-  width: 150px;
+  width: 120px;
   font-weight: 600;
-  color: var(--color-positive);
+  color: var(--color-ink);
 }
 .comparison-table .col-monthly {
   width: 100px;
@@ -1503,23 +1510,49 @@ textarea {
 
 /* Grade Column Centering */
 .comparison-table .grade-content-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.comparison-table .col-term {
+  width: 120px;
+  text-align: center;
+}
+
+.comparison-table .contract-end-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
+  gap: 4px;
+  text-align: center;
+}
+
+.comparison-table .contract-end-date {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 
 /* Removed comparison-table-specific grade sizing to keep grades text-only */
 
 /* Plan Name Cell & Badges */
-.plan-name-cell {
+.comparison-table .plan-name-cell {
+  /*
+   * Plan name vertical centering notes:
+   * - The td uses vertical-align: middle, but the inner div is block-level.
+   * - Stretch the wrapper to full cell height, then use flex to center content.
+   */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   gap: 4px;
   min-width: 140px;
+  height: 100%;
+  min-height: 48px;
 }
 
 .plan-badges {
@@ -1545,10 +1578,6 @@ textarea {
   background: transparent;
   border: none;
   color: var(--color-ink-secondary);
-}
-
-.term-badge {
-  /* Inherits base style */
 }
 
 .rate-type-badge-variable,
@@ -1621,6 +1650,12 @@ textarea {
   font-variant-numeric: tabular-nums;
 }
 
+.comparison-table .term-badge {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
 .comparison-table .col-annual,
 .comparison-table .col-monthly,
 .comparison-table .col-rate,
@@ -1646,6 +1681,10 @@ textarea {
   color: var(--color-ink);
 }
 
+.comparison-table .cost-value.text-positive {
+  color: var(--color-positive-ink);
+}
+
 .comparison-table .rate-value {
   color: var(--color-ink);
 }
@@ -1656,6 +1695,7 @@ textarea {
   font-size: var(--text-xs);
   color: var(--color-ink-tertiary);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .comparison-table .renewable-value {
@@ -1689,7 +1729,7 @@ textarea {
 
 /* Quality Grade Styling */
 .comparison-table .col-grade {
-  width: 80px;
+  width: 60px;
   text-align: center;
 }
 
@@ -1737,6 +1777,17 @@ textarea {
   font-size: var(--text-xs);
   color: var(--color-ink-tertiary);
   font-variant-numeric: tabular-nums;
+}
+
+.comparison-table .quality-grade,
+.comparison-table .quality-score {
+  display: inline-block;
+  line-height: 1;
+}
+
+.comparison-table .quality-score {
+  min-width: 3ch;
+  text-align: right;
 }
 
 /* Grade Legend */
@@ -2076,7 +2127,7 @@ textarea {
 }
 
 .modal-stat-value.highlight {
-  color: var(--color-positive);
+  color: var(--color-positive-ink);
 }
 
 .modal-stat-label {
@@ -2656,6 +2707,28 @@ textarea {
   .site-footer {
     background: var(--color-surface-sunken);
   }
+
+  .btn-plan-details {
+    color: var(--color-ink);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  .btn-plan-details:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.24);
+  }
+
+  .comparison-table .btn-view {
+    color: var(--color-ink);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  .comparison-table .btn-view:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.24);
+  }
 }
 
 /* Non-Fixed Rate Plan Styling */
@@ -2790,17 +2863,6 @@ textarea {
   color: var(--color-ink);
 }
 
-.plan-name-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--space-2);
-  font-weight: 500;
-  min-height: 44px;
-  max-width: 220px;
-}
-
 .plan-name-cell > span:first-child {
   line-height: 1.3;
 }
@@ -2905,7 +2967,7 @@ textarea {
 }
 
 .rank-badge-first {
-  color: var(--color-positive);
+  color: var(--color-positive-ink);
 }
 
 .rank-badge-top3 {
@@ -2919,7 +2981,7 @@ textarea {
 .rank-savings {
   font-size: var(--text-xs);
   font-weight: 500;
-  color: var(--color-positive);
+  color: var(--color-positive-ink);
 }
 
 .rank-diff {
@@ -2965,7 +3027,7 @@ textarea {
 /* Quality Score Tiers */
 
 .quality-score-high {
-  color: var(--color-positive);
+  color: var(--color-positive-ink);
   font-weight: 600;
 }
 
