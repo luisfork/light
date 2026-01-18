@@ -9,15 +9,15 @@ const hasModules = fs.existsSync(modulesDir);
 const moduleFiles = hasModules
   ? fs
     .readdirSync(modulesDir)
-    .filter((file) => file.endsWith('.css'))
+    .filter((file: string) => file.endsWith('.css'))
     .sort()
-    .map((file) => path.join(modulesDir, file))
+    .map((file: string) => path.join(modulesDir, file))
   : [];
 
 const sources =
   hasModules && moduleFiles.length > 0
-    ? [...moduleFiles, path.join(cssDir, 'styles.css')]
-    : [path.join(cssDir, 'styles.css')];
+    ? [path.join(cssDir, 'fonts.css'), ...moduleFiles, path.join(cssDir, 'styles.css')]
+    : [path.join(cssDir, 'fonts.css'), path.join(cssDir, 'styles.css')];
 
 const concatenated = sources.map((filePath) => fs.readFileSync(filePath, 'utf8')).join('\n');
 

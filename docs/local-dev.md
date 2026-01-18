@@ -137,3 +137,9 @@ All fonts are located in `src/assets/fonts/` with WOFF2 files providing ~30% sma
 ```bash
 bun run scripts/build-css.ts
 ```
+
+**JS Build:** After modifying any TypeScript files in `src/ts/`:
+
+```bash
+bun run build:ts
+```

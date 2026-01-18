@@ -23,14 +23,14 @@ However, they often overlook **when the contract expires** and **when they'll ne
 
 ### The Cost Impact
 
-**Scenario 1: Poor Timing**
+#### Scenario 1: Poor Timing
 
 - User signs 12-month contract in July 2026
 - Contract expires July 2027 (peak summer rates)
 - Renewal options: 14-16¢/kWh (expensive)
 - Total cost over 2 years: Higher
 
-**Scenario 2: Optimal Timing**
+#### Scenario 2: Optimal Timing
 
 - User signs 9-month contract in July 2026
 - Contract expires April 2027 (shoulder season)

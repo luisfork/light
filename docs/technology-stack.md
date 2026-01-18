@@ -19,7 +19,7 @@ Comprehensive overview of technologies, formats, and dependencies used in the Li
   - `base.css`: Design tokens, typography, color system
   - `styles.css`: Component styles, layout, responsive design
   - `fonts.css`: Font-face declarations with progressive fallback (WOFF2 → WOFF → OTF)
-- **Build**: Bun-based CSS concatenation into `bundle.css`
+- **Build**: Custom concatenation script running on Bun (`scripts/build-css.ts`)
 - **Features**:
   - CSS custom properties for design tokens
   - Spring physics transitions (cubic-bezier)
@@ -126,9 +126,10 @@ src/assets/fonts/
 ### JavaScript/TypeScript Tooling
 
 - **Runtime**: Bun (preferred) or Node.js 18+
+- **Bundler**: Bun (native)
 - **TypeScript**: Strict mode enabled with all null safety checks (NEW)
   - Source: `src/ts/`
-  - Compiled output: `src/js/` (Git ignored)
+  - Bundled output: `src/js/ (Git ignored)`
   - Config: `tsconfig.json`
 - **Linter**: Biome (`biome.json`)
   - Enforces consistent code style

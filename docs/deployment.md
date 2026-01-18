@@ -57,11 +57,11 @@ The deployment process prioritizes aggressive optimization:
 - Setup Python 3.11
 - Install dependencies: `bun install`
 - Build project: `bun run build`
-- Install minification tools (via Bun):
-  - html-minifier-terser (HTML)
-  - csso-cli (CSS)
-  - terser (TypeScript)
-  - python-minifier (Python)
+- Install minification tools:
+  - html-minifier-terser (via Bun)
+  - csso-cli (via Bun)
+  - terser (via Bun)
+  - python-minifier (via pip)
 ```
 
 #### 2. Directory Structure Creation
@@ -580,7 +580,7 @@ gh run list --workflow=deploy.yml --limit 5
 ### Not Planned
 
 - **Server-side rendering**: Conflicts with static architecture
-- **Client-side bundlers**: Adds build complexity
+- **Complex Build Frameworks**: Webpack/Vite replaced by native Bun bundling
 - **Node.js dependencies**: Increases attack surface
 
 ---
