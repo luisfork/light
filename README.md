@@ -557,9 +557,11 @@ uv run python scripts/fetch_tdu_rates.py
 - Archives CSV to `data/csv-archive/` (daily snapshot with columns)
 - Verifies archive integrity (JSON validation, CSV line count)
 - Fetches latest plans from Power to Choose API
-- Removes duplicate English/Spanish plan versions using simple numeric-only fingerprinting (11 fields)
+- Validates data integrity and schema compliance
 - Commits and pushes if changes detected
 - Triggers deployment workflow
+
+(Note: Deduplication of English/Spanish plan versions happens client-side in the browser to provide full transparency on removed duplicates.)
 
 #### Optimized Build and Deployment (`deploy.yml`)
 

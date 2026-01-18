@@ -1,4 +1,4 @@
-# Contract Expiration Timing Feature (DOCUMENTATION MIGHT BE OUTDATED)
+# Contract Expiration Timing Feature
 
 ## Overview
 
@@ -521,22 +521,6 @@ const safePlans = rankedPlans.filter(p => !p.hasExpirationRisk);
 - Uses standard `Date` object (ES5+)
 - No polyfills required
 - Compatible with IE11+ and all modern browsers
-
----
-
-## Deployment Checklist
-
-- [x] Implement `calculateContractExpiration()` function
-- [x] Integrate with `identifyWarnings()`
-- [x] Add JSDoc documentation
-- [x] Update README.md with feature description
-- [x] Create this technical documentation file
-- [ ] Add UI components (contract start date input)
-- [ ] Add visual expiration risk indicators
-- [ ] Implement alternative term selector
-- [ ] Write unit tests
-- [ ] Add to calculator UI workflow
-- [ ] Update user guide / help text
 
 ---
 
