@@ -4,7 +4,7 @@ This workflow explains how to run and test the Light project locally with real e
 
 ## Why Local Testing Requires a Server
 
-Opening `src/index.html` directly via `file://` protocol **will not work** because browsers block JavaScript from loading local JSON files due to CORS security restrictions. You must use a local HTTP server.
+Opening `src/index.html` directly via `file://` protocol **will not work** because browsers block TypeScript from loading local JSON files due to CORS security restrictions. You must use a local HTTP server.
 
 ## Quick Start
 
@@ -19,7 +19,7 @@ python -m http.server 8000
 
 The server will run at `http://localhost:8000/src/` (navigate to `/src/` for the app)
 
-### 1b. Install JavaScript Dependencies (for tests)
+### 1b. Install TypeScript Dependencies (for tests)
 
 ```bash
 cd /Users/luis/Desktop/light
@@ -135,5 +135,5 @@ All fonts are located in `src/assets/fonts/` with WOFF2 files providing ~30% sma
 **CSS Build:** After modifying any font declarations or CSS modules, rebuild the bundle:
 
 ```bash
-bun run scripts/build-css.js
+bun run scripts/build-css.ts
 ```

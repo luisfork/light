@@ -101,7 +101,7 @@ jobs:
             echo "✓ Minified: $file → $target"
           done
 
-      - name: Minify JavaScript files
+      - name: Minify TypeScript files
         run: |
           find src/js -name "*.js" | while read file; do
             target="_site/js/${file#src/js/}"
@@ -197,7 +197,7 @@ jobs:
             echo "### Optimizations Applied"
             echo "- ✓ HTML minified (comments removed, whitespace collapsed)"
             echo "- ✓ CSS minified (CSSO with comment removal)"
-            echo "- ✓ JavaScript minified (Terser with compression and mangling)"
+            echo "- ✓ TypeScript minified (Terser with compression and mangling)"
             echo "- ✓ Python scripts minified (docstrings and comments removed)"
             echo "- ✓ Fonts optimized (WOFF2 only)"
           } >> "$GITHUB_STEP_SUMMARY"

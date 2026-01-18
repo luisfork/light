@@ -60,7 +60,7 @@ The `fetch_plans.py` script performs significant normalization:
 3. **Price Parsing**: Converts values to floats. Handles formatted strings like `$0.16` or `16.5%`.
 4. **Fee Extraction**: If the `CancelFee` column is missing (common in Zip code exports), strictly parses the `Pricing Details` text using Regex to find "Cancellation Fee: $XXX".
 5. **EFL ETF Enrichment (Optional)**: When ETF values are missing or zero, `fetch_plans.py` may fetch the EFL document and store a small `etf_details` object with `structure` and rates. No PDFs are stored.
-6. **Deduplication**: Performed client-side in `src/js/api.js` using numeric-only plan fingerprints (provider, TDU area, rate type, prices, term, ETF, base charge, renewable %, prepaid flag, TOU flag). This removes English/Spanish duplicates without text parsing.
+6. **Deduplication**: Performed client-side in `src/ts/api.ts` using numeric-only plan fingerprints (provider, TDU area, rate type, prices, term, ETF, base charge, renewable %, prepaid flag, TOU flag). This removes English/Spanish duplicates without text parsing.
 
 ## Client-Side Detection (Not in API)
 

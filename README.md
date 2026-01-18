@@ -12,7 +12,7 @@ Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 [![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fluisfork.github.io%2Flight)](https://luisfork.github.io/light)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
-![Vanilla JS](https://img.shields.io/badge/vanilla-JavaScript-f7df1e?logo=javascript&logoColor=fff)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue?logo=typescript&logoColor=fff)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776ab?logo=python&logoColor=fff)
 ![No Dependencies](https://img.shields.io/badge/dependencies-zero-success)
 ![Playwright Tests](https://img.shields.io/badge/tested%20with-Playwright-45ba4b?logo=playwright)
@@ -125,7 +125,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 *Light* calculates your true annual electricity cost using this algorithm:
 
-```javascript
+```typescript
 // For each month of the year:
 1. Interpolate energy rate based on your usage (500/1000/2000 kWh tiers)
    Note: Plan rates already include TDU delivery charges per EFL requirements
@@ -172,7 +172,7 @@ Example: A 12-month contract starting in July expires in July (expensive). *Ligh
 
 Many plans charge $10-20 per month remaining instead of flat fees. *Light* prioritizes EFL-derived `etf_details` when present and falls back to conservative text parsing when not. If the EFL mentions a fee but does not disclose a rate, the UI shows “See EFL” instead of guessing.
 
-```javascript
+```typescript
 // Per-month-remaining ETF (common for 12-36 month contracts):
 Total ETF = Base Fee × Months Remaining
 
@@ -319,8 +319,8 @@ fees_credits, min_usage_fees, language, efl_url, enrollment_url, terms_url
 
 **Accessing Historical Data:**
 
-```javascript
-// Load historical plan data from specific date (JavaScript)
+```typescript
+// Load historical plan data from specific date (TypeScript)
 const historicalData = await fetch('/data/json-archive/plans_2025-12-01.json');
 const plans = await historicalData.json();
 
@@ -359,58 +359,22 @@ for f in csv_files[-5:]:  # Last 5 days
 
 ```bash
 light/
-├── .github/
-│   └── workflows/
-│       ├── deploy.yml           # GitHub Pages deployment automation
-│       ├── lint.yml             # Code linting (Ruff, Biome)
-│       └── update-plans.yml     # Daily data updates + historical archival
-├── data/
-│   ├── plans.json               # Current electricity plans (updated daily)
-│   ├── tdu-rates.json           # TDU delivery charges (updated Mar/Sep)
-│   ├── local-taxes.json         # Texas local tax rates
-│   ├── json-archive/            # Unlimited archive of historical plan snapshots (JSON)
-│   └── csv-archive/             # Daily CSV exports of plan data
-├── docs/                        # Comprehensive technical documentation
-│   ├── api-response-schema.md   # API response formats and data structures
-│   ├── calculation-algorithm.md # Detailed algorithm walkthrough
-│   ├── contract-expiration.md   # Contract timing analysis documentation
-│   ├── data-schema-plans.md     # plans.json structure specification
-│   ├── data_formats.md          # CSV/JSON format specifications
-│   ├── design-philosophy.md     # Design system, spring animations, accessibility
-│   ├── research.md              # Texas electricity market research
-│   └── tdu-service-areas.md     # TDU coverage mapping and rates
+├── .github/workflows/   # CI/CD: deploy, lint, updates
+├── data/                # plans.json, tdu-rates, archives
+├── docs/                # Technical documentation
 ├── src/
-│   ├── assets/
-│   │   └── fonts/
-│   │       ├── san_francisco/   # SF Pro, SF Compact, SF Mono fonts
-│   │       └── new_york/        # New York serif fonts
-│   ├── index.html               # Main application
-│   ├── css/
-│   │   ├── fonts.css            # @font-face declarations
-│   │   └── styles.css           # Professional design system
-│   └── js/
-│       ├── modules/             # Modular JavaScript components
-│       │   ├── cache.js               # Cache management with TTL
-│       │   ├── data-loader.js         # Fetch with retry and timeout
-│       │   ├── tax-lookup.js          # ZIP code to tax rate mapping
-│       │   ├── provider-formatter.js  # Provider name cleanup
-│       │   ├── formatters.js          # Currency and rate formatting
-│       │   ├── usage-estimator.js     # Seasonal usage pattern Estimation
-│       │   ├── cost-calculator.js     # Monthly/Annual cost calculations
-│       │   ├── contract-analyzer.js   # Contract expiration timing analysis
-│       │   ├── etf-calculator.js      # Early termination fee (ETF) calculations
-│       │   └── plan-ranker.js         # Plan ranking with quality scoring
-│       ├── api.js               # Data loading API facade (includes numeric-only deduplication)
-│       ├── calculator.js        # Main calculator facade
-│       └── ui.js                # User interface logic
-├── scripts/
-│   ├── fetch_plans.py           # Fetch from Power to Choose API
-│   ├── fetch_tdu_rates.py       # TDU rate management
-│   └── archive_to_csv.py        # Archive plans.json to CSV format
-├── biome.json                   # Biome linter configuration (JS/JSON)
-├── pyproject.toml               # Python deps + Ruff linter config
-├── README.md                    # This file (hello!)
-└── LICENSE                      # MIT License
+│   ├── ts/              # TypeScript Source
+│   │   ├── modules/     # Domain logic (cost, etf, ranker)
+│   │   ├── types/       # Type definitions
+│   │   ├── api.ts       # Data loading
+│   │   ├── calculator.ts# Facade
+│   │   └── ui.ts        # UI Controller
+│   ├── css/             # Styles & Fonts
+│   └── index.html       # Entry point
+├── scripts/             # Python tools (minified on deploy)
+├── tests/               # Unit (Bun) & UI (Playwright)
+├── playwright.config.ts # E2E config
+└── package.json         # Project config
 ```
 
 ---
@@ -485,8 +449,6 @@ light/
 > You must use a local HTTP server.
 
 ### TypeScript Build Process
-
-The codebase is being migrated from JavaScript to TypeScript for improved type safety:
 
 - **Source files**: `src/ts/` (TypeScript modules)
 - **Compiled output**: `src/js/` (compiled JavaScript for browser)
@@ -612,7 +574,7 @@ uv run python scripts/fetch_tdu_rates.py
 2. **Source Code Optimization**
    - **HTML Minification** (`html-minifier-terser`): Removes comments, collapses whitespace, strips redundant attributes, minifies inline CSS/JS
    - **CSS Minification** (`csso-cli`): Removes comments, optimizes selectors, eliminates redundancies
-   - **JavaScript Minification** (`terser`): Compresses logic, mangles variable names, removes comments and console statements
+   - **TypeScript Minification** (`terser`): Compresses logic, mangles variable names, removes comments and console statements
    - **Python Minification** (`python-minifier`): Strips docstrings, removes comments, renames globals/locals, hoists literals
 
 3. **Asset Optimization**
@@ -650,7 +612,7 @@ Python scripts in `scripts/` directory are minified and included in the deployme
 #### Linting (`lint.yml`)
 
 - Runs on pull requests and pushes to main
-- Biome for JavaScript/JSON linting and formatting
+- Biome for TypeScript/JSON linting and formatting
 - Ruff for Python linting and formatting
 - djlint for HTML linting (configured via `.djlintrc`)
 - actionlint for GitHub Actions workflow validation
@@ -672,7 +634,7 @@ Based on research showing Texans often renew during expensive months, *Light* im
 
 **Algorithm:**
 
-```javascript
+```typescript
 Renewal Seasonality Scores:
 - April, October: 0.0 (best)
 - May, November: 0.1-0.2 (excellent)
@@ -686,7 +648,7 @@ If expiration score ≥ 0.8: "High Risk" warning
 
 Many comparison tools incorrectly display per-month ETFs as flat fees. *Light* uses EFL-derived `etf_details` when available, otherwise applies conservative text parsing and marks ambiguous cases as unknown:
 
-```javascript
+```typescript
 detectETFStructure(plan):
   // EFL overrides
   if plan.etf_details:
@@ -716,7 +678,7 @@ calculateETF(plan, monthsRemaining):
 
 Plans are ranked by a combined score: **85% cost efficiency + 15% quality factors**.
 
-```javascript
+```typescript
 calculateCombinedScore(plan, bestCost, worstCost):
   // Cost score (0-100, lower cost = higher score)
   costScore = 100 - ((plan.annualCost - bestCost) / (worstCost - bestCost)) * 100
@@ -775,7 +737,7 @@ The quality score (0-100) is calculated from multiple factors:
 
 Automatically identifies and removes duplicate English/Spanish plan versions using simple, robust numeric-only fingerprinting:
 
-```javascript
+```typescript
 deduplicatePlans(plans):
   1. Create fingerprint from 11 objective fields:
      - Identifiers: rep_name, tdu_area, rate_type
@@ -829,7 +791,7 @@ Analysis of 986 plans confirms that plans with identical numeric features (price
 
 **Correct Detection Examples:**
 
-```javascript
+```typescript
 // DUPLICATES (same numeric fingerprint, English kept):
 "Truly Simple 12" vs "Verdaderamente Simple 12"
   → Same prices (15.0¢, 14.5¢, 14.0¢), term (12 months), fees ($150 ETF)
@@ -845,7 +807,7 @@ Analysis of 986 plans confirms that plans with identical numeric features (price
 
 Ensures professional, consistent display:
 
-```javascript
+```typescript
 formatProviderName(name):
   1. Convert to uppercase
   2. Remove trailing: LLC, INC, LP, & CO, (TX), (TEXAS), COMPANY, RETAIL, SERVICES
@@ -891,7 +853,7 @@ Unlike competitors, *Light* maintains unlimited historical archive:
 
 - **Static architecture**: Zero backend, instant loading
 - **Pre-fetched data**: No API calls during use
-- **Minimal dependencies**: Vanilla JavaScript, custom CSS
+- **Minimal dependencies**: Vanilla JavaScript/TypeScript, custom CSS
 - **Optimized caching**: 5-minute browser cache with retry logic
 
 ### Accessibility

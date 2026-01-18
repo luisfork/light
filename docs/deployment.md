@@ -12,7 +12,7 @@
 
 *Light* is a pure static site:
 
-- **No backend servers**: All computation happens client-side in JavaScript
+- **No backend servers**: All computation happens client-side in TypeScript
 - **No databases**: Data stored in static JSON files updated daily
 - **No build-time SSG**: HTML is pre-written and minified at deployment
 - **GitHub Pages hosting**: Free, reliable CDN with automatic HTTPS
@@ -58,14 +58,14 @@ The deployment process prioritizes aggressive optimization:
 - Install minification tools:
   - html-minifier-terser (HTML)
   - csso-cli (CSS)
-  - terser (JavaScript)
+  - terser (TypeScript)
   - python-minifier (Python)
 ```
 
 #### 2. Directory Structure Creation
 
 ```bash
-_site/
+site/
 ├── assets/fonts/
 │   ├── new_york/WOFF2/
 │   └── san_francisco/WOFF2/
@@ -83,7 +83,7 @@ _site/
 
 - Remove all HTML comments
 - Collapse whitespace and newlines
-- Remove redundant attributes (e.g., `type="text/javascript"`)
+- Remove redundant attributes (e.g., `type="text/TypeScript"`)
 - Minify inline CSS and JavaScript
 - Use short doctypes
 - Strip optional closing tags where valid
@@ -134,7 +134,7 @@ csso "$file" --output "$target" --comments none
 - Optimized selector efficiency
 - Preserved visual output
 
-#### 5. JavaScript Minification
+#### 5. TypeScript Minification
 
 **Tool:** `terser`
 
@@ -257,7 +257,7 @@ Python scripts are **static downloads** on GitHub Pages. They are not executed s
 ### Optimizations Applied
 - ✓ HTML minified (comments removed, whitespace collapsed)
 - ✓ CSS minified (CSSO with comment removal)
-- ✓ JavaScript minified (Terser with compression and mangling)
+- ✓ TypeScript minified (Terser with compression and mangling)
 - ✓ Python scripts minified (docstrings and comments removed)
 - ✓ Fonts optimized (WOFF2 only)
 ```
@@ -298,7 +298,7 @@ Python scripts are **static downloads** on GitHub Pages. They are not executed s
 - `cssnano`: Requires PostCSS ecosystem
 - `lightningcss`: Modern but less mature
 
-### JavaScript: `terser`
+### TypeScript: `terser`
 
 **Why chosen:**
 
@@ -377,7 +377,7 @@ GitHub Pages serves **only static content** (HTML, CSS, JS, images, fonts, docum
 
 1. User visits `https://luisfork.github.io/light`
 2. Browser loads minified HTML/CSS/JS
-3. JavaScript fetches `data/plans.json` (pre-fetched, static)
+3. TypeScript fetches `data/plans.json` (pre-fetched, static)
 4. All calculations happen client-side in browser
 5. No server-side processing occurs
 
@@ -391,7 +391,7 @@ GitHub Pages serves **only static content** (HTML, CSS, JS, images, fonts, docum
 | --- | --- | --- | --- |
 | HTML | ~40 KB | ~20 KB | 50% |
 | CSS | ~60 KB | ~30 KB | 50% |
-| JavaScript | ~120 KB | ~45 KB | 62% |
+| TypeScript | ~120 KB | ~45 KB | 62% |
 | Python | ~30 KB | ~15 KB | 50% |
 | **Total** | **~250 KB** | **~110 KB** | **56%** |
 

@@ -72,7 +72,7 @@ Plans provide rates at exactly three usage levels: 500, 1000, and 2000 kWh. Real
 
 ### Implementation
 
-```javascript
+```typescript
 function interpolateRate(usageKwh, plan) {
     const { price_kwh_500, price_kwh_1000, price_kwh_2000 } = plan;
 
@@ -184,7 +184,7 @@ TDU Cost (tracked separately for transparency, NOT added to total):
 
 ### Implementation
 
-```javascript
+```typescript
 function calculateMonthlyCost(usageKwh, plan, tduRates, localTaxRate = 0) {
     // Step 1: Calculate energy charges
     // Plan rates already include TDU charges per EFL requirements
@@ -313,7 +313,7 @@ Bill credits are specified in free-text `special_terms` field. Requires pattern 
 
 ### Implementation
 
-```javascript
+```typescript
 function calculateBillCredits(usageKwh, plan) {
     if (!plan.special_terms) return 0;
 
@@ -384,7 +384,7 @@ Calculate total annual cost using realistic monthly usage pattern (not 12 identi
 
 ### Implementation
 
-```javascript
+```typescript
 function calculateAnnualCost(monthlyUsageArray, plan, tduRates, localTaxRate = 0) {
     // Validate input
     if (monthlyUsageArray.length !== 12) {
@@ -466,7 +466,7 @@ When user provides only average monthly usage or home size, generate realistic s
 
 Based on ERCOT load data and residential consumption patterns:
 
-```javascript
+```typescript
 const seasonalMultipliers = [
     1.2,   // January - Winter heating (20% above baseline)
     1.1,   // February - Moderate winter
@@ -485,7 +485,7 @@ const seasonalMultipliers = [
 
 ### Implementation
 
-```javascript
+```typescript
 function estimateUsagePattern(avgMonthlyKwh, homeSize = null) {
     // Calculate adjustment factor to ensure average equals input
     const sumMultipliers = seasonalMultipliers.reduce((a, b) => a + b, 0);
@@ -532,7 +532,7 @@ Without adjustment, sum of multipliers (14.6) would create average of 1,217 kWh 
 
 ### Home Size to Usage Mapping
 
-```javascript
+```typescript
 function estimateUsageFromHomeSize(homeSize) {
     const sizeMap = {
         'studio': 500,
@@ -565,7 +565,7 @@ Quantify risk of unexpected costs. Higher volatility = less predictable bills.
 
 ### Implementation
 
-```javascript
+```typescript
 function calculateVolatility(plan, userUsage) {
     let volatilityScore = 0;
 
@@ -688,7 +688,7 @@ Volatility = 0 + 0 + 0.4 = 0.4 (Moderate-High)
 
 ### Implementation
 
-```javascript
+```typescript
 function rankPlans(plans, userUsage, tduRates, options = {}) {
     const { localTaxRate = 0, termLengthPreference = null } = options;
 
@@ -769,7 +769,7 @@ The UI displays visual warning badges for plans with specific restrictions:
 
 Plans are flagged as new-customer-only using conservative phrase matching:
 
-```javascript
+```typescript
 function isNewCustomerOnly(plan) {
   const text = [
     plan.special_terms,
@@ -799,7 +799,7 @@ function isNewCustomerOnly(plan) {
 
 ### Implementation
 
-```javascript
+```typescript
 function identifyWarnings(plan, userUsage, contractStartDate = null) {
     const warnings = [];
 
@@ -893,7 +893,7 @@ function identifyWarnings(plan, userUsage, contractStartDate = null) {
 
 ### Detection Logic
 
-```javascript
+```typescript
 function calculateEarlyTerminationFee(plan, monthsRemaining) {
     // EFL-derived details override heuristics
     if (plan.etf_details) {
@@ -1021,7 +1021,7 @@ Alternative Terms Suggested:
 
 Plans are ranked by a **Multiplicative Value Score**.
 
-```javascript
+```typescript
 // Combined Score = Cost Efficiency × Quality Factor
 const costScore = 100 - ((plan.annualCost - bestAnnualCost) / costRange) * 100;
 const qualityFactor = Math.max(1, plan.qualityScore) / 100;
@@ -1067,7 +1067,7 @@ The quality score (0-100) is calculated from multiple factors:
 
 Plans are ranked using a multiplicative value model that discounts risky plans:
 
-```javascript
+```typescript
 // Combined Score = Cost Score × (Quality Score / 100)
 const costScore = 100 - ((plan.annualCost - bestAnnualCost) / costRange) * 100;
 const qualityFactor = Math.max(1, plan.qualityScore) / 100;
@@ -1155,7 +1155,7 @@ This ensures a plan must be both competitively priced and high quality to rank w
 
 Plans are fingerprinted using structural features that should be identical for duplicates:
 
-```javascript
+```typescript
 function createPlanFingerprint(plan) {
   return JSON.stringify({
     rep: plan.rep_name.toUpperCase().trim(),
@@ -1180,7 +1180,7 @@ function createPlanFingerprint(plan) {
 
 When duplicates are found, the system selects the preferred version using a weighted scoring system:
 
-```javascript
+```typescript
 function calculatePlanPreference(plan) {
   let score = 100;
   const language = (plan.language || '').toLowerCase();
@@ -1257,15 +1257,15 @@ Spanish-only plans receive a `SPANISH ONLY` badge in the UI to inform users:
 - Allows client-side to show real-time statistics
 - Preserves data integrity for analysis
 
-**Client-Side (JavaScript):**
+**Client-Side (TypeScript):**
 
-- `src/js/api.js` performs deduplication on page load
+- `src/ts/api.ts` performs deduplication on page load
 - Returns metrics: `duplicateCount`, `orphanedEnglishCount`, `orphanedSpanishCount`
 - Marks plans with `is_spanish_only` flag for UI display
 
 **Example Detection:**
 
-```javascript
+```typescript
 // These are DUPLICATES (same fingerprint):
 {
   plan_name: "SoFed Better Rate - 3",
@@ -1287,7 +1287,7 @@ Spanish-only plans receive a `SPANISH ONLY` badge in the UI to inform users:
 // System keeps: "SoFed Better Rate - 3" (English, higher score)
 ```
 
-```javascript
+```typescript
 // These are NOT DUPLICATES (different pricing):
 {
   plan_name: "SoFed Better Rate 12",
@@ -1331,7 +1331,7 @@ Filter by TDU area before calculating (reduces plan count by ~83%).
 
 ### Unit Test Cases
 
-```javascript
+```typescript
 // Test 1: Interpolation accuracy
 assert(interpolateRate(750, plan) === expectedRate);
 
@@ -1351,7 +1351,7 @@ assert(calculateEarlyTerminationFee(perMonthPlan, 18) === 270);
 
 ### Integration Test Cases
 
-```javascript
+```typescript
 // Test 1: End-to-end ranking
 const ranked = rankPlans(allPlans, userUsage, tdu);
 assert(ranked[0].annualCost <= ranked[1].annualCost);

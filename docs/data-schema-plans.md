@@ -72,7 +72,7 @@ last_updated = datetime.now(timezone.utc).isoformat()
 
 **UI Display:**
 
-```javascript
+```typescript
 const date = new Date(data.last_updated);
 const displayDate = date.toLocaleDateString('en-US', {
   month: 'short',
@@ -185,7 +185,7 @@ type TDUCode =
 
 **Validation:**
 
-```javascript
+```typescript
 assert(typeof plan_id === 'string' && plan_id.length > 0);
 assert(plan_id.match(/^[A-Z0-9-]+$/i));  // Alphanumeric + hyphens
 ```
@@ -206,7 +206,7 @@ assert(plan_id.match(/^[A-Z0-9-]+$/i));  // Alphanumeric + hyphens
 
 **Transformation:**
 
-```javascript
+```typescript
 function formatProviderName(rawName) {
     return rawName
         .toUpperCase()
@@ -218,7 +218,7 @@ function formatProviderName(rawName) {
 
 **Validation:**
 
-```javascript
+```typescript
 assert(rep_name === rep_name.toUpperCase());
 assert(rep_name.length >= 2 && rep_name.length <= 50);
 assert(!rep_name.match(/\b(LLC|INC|L\.P\.|LP)\b/i));  // Suffixes removed
@@ -243,7 +243,7 @@ assert(!rep_name.match(/\b(LLC|INC|L\.P\.|LP)\b/i));  // Suffixes removed
 
 **Validation:**
 
-```javascript
+```typescript
 assert(typeof plan_name === 'string');
 assert(plan_name.length >= 5 && plan_name.length <= 200);
 ```
@@ -263,7 +263,7 @@ assert(plan_name.length >= 5 && plan_name.length <= 200);
 
 **Normalization Mapping:**
 
-```javascript
+```typescript
 const tduNormalization = {
   "Oncor Electric Delivery": "ONCOR",
   "Oncor": "ONCOR",
@@ -294,7 +294,7 @@ const tduNormalization = {
 
 **Validation:**
 
-```javascript
+```typescript
 const validTDUs = ["ONCOR", "CENTERPOINT", "AEP_CENTRAL", "AEP_NORTH", "TNMP", "LPL"];
 assert(validTDUs.includes(tdu_area));
 ```
@@ -309,7 +309,7 @@ assert(validTDUs.includes(tdu_area));
 
 **Validation:**
 
-```javascript
+```typescript
 assert(typeof price_kwh_500 === 'number' && !isNaN(price_kwh_500));
 assert(price_kwh_500 >= 5.0 && price_kwh_500 <= 50.0);
 assert(typeof price_kwh_1000 === 'number' && !isNaN(price_kwh_1000));
@@ -349,7 +349,7 @@ Flat-ish Plan:     10.5¢ → 10.2¢ → 10.0¢ (minimal variance, predictable)
 
 **Validation:**
 
-```javascript
+```typescript
 assert(Number.isInteger(term_months));
 assert(term_months >= 1 && term_months <= 36);
 ```
@@ -392,7 +392,7 @@ Variable and indexed-rate plans expose users to unpredictable costs. Light focus
 
 **Validation:**
 
-```javascript
+```typescript
 assert(Number.isInteger(renewable_pct));
 assert(renewable_pct >= 0 && renewable_pct <= 100);
 ```
@@ -419,13 +419,13 @@ Allows filtering to plans with ≥50% or 100% renewable content.
 
 **Transformation:**
 
-```javascript
+```typescript
 is_prepaid = (rawData.PrepaidYN === 'Y' || rawData.PrepaidProduct === true);
 ```
 
 **Validation:**
 
-```javascript
+```typescript
 assert(typeof is_prepaid === 'boolean');
 ```
 
@@ -444,13 +444,13 @@ assert(typeof is_prepaid === 'boolean');
 
 **Transformation:**
 
-```javascript
+```typescript
 is_tou = (rawData.TimeOfUseYN === 'Y');
 ```
 
 **Validation:**
 
-```javascript
+```typescript
 assert(typeof is_tou === 'boolean');
 ```
 
@@ -470,14 +470,14 @@ assert(typeof is_tou === 'boolean');
 
 **Validation:**
 
-```javascript
+```typescript
 assert(typeof early_termination_fee === 'number' && !isNaN(early_termination_fee));
 assert(early_termination_fee >= 0 && early_termination_fee <= 500);
 ```
 
 **Fee Structure Detection:**
 
-```javascript
+```typescript
 // Prefer etf_details when present (EFL-derived)
 if (etf_details) {
   // Use etf_details.structure and rates directly
@@ -545,7 +545,7 @@ def extract_base_charge(fees_text):
 
 **Validation:**
 
-```javascript
+```typescript
 assert(typeof base_charge_monthly === 'number' && !isNaN(base_charge_monthly));
 assert(base_charge_monthly >= 0 && base_charge_monthly <= 30);
 ```
@@ -568,7 +568,7 @@ Base charges favor high-usage households and penalize low-usage customers.
 
 **Validation:**
 
-```javascript
+```typescript
 if (efl_url !== '') {
   assert(efl_url.startsWith('http://') || efl_url.startsWith('https://'));
   assert(efl_url.endsWith('.pdf') || efl_url.includes('/efl/'));
@@ -590,7 +590,7 @@ if (efl_url !== '') {
 
 **Validation:**
 
-```javascript
+```typescript
 if (enrollment_url !== '') {
   assert(enrollment_url.startsWith('http://') || enrollment_url.startsWith('https://'));
 }
@@ -608,7 +608,7 @@ Deep link to plan-specific signup page for user convenience.
 
 **Validation:**
 
-```javascript
+```typescript
 if (terms_url !== '') {
   assert(terms_url.startsWith('http://') || terms_url.startsWith('https://'));
 }
@@ -884,7 +884,7 @@ Some REPs list identical plans in both English and Spanish versions with differe
 
 ### Detection Algorithm
 
-```javascript
+```typescript
 function detectDuplicatePlans(plans) {
   const seen = new Map();
   const duplicates = [];
@@ -918,7 +918,7 @@ function detectDuplicatePlans(plans) {
 
 ### Deduplication Strategy
 
-```javascript
+```typescript
 function deduplicatePlans(plans) {
   const fingerprintMap = new Map();
 
@@ -970,7 +970,7 @@ plans_2026-01-10.json
 
 ### Usage
 
-```javascript
+```typescript
 // Load historical data for comparison
 const current = await fetch('/data/plans.json').then(r => r.json());
 const historical = await fetch('/data/historical/plans_2025-12-01.json').then(r => r.json());

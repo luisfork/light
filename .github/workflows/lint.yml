@@ -49,7 +49,7 @@ jobs:
           uv tool install ruff
           uv tool install djlint
 
-      - name: Install JavaScript tools
+      - name: Install TypeScript tools
         run: npm install -g @biomejs/biome@1.9.4
 
       - name: Run Ruff (Python)

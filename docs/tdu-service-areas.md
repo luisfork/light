@@ -360,7 +360,7 @@ TDU Percentage = 50%
 
 ### TDU Detection Algorithm
 
-```javascript
+```typescript
 function detectTDU(zipCode, tduList) {
     const zipRanges = {
         'ONCOR': [

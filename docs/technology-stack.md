@@ -7,13 +7,14 @@ Comprehensive overview of technologies, formats, and dependencies used in the Li
 ### Core Technologies
 
 - **Architecture**: Static single-page application (SPA)
-- **JavaScript**: 100% Vanilla JS (ES6+), zero runtime frameworks
+- **Language**: TypeScript 5.0+ (transpiled to ES2020)
+- **Runtime**: Zero dependencies (Vanilla JS output)
 - **HTML**: Semantic HTML5 with ARIA labels
 - **CSS**: Custom design system with CSS variables
 
 ### CSS System
 
-- **Format**: Modular CSS with custom bundler (`scripts/build-css.js`)
+- **Format**: Modular CSS with custom bundler (`scripts/build-css.ts`)
 - **Modules**:
   - `base.css`: Design tokens, typography, color system
   - `styles.css`: Component styles, layout, responsive design
@@ -101,7 +102,7 @@ src/assets/fonts/
 ### Data Scripts
 
 | Script | Purpose | Output |
-|--------|---------|--------|
+| --- | --- | --- |
 | `fetch_plans.py` | Fetch electricity plans from Power to Choose API | `data/plans.json` |
 | `fetch_tdu_rates.py` | Manage TDU delivery rates | `data/tdu-rates.json` |
 | `archive_to_csv.py` | Convert JSON archives to CSV format | `data/csv-archive/*.csv` |
@@ -127,7 +128,7 @@ src/assets/fonts/
 - **Runtime**: Bun (preferred) or Node.js 18+
 - **TypeScript**: Strict mode enabled with all null safety checks (NEW)
   - Source: `src/ts/`
-  - Compiled output: `src/js/`
+  - Compiled output: `src/js/` (Git ignored)
   - Config: `tsconfig.json`
 - **Linter**: Biome (`biome.json`)
   - Enforces consistent code style

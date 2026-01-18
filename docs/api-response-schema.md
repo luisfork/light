@@ -314,7 +314,7 @@ ZIP code to TDU mapping and local tax rates.
 
 ### `calculateMonthlyCost()` Response
 
-```javascript
+```typescript
 {
   total: 127.45,                    // Total monthly bill (dollars)
   breakdown: {
@@ -330,7 +330,7 @@ ZIP code to TDU mapping and local tax rates.
 
 ### `calculateAnnualCost()` Response
 
-```javascript
+```typescript
 {
   annualCost: 1529.40,              // Total annual cost (dollars)
   monthlyCosts: [                   // Array of 12 monthly costs
@@ -344,7 +344,7 @@ ZIP code to TDU mapping and local tax rates.
 
 ### `rankPlans()` Response
 
-```javascript
+```typescript
 [
   {
     // Original plan fields...
@@ -371,7 +371,7 @@ ZIP code to TDU mapping and local tax rates.
 
 ### `calculateContractExpiration()` Response
 
-```javascript
+```typescript
 {
   startDate: Date,                  // Contract start date object
   expirationDate: Date,             // Calculated expiration date
@@ -417,7 +417,7 @@ ZIP code to TDU mapping and local tax rates.
 
 Returns single number (float) representing total ETF in dollars.
 
-```javascript
+```typescript
 // Per-month-remaining ETF:
 calculateEarlyTerminationFee(plan, 18) → 270.00
 // (Plan with $15/month ETF, 18 months remaining = $15 × 18)
@@ -469,7 +469,7 @@ calculateEarlyTerminationFee(plan, 18) → 150.00
 
 ### Plan Validation
 
-```javascript
+```typescript
 const validatePlan = (plan) => {
   assert(plan.plan_id && typeof plan.plan_id === 'string');
   assert(plan.rep_name && plan.rep_name === plan.rep_name.toUpperCase());
@@ -486,7 +486,7 @@ const validatePlan = (plan) => {
 
 ### Usage Data Validation
 
-```javascript
+```typescript
 const validateUsageArray = (monthlyUsage) => {
   assert(Array.isArray(monthlyUsage) && monthlyUsage.length === 12);
   monthlyUsage.forEach(usage => {
@@ -500,7 +500,7 @@ const validateUsageArray = (monthlyUsage) => {
 
 ### ZIP Code Validation
 
-```javascript
+```typescript
 const validateZipCode = (zip) => {
   assert(typeof zip === 'string');
   assert(/^\d{5}$/.test(zip));  // Exactly 5 digits
@@ -514,7 +514,7 @@ const validateZipCode = (zip) => {
 
 ### Client-Side Caching Strategy
 
-```javascript
+```typescript
 const CACHE_CONFIG = {
   plans: {
     ttl: 300000,        // 5 minutes (data changes infrequently)

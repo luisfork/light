@@ -62,11 +62,11 @@ Based on historical Power to Choose data and market research:
 
 ### Core Function: `calculateContractExpiration()`
 
-Located in: `src/js/calculator.js`
+Located in: `src/ts/calculator.ts`
 
 #### Function Signature
 
-```javascript
+```typescript
 /**
  * Calculate contract expiration date and timing analysis
  *
@@ -79,7 +79,7 @@ function calculateContractExpiration(startDate, termMonths)
 
 #### Return Object Structure
 
-```javascript
+```typescript
 {
   startDate: Date,                    // Contract start date (Date object)
   expirationDate: Date,               // Contract expiration date (Date object)
@@ -98,7 +98,7 @@ function calculateContractExpiration(startDate, termMonths)
 
 #### Alternative Terms Structure
 
-```javascript
+```typescript
 alternativeTerms: [
   {
     termMonths: number,               // Alternative term length (e.g., 9)
@@ -117,7 +117,7 @@ alternativeTerms: [
 
 ### Step 1: Calculate Expiration Date
 
-```javascript
+```typescript
 const start = new Date(startDate);
 const expiration = new Date(start);
 expiration.setMonth(expiration.getMonth() + termMonths);
@@ -126,7 +126,7 @@ const expirationMonth = expiration.getMonth(); // 0-11
 
 ### Step 2: Score Renewal Seasonality
 
-```javascript
+```typescript
 const renewalSeasonality = {
   0: 0.7,  // January - expensive (winter peak)
   1: 0.5,  // February - moderate
@@ -147,7 +147,7 @@ const seasonalityScore = renewalSeasonality[expirationMonth];
 
 ### Step 3: Categorize Risk Level
 
-```javascript
+```typescript
 if (seasonalityScore >= 0.8) {
   renewalTiming = 'Peak Season (Expensive)';
   riskLevel = 'high';
@@ -167,7 +167,7 @@ else {
 
 ### Step 4: Calculate Alternative Terms
 
-```javascript
+```typescript
 const alternatives = [];
 for (let altTerm of [6, 9, 12, 18, 24, 36]) {
   if (altTerm === termMonths) continue; // Skip current term
@@ -201,7 +201,7 @@ alternatives.sort((a, b) => a.seasonalityScore - b.seasonalityScore);
 
 The contract expiration feature integrates with the existing plan warning system:
 
-```javascript
+```typescript
 /**
  * @param {Date} contractStartDate - Optional start date for expiration analysis
  */
@@ -347,7 +347,7 @@ Add to each plan card in results:
 
 ### Example 1: High-Risk Expiration
 
-```javascript
+```typescript
 const startDate = new Date('2026-01-15');
 const termMonths = 18; // 18-month contract
 
@@ -389,7 +389,7 @@ console.log(analysis);
 
 ### Example 2: Optimal Expiration
 
-```javascript
+```typescript
 const startDate = new Date('2026-06-01');
 const termMonths = 10; // 10-month contract
 
@@ -407,7 +407,7 @@ console.log(analysis.alternativeTerms);
 
 ### Example 3: Integrating with Plan Ranking
 
-```javascript
+```typescript
 const plans = await API.loadPlans();
 const userUsage = [1200, 1100, 1000, 900, 1000, 1500, 2000, 2100, 1600, 1000, 900, 1200];
 const contractStart = new Date('2026-02-01');

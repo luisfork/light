@@ -770,13 +770,11 @@ def parse_int(value: Any) -> int | None:
 
 def create_plan_fingerprint(plan: dict[str, Any]) -> str:
     """
-    Create fingerprint matching JavaScript implementation.
+    Create fingerprint
 
-    Duplicates typically occur when providers list the same plan in both English and Spanish
-    with identical pricing, terms, and features but different plan names.
+    Duplicates typically occur when providers list the same plan in both English and Spanish with identical pricing, terms, and features but different plan names.
 
-    Analysis shows that plans with identical numeric features always have identical
-    text descriptions, making text extraction unnecessary.
+    Analysis shows that plans with identical numeric features always have identical text descriptions, making text extraction unnecessary.
     """
 
     def normalize_price(price):

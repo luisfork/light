@@ -49,7 +49,7 @@ Improve early termination fee (ETF) (also known as cancellation fee) accuracy by
 
 ### 2. ETF Calculator Logic
 
-**File**: `src/js/modules/etf-calculator.js`
+**File**: `src/ts/modules/etf-calculator.ts`
 
 - Prefer `etf_details` when present.
 - Expand term sources to include `fees_credits`, `promotion_details`, `min_usage_fees`.
@@ -58,14 +58,14 @@ Improve early termination fee (ETF) (also known as cancellation fee) accuracy by
 
 ### 3. UI Display & Sorting
 
-**File**: `src/js/ui.js`
+**File**: `src/ts/ui.ts`
 
 - Display `See EFL` when `structure === "unknown"` and show verification icon.
 - Sort `unknown` ETFs last to avoid being treated as lowest fee.
 
 ### 4. Tests
 
-**File**: `tests/unit/etf-calculator.test.js`
+**File**: `tests/unit/etf-calculator.test.ts`
 
 - Test EFL‑derived `etf_details` handling.
 - Test prepaid plans remain `flat`.
