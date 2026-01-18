@@ -9,7 +9,7 @@
  * VULNERABILITY FIXED: Type-safe ZIP code parsing
  */
 
-import type { TaxInfo } from '../types';
+// Types are locally defined for this standalone module
 
 /**
  * City tax data structure.
@@ -44,7 +44,9 @@ interface TaxDataFile {
 /**
  * Extended tax info with deregulation details.
  */
-interface ExtendedTaxInfo extends TaxInfo {
+interface ExtendedTaxInfo {
+  readonly rate: number;
+  readonly city?: string;
   readonly tdu: string | null;
   readonly region?: string;
   readonly deregulated: boolean;
@@ -82,8 +84,6 @@ const TaxLookup = {
     if (Number.isNaN(zip)) {
       return {
         rate: taxData.default_local_rate ?? 0,
-        city: null,
-        county: null,
         region: 'Texas',
         tdu: null,
         deregulated: true,
@@ -100,7 +100,6 @@ const TaxLookup = {
           return {
             rate: cityData.rate ?? 0,
             city: cityName.replace(/_/g, ' '),
-            county: null,
             tdu: cityData.tdu,
             deregulated: cityData.deregulated !== false,
             note: cityData.note ?? null
@@ -127,8 +126,6 @@ const TaxLookup = {
         if (!Number.isNaN(min) && !Number.isNaN(max) && zip >= min && zip <= max) {
           return {
             rate: rangeData.rate ?? 0,
-            city: null,
-            county: null,
             region: rangeData.region,
             tdu: rangeData.tdu,
             deregulated: rangeData.tdu !== null,
@@ -141,8 +138,6 @@ const TaxLookup = {
     // Default response
     return {
       rate: taxData.default_local_rate ?? 0,
-      city: null,
-      county: null,
       region: 'Texas',
       tdu: null,
       deregulated: true,

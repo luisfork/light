@@ -83,12 +83,11 @@ export interface ElectricityPlan {
  * Plans data file structure (data/plans.json).
  */
 export interface PlansData {
-  readonly plans: readonly ElectricityPlan[];
-  readonly metadata: {
-    readonly fetched_at: string;
-    readonly total_plans: number;
-    readonly source: string;
-  };
+  plans: ElectricityPlan[];
+  readonly last_updated: string;
+  readonly data_source: string;
+  total_plans: number;
+  readonly disclaimer: string;
 }
 
 // ============================================================================
@@ -123,24 +122,45 @@ export interface TDURatesData {
   readonly next_update: string;
 }
 
-// ============================================================================
-// Tax Types
-// ============================================================================
-
 /**
  * Local tax information for a ZIP code.
  */
 export interface TaxInfo {
   readonly rate: number;
-  readonly city: string | null;
-  readonly county: string | null;
+  readonly city?: string;
+  readonly region?: string;
+  readonly tdu: string | null;
+  readonly deregulated: boolean;
+}
+
+/**
+ * City tax data entry.
+ */
+export interface CityTaxData {
+  readonly rate: number;
+  readonly zip_codes: readonly string[];
+  readonly tdu: string | null;
+  readonly deregulated: boolean;
+}
+
+/**
+ * ZIP code range data entry.
+ */
+export interface ZipCodeRangeData {
+  readonly rate: number;
+  readonly region: string;
+  readonly tdu: string | null;
 }
 
 /**
  * Local taxes data file structure (data/local-taxes.json).
  */
 export interface LocalTaxesData {
-  readonly [zipCode: string]: TaxInfo;
+  readonly last_updated: string;
+  readonly state_sales_tax: number;
+  readonly default_local_rate: number;
+  readonly zip_code_ranges: Record<string, ZipCodeRangeData>;
+  readonly major_cities: Record<string, CityTaxData>;
 }
 
 // ============================================================================
