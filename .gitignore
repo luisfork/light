@@ -1,6 +1,3 @@
-# Other
-.other/
-
 # Python
 __pycache__/
 *.py[cod]
@@ -72,3 +69,7 @@ test-results/
 # Bun
 bun.lockb
 .bun/
+
+# Other
+.other/
+
