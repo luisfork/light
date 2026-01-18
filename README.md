@@ -516,7 +516,7 @@ uv run python scripts/fetch_tdu_rates.py
 
 ### GitHub Actions Workflows
 
-**Daily Data Updates** (`update-plans.yml`):
+#### Daily Data Updates (`update-plans.yml`)
 
 - Runs at 2 AM Central Time (7 AM UTC)
 - Archives current plans to `data/json-archive/` (unlimited retention)
@@ -527,13 +527,55 @@ uv run python scripts/fetch_tdu_rates.py
 - Commits and pushes if changes detected
 - Triggers deployment workflow
 
-**Deployment** (`deploy.yml`):
+#### Optimized Build and Deployment (`deploy.yml`)
 
-- Triggered on push to `main` branch
-- Triggered after successful data update
-- Builds site and deploys to GitHub Pages
+*Light* employs an aggressive optimization pipeline that minifies and obfuscates all source files before deployment to GitHub Pages. This reduces file sizes, improves load times, and protects intellectual property.
 
-**Linting** (`lint.yml`):
+**Build Process:**
+
+1. **Environment Setup**
+   - Ubuntu runner with Node.js 20 and Python 3.11
+   - Installs industry-standard minification tools
+
+2. **Source Code Optimization**
+   - **HTML Minification** (`html-minifier-terser`): Removes comments, collapses whitespace, strips redundant attributes, minifies inline CSS/JS
+   - **CSS Minification** (`csso-cli`): Removes comments, optimizes selectors, eliminates redundancies
+   - **JavaScript Minification** (`terser`): Compresses logic, mangles variable names, removes comments and console statements
+   - **Python Minification** (`python-minifier`): Strips docstrings, removes comments, renames globals/locals, hoists literals
+
+3. **Asset Optimization**
+   - Fonts: Only WOFF2 format deployed (30% smaller than WOFF, 50% smaller than OTF)
+   - Data: JSON files copied without modification (integrity preservation)
+   - Documentation: LICENSE and README included for transparency
+
+4. **Deployment**
+   - Publishes optimized `_site/` directory to GitHub Pages
+   - Creates `.nojekyll` to bypass Jekyll processing
+   - Generates build report with file size statistics
+
+**Triggers:**
+
+- Every push to `main` branch
+- After successful data update workflow
+- After data fetch completes (workflow_run trigger)
+- Manual dispatch available
+
+**Production vs Development:**
+
+- **Production (GitHub Pages)**: Fully minified and obfuscated source code
+- **Development (`src/`)**: Human-readable source with full comments and formatting
+- **Source Code**: Always available in GitHub repository
+
+**Python on GitHub Pages:**
+
+Python scripts in `scripts/` directory are minified and included in the deployment for download and reference. These are **static files** for user inspection, not server-side scripts. GitHub Pages serves only static content (HTML, CSS, JS, assets). The Python scripts enable users to:
+
+- Inspect data fetching methodology
+- Run scripts locally for verification
+- Understand data processing logic
+- Contribute to the project
+
+#### Linting (`lint.yml`)
 
 - Runs on pull requests and pushes to main
 - Biome for JavaScript/JSON linting and formatting

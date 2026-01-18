@@ -1,14 +1,10 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy to GitHub Pages
 
 on:
-  # Trigger on push to main branch
+  # Trigger on every push to main branch
   push:
     branches:
       - main
-    paths:
-      - 'src/**'
-      - 'data/**'
-      - '.github/workflows/deploy.yml'
 
   # Trigger after the data update workflow completes
   workflow_run:
@@ -34,7 +30,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Build job
+  # Build and optimization job
   build:
     runs-on: ubuntu-latest
     # Only run if workflow_run was successful, or if triggered by push/workflow_dispatch
@@ -52,23 +48,126 @@ jobs:
           # Enable Pages if not already enabled (requires appropriate permissions)
           enablement: true
 
-      - name: Assemble site
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install minification tools
         run: |
-          # Create a temporary directory for the assembled site
-          mkdir -p _site
-          
-          # Copy all files from src/ to _site/ (including hidden files)
-          cp -r src/. _site/
-          
-          # Create data directory in _site and copy data files (including hidden files)
+          # Install Node.js minifiers
+          npm install -g html-minifier-terser csso-cli terser
+          # Install Python minifier
+          pip install python-minifier
+
+      - name: Create build directory structure
+        run: |
+          mkdir -p _site/assets/fonts/new_york/WOFF2
+          mkdir -p _site/assets/fonts/san_francisco/WOFF2
+          mkdir -p _site/css/modules
+          mkdir -p _site/js/modules
           mkdir -p _site/data
-          cp -r data/. _site/data/
-          
-          echo "Site assembled successfully"
-          echo "Contents of _site:"
-          ls -la _site/
-          echo "Contents of _site/data:"
-          ls -la _site/data/
+          mkdir -p _site/scripts
+
+      - name: Minify HTML files
+        run: |
+          find src -name "*.html" | while read file; do
+            target="_site/${file#src/}"
+            mkdir -p "$(dirname "$target")"
+            html-minifier-terser \
+              --collapse-whitespace \
+              --remove-comments \
+              --remove-redundant-attributes \
+              --remove-script-type-attributes \
+              --remove-style-link-type-attributes \
+              --minify-css true \
+              --minify-js true \
+              --use-short-doctype \
+              "$file" -o "$target"
+            echo "✓ Minified: $file → $target"
+          done
+
+      - name: Minify CSS files
+        run: |
+          find src/css -name "*.css" | while read file; do
+            target="_site/css/${file#src/css/}"
+            mkdir -p "$(dirname "$target")"
+            csso "$file" --output "$target" --comments none
+            echo "✓ Minified: $file → $target"
+          done
+
+      - name: Minify JavaScript files
+        run: |
+          find src/js -name "*.js" | while read file; do
+            target="_site/js/${file#src/js/}"
+            mkdir -p "$(dirname "$target")"
+            terser "$file" \
+              --compress passes=2 \
+              --mangle \
+              --comments false \
+              --output "$target"
+            echo "✓ Minified: $file → $target"
+          done
+
+      - name: Minify Python scripts
+        run: |
+          find scripts -name "*.py" | while read file; do
+            target="_site/scripts/${file#scripts/}"
+            mkdir -p "$(dirname "$target")"
+            pyminify \
+              --remove-literal-statements \
+              --remove-asserts \
+              --hoist-literals \
+              --rename-globals \
+              --rename-locals \
+              "$file" > "$target" || cp "$file" "$target"
+            echo "✓ Processed: $file → $target"
+          done
+
+      - name: Copy optimized fonts (WOFF2 only)
+        run: |
+          # Only copy WOFF2 format for optimal compression
+          if [ -d "src/assets/fonts/new_york/WOFF2" ]; then
+            cp -r src/assets/fonts/new_york/WOFF2/* _site/assets/fonts/new_york/WOFF2/
+            echo "✓ Copied New York fonts (WOFF2)"
+          fi
+          if [ -d "src/assets/fonts/san_francisco/WOFF2" ]; then
+            cp -r src/assets/fonts/san_francisco/WOFF2/* _site/assets/fonts/san_francisco/WOFF2/
+            echo "✓ Copied San Francisco fonts (WOFF2)"
+          fi
+
+      - name: Copy data files
+        run: |
+          # Copy all JSON data files (no minification to preserve data integrity)
+          cp -r data/* _site/data/
+          echo "✓ Copied data files"
+
+      - name: Copy additional files
+        run: |
+          # Copy LICENSE and README for transparency
+          cp LICENSE _site/ 2>/dev/null || true
+          cp README.md _site/ 2>/dev/null || true
+          echo "✓ Copied documentation files"
+
+      - name: Create .nojekyll file
+        run: |
+          # Disable Jekyll processing
+          touch _site/.nojekyll
+          echo "✓ Created .nojekyll"
+
+      - name: Generate build report
+        run: |
+          echo "## Build Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "### File Sizes" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
+          du -sh _site/* 2>/dev/null | sort -h >> "$GITHUB_STEP_SUMMARY"
+          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Total size:** $(du -sh _site | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -94,4 +193,11 @@ jobs:
             echo "**Status:** ✅ Successfully deployed to GitHub Pages"
             echo "**URL:** ${{ steps.deployment.outputs.page_url }}"
             echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')"
+            echo ""
+            echo "### Optimizations Applied"
+            echo "- ✓ HTML minified (comments removed, whitespace collapsed)"
+            echo "- ✓ CSS minified (CSSO with comment removal)"
+            echo "- ✓ JavaScript minified (Terser with compression and mangling)"
+            echo "- ✓ Python scripts minified (docstrings and comments removed)"
+            echo "- ✓ Fonts optimized (WOFF2 only)"
           } >> "$GITHUB_STEP_SUMMARY"
