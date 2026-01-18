@@ -1,3 +1,7 @@
+# Other
+docs/
+.other/
+
 # Python
 __pycache__/
 *.py[cod]
