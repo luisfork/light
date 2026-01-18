@@ -937,16 +937,21 @@ if (typeof window !== 'undefined') {
   (window as unknown as Record<string, unknown>)['Toast'] = Toast;
 }
 
-// CommonJS compatibility
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { UI, Toast };
-}
+
 
 // Initialize on DOM ready
 if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => UI.init());
-  } else {
+  const init = (): void => {
+    // Prevent double init
+    if ((window as any)._uiInitialized) return;
+    (window as any)._uiInitialized = true;
     UI.init();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('load', init);
+  } else {
+    init();
   }
 }

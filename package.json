@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "bun run build:ts && bun run build:css",
-    "build:ts": "tsc",
+    "build:ts": "bun build ./src/ts/ui.ts --outdir ./src/js --target browser",
     "build:css": "bun run scripts/build-css.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun run typecheck && bun run test:unit && bun run test:ui",

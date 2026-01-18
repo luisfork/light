@@ -48,20 +48,26 @@ jobs:
           # Enable Pages if not already enabled (requires appropriate permissions)
           enablement: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '20'
+          bun-version: latest
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build project
+        run: bun run build
+
       - name: Install minification tools
         run: |
-          # Install Node.js minifiers
-          npm install -g html-minifier-terser csso-cli terser
+          # Install Node.js minifiers using Bun
+          bun add -g html-minifier-terser csso-cli terser
           # Install Python minifier
           pip install python-minifier
 

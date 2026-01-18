@@ -451,13 +451,13 @@ light/
 ### TypeScript Build Process
 
 - **Source files**: `src/ts/` (TypeScript modules)
-- **Compiled output**: `src/js/` (compiled JavaScript for browser)
+- **Bundled output**: `src/js/` (bundled JavaScript for browser)
 - **Configuration**: `tsconfig.json` with strict mode enabled
 
 ```bash
 # Available scripts
-bun run build        # Build TypeScript + CSS
-bun run build:ts     # Build TypeScript only
+bun run build        # Build & Bundle TypeScript + CSS
+bun run build:ts     # Build & Bundle TypeScript only
 bun run typecheck    # Type check without emitting files
 bun run test         # Type check + unit tests + UI tests
 bun run dev          # Start local development server

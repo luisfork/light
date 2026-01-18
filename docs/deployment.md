@@ -53,9 +53,11 @@ The deployment process prioritizes aggressive optimization:
 #### 1. Environment Preparation
 
 ```yaml
-- Setup Node.js 20
+- Setup Bun (latest)
 - Setup Python 3.11
-- Install minification tools:
+- Install dependencies: `bun install`
+- Build project: `bun run build`
+- Install minification tools (via Bun):
   - html-minifier-terser (HTML)
   - csso-cli (CSS)
   - terser (TypeScript)
