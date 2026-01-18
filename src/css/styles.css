@@ -273,9 +273,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border-medium);
   border-radius: 6px;
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   appearance: none;
 }
 
@@ -780,9 +778,7 @@ textarea {
   box-shadow: none;
   opacity: 0;
   transform: translateY(12px);
-  transition:
-    opacity var(--transition-base),
-    transform var(--transition-base);
+  transition: opacity var(--transition-base), transform var(--transition-base);
 }
 
 .results-section.is-visible {
@@ -966,12 +962,12 @@ textarea {
   gap: 6px;
   padding: var(--space-3) var(--space-3) var(--space-2);
   border-radius: 10px;
-  background-image:
-    linear-gradient(180deg, var(--usage-chart-bg-start) 0%, var(--usage-chart-bg-end) 100%),
-    linear-gradient(to top, var(--usage-chart-grid) 1px, transparent 1px);
-  background-size:
-    100% 100%,
-    100% 25%;
+  background-image: linear-gradient(
+      180deg,
+      var(--usage-chart-bg-start) 0%,
+      var(--usage-chart-bg-end) 100%
+    ), linear-gradient(to top, var(--usage-chart-grid) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 25%;
   background-repeat: no-repeat, repeat;
 }
 
@@ -993,10 +989,8 @@ textarea {
   --usage-bar-end: var(--usage-low-end);
   background: linear-gradient(180deg, var(--usage-bar-start) 0%, var(--usage-bar-end) 100%);
   box-shadow: var(--usage-bar-shadow);
-  transition:
-    transform var(--transition-base),
-    box-shadow var(--transition-base),
-    filter var(--transition-base);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), filter
+    var(--transition-base);
 }
 
 .profile-chart .bar:hover {
@@ -1084,21 +1078,15 @@ textarea {
   -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-xl);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow:
-    0 2px 12px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  transition:
-    transform var(--transition-base),
-    box-shadow var(--transition-base),
-    background-color var(--transition-base);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), background-color
+    var(--transition-base);
 }
 
 .plan-item:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.06),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0
+    rgba(255, 255, 255, 0.9);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
 }
 
@@ -1317,11 +1305,8 @@ textarea {
   border-radius: 10px;
   cursor: pointer;
   text-decoration: none;
-  transition:
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast),
-    background-color var(--transition-fast),
-    opacity var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color
+    var(--transition-fast), opacity var(--transition-fast);
 }
 
 .btn-plan-action:focus-visible {
@@ -1550,9 +1535,7 @@ textarea {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b6b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
     background-color var(--transition-fast);
   box-shadow: var(--shadow-sm);
 }
@@ -1565,9 +1548,7 @@ textarea {
 .filter-select:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow:
-    0 0 0 3px var(--color-accent-muted),
-    var(--shadow-sm);
+  box-shadow: 0 0 0 3px var(--color-accent-muted), var(--shadow-sm);
   background: var(--color-surface);
 }
 
@@ -1659,9 +1640,7 @@ textarea {
 
 .comparison-table tbody tr {
   cursor: pointer;
-  transition:
-    background-color var(--transition-fast),
-    box-shadow var(--transition-fast),
+  transition: background-color var(--transition-fast), box-shadow var(--transition-fast),
     border-color var(--transition-fast);
 }
 
@@ -1829,9 +1808,7 @@ textarea {
   border-right: 4px solid transparent;
   border-bottom: 5px solid var(--color-ink-muted);
   opacity: 0.3;
-  transition:
-    opacity var(--transition-fast),
-    transform var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
   vertical-align: middle;
 }
 
@@ -1931,11 +1908,8 @@ textarea {
   border: 1px solid var(--color-border-medium);
   border-radius: 6px;
   cursor: pointer;
-  transition:
-    transform var(--transition-base),
-    box-shadow var(--transition-base),
-    border-color var(--transition-base),
-    background-color var(--transition-base);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color
+    var(--transition-base), background-color var(--transition-base);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -2238,11 +2212,8 @@ textarea {
   -webkit-backdrop-filter: blur(40px) saturate(150%);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.04),
-    0 8px 40px rgba(0, 0, 0, 0.12),
-    0 24px 80px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 8px 40px rgba(0, 0, 0, 0.12), 0 24px 80px
+    rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   animation: modalDialogIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   transform-origin: center center;
 }
@@ -2337,10 +2308,8 @@ textarea {
   border: none;
   cursor: pointer;
   border-radius: 50%;
-  transition:
-    background-color var(--transition-fast),
-    color var(--transition-fast),
-    transform var(--transition-fast);
+  transition: background-color var(--transition-fast), color var(--transition-fast), transform
+    var(--transition-fast);
   z-index: 1;
 }
 
@@ -2531,10 +2500,8 @@ textarea {
   cursor: pointer;
   text-align: center;
   text-decoration: none;
-  transition:
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast),
-    background-color var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color
+    var(--transition-fast);
 }
 
 .modal-btn:focus-visible {
@@ -2814,10 +2781,8 @@ textarea {
   background: var(--color-surface);
   color: var(--color-ink);
   border-radius: 10px;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 10px 15px -3px rgba(0, 0, 0, 0.08),
-    0 20px 25px -5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 20px 25px
+    -5px rgba(0, 0, 0, 0.05);
   pointer-events: auto;
   animation: toastIn 0.35s cubic-bezier(0.21, 1.02, 0.73, 1);
   border: 1px solid var(--color-border-subtle);

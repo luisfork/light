@@ -1341,8 +1341,8 @@ const UI = {
     }
 
     return {
-      lowestCost: Math.min(...plans.map((p) => p.annualCost || Infinity)),
-      lowestRate: Math.min(...plans.map((p) => p.effectiveRate || Infinity)),
+      lowestCost: Math.min(...plans.map((p) => p.annualCost || Number.POSITIVE_INFINITY)),
+      lowestRate: Math.min(...plans.map((p) => p.effectiveRate || Number.POSITIVE_INFINITY)),
       highestQuality: Math.max(...plans.map((p) => p.qualityScore || 0)),
       lowestFee: Math.min(...plans.map((p) => this.getETFSortValue(p)))
     };
