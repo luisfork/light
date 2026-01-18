@@ -80,17 +80,16 @@
   --usage-bar-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   --usage-bar-shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.12);
 
-  /* Typography - SF Pro, SF Mono, SF Compact, New York (Apple-exclusive fonts) */
+  /* Typography - SF Pro, SF Compact, New York Small (Apple fonts)
+     Font stack priority: Custom fonts → Apple system → System fallbacks
+     Note: Only WOFF2 format used for optimal performance (~30% smaller than WOFF) */
   --font-system: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-display:
-    "SF Pro Display", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono: "SF Mono", -apple-system, BlinkMacSystemFont, system-ui, monospace;
+  --font-display: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
   --font-compact: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-compact-display:
-    "SF Compact Display", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-serif: "New York Small", "New York", -apple-system, BlinkMacSystemFont, system-ui, serif;
-  --font-serif-large:
-    "New York", "New York Large", -apple-system, BlinkMacSystemFont, system-ui, serif;
+    "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-serif: "New York Small", ui-serif, "Times New Roman", Times, serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;

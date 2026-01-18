@@ -121,3 +121,19 @@ Install Playwright browsers with Bun:
 ```bash
 bunx playwright install
 ```
+
+## Font Assets
+
+Light uses Apple fonts in WOFF2 format for optimal performance:
+
+- **SF Pro**: Primary UI font (weights 400-700, regular/italic)
+- **SF Compact**: Condensed UI variant (weights 400-700, regular/italic)
+- **New York Small**: Serif font for headings (weights 400-700, regular/italic)
+
+All fonts are located in `src/assets/fonts/` with WOFF2 files providing ~30% smaller file size vs WOFF.
+
+**CSS Build:** After modifying any font declarations or CSS modules, rebuild the bundle:
+
+```bash
+bun run scripts/build-css.js
+```

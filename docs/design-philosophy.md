@@ -145,28 +145,34 @@ Light implements Apple's official system colors for both Light and Dark modes.
 
 ### Font Families
 
-Light implements the complete Apple font ecosystem with precise usage guidelines following the Human Interface Guidelines.
+Light implements Apple fonts with WOFF2 format for optimal performance.
 
 ```css
 /* San Francisco Pro - Primary UI font */
 --font-system: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
-/* San Francisco Pro Display - Large headings (>19px) */
---font-display: "SF Pro Display", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+/* San Francisco Pro - All text sizes (Display variant removed) */
+--font-display: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
-/* San Francisco Mono - Numeric and tabular data */
---font-mono: "SF Mono", -apple-system, BlinkMacSystemFont, system-ui, monospace;
+/* Monospace - System fonts (SF Mono not included) */
+--font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
-/* San Francisco Compact - Condensed UI elements and table headers */
+/* San Francisco Compact - Condensed UI elements */
 --font-compact: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
---font-compact-display: "SF Compact Display", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+--font-compact-display: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
-/* New York - Serif headings and editorial content */
---font-serif: "New York", -apple-system, BlinkMacSystemFont, system-ui, serif;
+/* New York Small - Serif headings and editorial content */
+--font-serif: "New York Small", ui-serif, "Times New Roman", Times, serif;
 
-/* New York Large - Hero and display headings */
---font-serif-large: "New York Large", "New York", -apple-system, BlinkMacSystemFont, system-ui, serif;
 ```
+
+**Available Fonts:**
+
+- **SF Pro**: Primary system font (weights 400-700, regular/italic)
+- **SF Compact**: Condensed variant for dense UI (weights 400-700, regular/italic)
+- **New York Small**: Serif font for headings (weights 400-700, regular/italic)
+
+**Performance:** All fonts use WOFF2 format exclusively, reducing file size by ~30% compared to WOFF while maintaining full browser support.
 
 ### Type Scale
 
@@ -189,35 +195,54 @@ Light implements the complete Apple font ecosystem with precise usage guidelines
 
 **Weight Distribution:**
 
-- 300 (Light): Rarely used, reserved for large display text
-- 400 (Regular): Default body text
-- 500 (Medium): Emphasized UI elements, button labels
-- 600 (Semibold): Strong emphasis, active states
-- 700 (Bold): Very strong emphasis (use sparingly)
+- 400 (Regular): Body text, general content
+- 500 (Medium): Emphasized headings, UI elements
+- 600 (Semibold): Primary headings (h1-h4)
+- 700 (Bold): Strong emphasis (use sparingly)
 
 **Elements:**
 
 - Body paragraphs (400)
 - Button labels (500)
-- Form labels (600)
+- Form labels (500-600)
 - Navigation items (500)
-- Secondary descriptions (400)
+- Section headings (600)
 
-#### San Francisco Pro Display
+#### San Francisco Compact
 
-**Purpose:** Large headings (≥20px)
+**Purpose:** Condensed UI elements, table headers, badges
 
 **When to use:**
 
-- Hero titles ≥32px
-- Section headings ≥20px
-- Display text requiring optical sizing
+- Table column headers (uppercase, 600 weight)
+- Mobile layouts requiring space efficiency
+- Dense data displays
+- Compact labels and metadata
 
-**Note:** SF Pro Display is designed with wider apertures for large sizes. It provides better legibility at display sizes compared to SF Pro Text.
+#### New York Small
 
-#### San Francisco Mono (SF Mono)
+**Purpose:** All serif applications—headings, hero titles, editorial content
 
-**Purpose:** Numeric data, tabular information, code
+**Weight Distribution:**
+
+- 400 (Regular): Body serif text, legal disclaimers
+- 500 (Medium): Emphasized headings
+- 600 (Semibold): Primary headings (h1, h2)
+- 700 (Bold): Hero titles, strong emphasis
+
+**Elements:**
+
+- Hero titles (700, 32-64px)
+- Page headings (h1, h2)
+- Section headings (h3, h4)
+- Editorial content
+- Footer legal text
+
+#### Monospace Stack
+
+**Purpose:** Numeric data, tabular information
+
+**Font stack:** `ui-monospace, "SF Mono", Menlo, monospace`
 
 **Critical Usage:**
 
@@ -227,86 +252,33 @@ Light implements the complete Apple font ecosystem with precise usage guidelines
 - ZIP codes (75001)
 - Contract terms (12 months)
 - All table numeric cells
-- Metric values in hero section
-- Plan cost displays
+- Metric values
 
-**Why SF Mono:**
+**Why monospace:**
 
 - Fixed-width characters ensure perfect alignment
 - Tabular numerals maintain consistent spacing
 - Superior legibility for financial data
-- Reduces cognitive load when scanning numbers
-
-#### San Francisco Compact
-
-**Purpose:** Condensed UI elements, table headers, mobile optimization
-
-**When to use:**
-
-- Table column headers (uppercase, 600 weight)
-- Mobile responsive layouts (<768px)
-- Space-constrained interfaces
-- Dense data displays
-
-**Benefits:**
-
-- 10-15% narrower than SF Pro
-- Maintains legibility at small sizes
-- Optimized for data-dense layouts
-
-#### New York
-
-**Purpose:** Editorial headings, serif accent text
-
-**Weight Distribution:**
-
-- 400 (Regular): Standard headings (h3, h4)
-- 500 (Medium): Emphasized headings
-- 600 (Semibold): Primary headings (h1, h2)
-- 700 (Bold): Rare, very strong emphasis
-
-**Elements:**
-
-- Page titles (h1, h2)
-- Section headings (h3, h4)
-- Legal disclaimers (400, smaller size)
-- Footer legal text
-
-#### New York Large
-
-**Purpose:** Hero section display headings
-
-**When to use:**
-
-- Hero titles ≥32px
-- Landing page headlines
-- Feature section headings
-
-**Characteristics:**
-
-- Optimized for large display sizes (≥32px)
-- Enhanced contrast and readability
-- Wider character spacing for visual impact
 
 ### Typography Pairing Rules
 
 #### Hierarchy System
 
 ```bash
-Hero Title       → New York Large (700, 40-64px)
-Page Heading     → New York (600, 24-32px)
-Section Heading  → SF Pro Display (600, 20-24px)
+Hero Title       → New York Small (700, 40-64px)
+Page Heading     → New York Small (600, 24-32px)
+Section Heading  → SF Pro (600, 20-24px)
 Subsection       → SF Pro (600, 18px)
 Body Text        → SF Pro (400, 16px)
 Caption          → SF Pro (400, 14px)
 Label            → SF Compact (600, 12px uppercase)
-Numeric Data     → SF Mono (500-700, varies)
+Numeric Data     → System Monospace (500-700, varies)
 ```
 
 #### Contrast Pairing
 
-- **Serif + Sans:** New York headings with SF Pro body (current implementation)
-- **Mono + Sans:** SF Mono numbers with SF Pro labels
+- **Serif + Sans:** New York Small headings with SF Pro body
+- **Mono + Sans:** System monospace numbers with SF Pro labels
 - **Compact + Regular:** SF Compact headers with SF Pro content
 
 ### Advanced Typography Features
@@ -320,7 +292,7 @@ font-variant-numeric: tabular-nums;
 /* Enable ligatures for SF Pro (default) */
 font-variant-ligatures: common-ligatures;
 
-/* Disable ligatures for SF Mono (monospace integrity) */
+/* Disable ligatures for monospace (preserve fixed-width integrity) */
 font-variant-ligatures: none;
 ```
 
@@ -364,7 +336,7 @@ font-variant-ligatures: none;
 ```css
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/SF-Pro-Text-Regular.otf") format("opentype");
+  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap; /* Prevent FOIT (Flash of Invisible Text) */
@@ -376,7 +348,7 @@ font-variant-ligatures: none;
 - Shows fallback font immediately
 - Swaps to custom font when loaded
 - Prevents blank text during font download
-- Acceptable for non-critical branding
+- WOFF2 format provides ~30% smaller files vs WOFF
 
 ### Accessibility Considerations
 
@@ -391,22 +363,22 @@ font-variant-ligatures: none;
 ```bash
 src/assets/fonts/
 ├── san_francisco/
-│   ├── SF-Pro-Text-*.otf        (12 files)
-│   ├── SF-Pro-Display-*.otf     (9 files)
-│   ├── SF-Mono-*.otf            (12 files)
-│   └── SF-Compact-*.otf         (8 files loaded)
+│   └── WOFF2/
+│       ├── SF-Pro-Text-*.woff2 (8 files: Regular/Medium/Semibold/Bold + italics)
+│       └── SF-Compact-Text-*.woff2 (8 files: Regular/Medium/Semibold/Bold + italics)
 └── new_york/
-    ├── NewYorkMedium-*.otf      (6 files)
-    └── NewYorkLarge-*.otf       (4 files)
+    └── WOFF2/
+        └── NewYorkSmall-*.woff2 (8 files: Regular/Medium/Semibold/Bold + italics)
 ```
 
-**Total fonts loaded:** 51 font files (necessary for complete weight and style coverage)
+**Total fonts loaded:** 24 WOFF2 files (8 per family × 3 families)
 
 ### Performance Optimization
 
-- **Subset loading:** Consider creating font subsets for production
-- **Preload critical fonts:** Preload Regular and Semibold weights
-- **Lazy load display fonts:** New York Large can be loaded after initial render
+- **WOFF2 only:** Single format reduces complexity and file size
+- **Modern browsers:** WOFF2 supported by all modern browsers (95%+ global coverage)
+- **Swap strategy:** Prevents flash of invisible text (FOIT)
+- **System fallbacks:** Graceful degradation to system fonts
 - **WOFF2 conversion:** Convert OTF to WOFF2 for smaller file sizes (future enhancement)
 
 ---
