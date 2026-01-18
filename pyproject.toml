@@ -51,6 +51,7 @@ ignore = "H006,H030,H031"
 [dependency-groups]
 dev = [
     "mypy>=1.19.1",
+    "pytest>=9.0.2",
     "types-requests>=2.32.4.20260107",
 ]
 # H006: img tag height/width (not always needed)

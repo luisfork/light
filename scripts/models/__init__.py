@@ -180,3 +180,48 @@ class LocalTaxesData(BaseModel):
     default_local_rate: Annotated[float, Field(ge=0, le=1, default=0.0)]
 
     model_config = {"frozen": True}
+
+
+class TDURateValidator:
+    """Utility class for validating TDU rate data."""
+
+    @staticmethod
+    def validate_rate_value(rate: float, max_reasonable: float = 100.0) -> bool:
+        """
+        Validate that a rate value is within reasonable bounds.
+
+        Args:
+            rate: Rate value to validate
+            max_reasonable: Maximum reasonable rate (default 100 cents/kWh)
+
+        Returns:
+            True if rate is valid, False otherwise
+        """
+        if not isinstance(rate, (int, float)):
+            return False
+        return rate <= max_reasonable
+
+    @staticmethod
+    def validate_zip_code_range(min_zip: int, max_zip: int) -> bool:
+        """
+        Validate a ZIP code range.
+
+        Args:
+            min_zip: Minimum ZIP code in range
+            max_zip: Maximum ZIP code in range
+
+        Returns:
+            True if range is valid, False otherwise
+        """
+        # ZIP codes must be 5 digits (10000-99999)
+        if min_zip < 10000 or max_zip > 99999:
+            return False
+        # Min must be <= Max
+        if min_zip > max_zip:
+            return False
+        return True
+
+
+# Aliases for backwards compatibility with tests
+TDURateModel = TDURate
+TDURatesDataModel = TDURatesData

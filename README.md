@@ -513,25 +513,56 @@ uv run mypy scripts/
 uv sync --all-extras
 ```
 
-### Automated Testing
+### Testing & Validation
 
-*Light* uses **node:test** (via Bun) for unit tests and **Playwright** for robust UI testing. This ensures that core calculation logic, cost formatting, and critical UI components remain stable after code changes.
+*Light* uses a comprehensive testing strategy covering TypeScript, Python, and UI logic.
 
-> [!NOTE]
-> Testing is performed against a real browser engine (Chromium) but remains decoupled from the production code, which stays **100% *Vanilla* JavaScript**.
+#### 1. TypeScript Validation
+
+Strict type checking ensures code integrity before runtime.
+
+```bash
+# Compilation verification
+bun run typecheck
+
+# Full build (transpile TS to JS)
+bun run build
+```
+
+#### 2. Python Unit Tests (Pytest)
+
+Validates data models, rate limiters, and utility functions using Pydantic schemas.
+
+```bash
+# Install test runner
+uv pip install pytest
+
+# Run all Python tests
+uv run pytest
+
+# Run with verbose output
+uv run pytest -v
+```
+
+#### 3. Frontend Unit Tests (Bun)
+
+Tests core calculation logic, formatting, and ranking algorithms.
 
 ```bash
 # Run unit tests
 bun test tests/unit
+```
 
-# Run all UI tests (headless)
+#### 4. UI/E2E Tests (Playwright)
+
+Validates the full user journey against a real browser.
+
+```bash
+# Install browsers
+bunx playwright install chromium
+
+# Run all UI tests
 bunx playwright test
-
-# Run tests and show report on failure
-bunx playwright test --reporter=html
-
-# Debug tests (shows browser window)
-bunx playwright test --debug
 ```
 
 Test specifications are located in `tests/ui/` and configuration in `playwright.config.js`.
