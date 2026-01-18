@@ -756,17 +756,18 @@ Unlike competitors, *Light* maintains unlimited historical archive:
 
 ### Professional Aesthetic
 
+- **Professional Aesthetic**: Custom Apple-inspired design system
 - **NO emojis**: Professional text-only communication
 - **NO bento grids**: Clear, hierarchical layout
 - **NO shadcn/ui aesthetic**: Custom Apple-inspired design system
 - **NO animations except spring physics**: All transitions use spring-based cubic-bezier timing functions
 - **Sophisticated neutral palette**: Ink grays, ambient light effects, translucent materials with backdrop-filter
-- **Typography-focused**: Apple fonts optimized for web performance
+- **Typography-focused**: Apple fonts with progressive loading (WOFF2 → WOFF → OTF)
   - **SF Pro**: Primary UI text and body copy (weights 400-700, regular/italic)
   - **SF Compact**: Table headers and dense UI layouts (weights 400-700, regular/italic)
   - **New York Small**: All serif applications—headings, hero titles, editorial content (weights 400-700, regular/italic)
   - **System Monospace**: All numeric and tabular data for superior legibility and alignment
-- **WOFF2 format**: All fonts use WOFF2 for ~30% smaller file size and optimal performance
+- **Progressive Font Loading**: Modern browsers use WOFF2 (~30% smaller), older browsers fall back to WOFF or OTF
 - **Functional depth**: Rich calculations, transparent methodology
 
 > [!TIP]

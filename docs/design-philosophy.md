@@ -145,7 +145,7 @@ Light implements Apple's official system colors for both Light and Dark modes.
 
 ### Font Families
 
-Light implements Apple fonts with WOFF2 format for optimal performance.
+Light implements Apple fonts with progressive loading for maximum browser compatibility.
 
 ```css
 /* San Francisco Pro - Primary UI font */
@@ -172,7 +172,7 @@ Light implements Apple fonts with WOFF2 format for optimal performance.
 - **SF Compact**: Condensed variant for dense UI (weights 400-700, regular/italic)
 - **New York Small**: Serif font for headings (weights 400-700, regular/italic)
 
-**Performance:** All fonts use WOFF2 format exclusively, reducing file size by ~30% compared to WOFF while maintaining full browser support.
+**Performance:** Fonts use progressive loading (WOFF2 → WOFF → OTF) for optimal performance and maximum compatibility. Modern browsers automatically select WOFF2 (~30% smaller than WOFF), while older browsers fall back to WOFF or OTF.
 
 ### Type Scale
 
@@ -336,19 +336,31 @@ font-variant-ligatures: none;
 ```css
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Regular.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Regular.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Regular.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap; /* Prevent FOIT (Flash of Invisible Text) */
 }
 ```
 
-**Strategy:** `font-display: swap`
+**Strategy:** `font-display: swap` with progressive format fallback
 
 - Shows fallback font immediately
 - Swaps to custom font when loaded
 - Prevents blank text during font download
-- WOFF2 format provides ~30% smaller files vs WOFF
+- **Progressive Loading:**
+  1. **WOFF2**: Modern browsers (Chrome 36+, Firefox 39+, Safari 10+, Edge 14+)
+     - Best compression (~30% smaller than WOFF)
+     - Fastest load times
+  2. **WOFF**: Older browsers (Chrome 5+, Firefox 3.6+, Safari 5.1+, IE 9+)
+     - Wide compatibility
+     - Standard web font format
+  3. **OTF**: Legacy fallback
+     - Universal browser support
+     - Desktop font format for older clients
 
 ### Accessibility Considerations
 
@@ -363,23 +375,27 @@ font-variant-ligatures: none;
 ```bash
 src/assets/fonts/
 ├── san_francisco/
-│   └── WOFF2/
-│       ├── SF-Pro-Text-*.woff2 (8 files: Regular/Medium/Semibold/Bold + italics)
-│       └── SF-Compact-Text-*.woff2 (8 files: Regular/Medium/Semibold/Bold + italics)
+│   ├── WOFF2/  SF-Pro-Text-*.woff2, SF-Compact-Text-*.woff2 (16 files)
+│   ├── WOFF/   SF-Pro-Text-*.woff, SF-Compact-Text-*.woff (16 files)
+│   └── OTF/    SF-Pro-Text-*.otf, SF-Compact-Text-*.otf (16 files)
 └── new_york/
-    └── WOFF2/
-        └── NewYorkSmall-*.woff2 (8 files: Regular/Medium/Semibold/Bold + italics)
+    ├── WOFF2/  NewYorkSmall-*.woff2 (8 files)
+    ├── WOFF/   NewYorkSmall-*.woff (8 files)
+    └── OTF/    NewYorkSmall-*.otf (8 files)
 ```
 
-**Total fonts loaded:** 24 WOFF2 files (8 per family × 3 families)
+**Total fonts available:** 24 variants per format × 3 formats = 72 font files
+
+**Fonts loaded per user:** Modern browsers load 24 WOFF2 files; older browsers fall back to WOFF or OTF as needed
 
 ### Performance Optimization
 
-- **WOFF2 only:** Single format reduces complexity and file size
-- **Modern browsers:** WOFF2 supported by all modern browsers (95%+ global coverage)
+- **Progressive loading:** WOFF2 → WOFF → OTF ensures optimal performance and maximum compatibility
+- **Modern browsers:** Automatically select WOFF2 for best performance (95%+ global coverage)
+- **Legacy support:** Graceful degradation to WOFF or OTF for older browsers
 - **Swap strategy:** Prevents flash of invisible text (FOIT)
-- **System fallbacks:** Graceful degradation to system fonts
-- **WOFF2 conversion:** Convert OTF to WOFF2 for smaller file sizes (future enhancement)
+- **System fallbacks:** Graceful degradation to system fonts if custom fonts fail
+- **Browser intelligence:** Each browser automatically selects the best supported format
 
 ---
 

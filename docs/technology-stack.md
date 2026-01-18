@@ -17,7 +17,7 @@ Comprehensive overview of technologies, formats, and dependencies used in the Li
 - **Modules**:
   - `base.css`: Design tokens, typography, color system
   - `styles.css`: Component styles, layout, responsive design
-  - `fonts.css`: Font-face declarations (WOFF2 only)
+  - `fonts.css`: Font-face declarations with progressive fallback (WOFF2 → WOFF → OTF)
 - **Build**: Bun-based CSS concatenation into `bundle.css`
 - **Features**:
   - CSS custom properties for design tokens
@@ -27,7 +27,7 @@ Comprehensive overview of technologies, formats, and dependencies used in the Li
 
 ### Typography
 
-**Format**: WOFF2 exclusively for optimal performance (~30% smaller than WOFF)
+**Format**: Progressive font loading with WOFF2 → WOFF → OTF fallback chain
 
 **Font Families**:
 
@@ -50,20 +50,33 @@ Comprehensive overview of technologies, formats, and dependencies used in the Li
 
 - Usage: Numeric data, currency values, energy rates, tabular information
 
-**Performance**: WOFF2 reduces font file size by ~30% vs WOFF while maintaining full browser support.
+**Format Priority**:
+
+1. **WOFF2**: Modern browsers (Chrome 36+, Firefox 39+, Safari 10+, Edge 14+)
+   - Best compression (~30% smaller than WOFF)
+   - Fastest load times
+2. **WOFF**: Older browsers (Chrome 5+, Firefox 3.6+, Safari 5.1+, IE 9+)
+   - Wide compatibility
+   - Standard web font format
+3. **OTF**: Legacy fallback
+   - Universal browser support
+   - Desktop font format for older clients
 
 **File Structure**:
 
-```
+```bash
 src/assets/fonts/
 ├── san_francisco/
-│   └── WOFF2/
-│       ├── SF-Pro-Text-*.woff2 (8 files)
-│       └── SF-Compact-Text-*.woff2 (8 files)
+│   ├── WOFF2/      SF-Pro-Text-*.woff2, SF-Compact-Text-*.woff2 (16 files)
+│   ├── WOFF/       SF-Pro-Text-*.woff, SF-Compact-Text-*.woff (16 files)
+│   └── OTF/        SF-Pro-Text-*.otf, SF-Compact-Text-*.otf (16 files)
 └── new_york/
-    └── WOFF2/
-        └── NewYorkSmall-*.woff2 (8 files)
+    ├── WOFF2/      NewYorkSmall-*.woff2 (8 files)
+    ├── WOFF/       NewYorkSmall-*.woff (8 files)
+    └── OTF/        NewYorkSmall-*.otf (8 files)
 ```
+
+**Browser Behavior**: Modern browsers automatically select WOFF2 for optimal performance, while older browsers gracefully fall back to WOFF or OTF as needed.
 
 ### Design System
 

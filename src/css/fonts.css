@@ -2,18 +2,25 @@
  * Font Declarations
  *
  * San Francisco (SF Pro, SF Compact) and New York Small Font Families
- * Optimized with WOFF2 for best performance
+ * Progressive font loading with format fallbacks for maximum compatibility
  *
- * Format priority:
- * 1. WOFF2 - Best compression, modern browser support (~30% smaller than WOFF)
+ * Format Priority (Browser Compatibility):
+ * 1. WOFF2 - Modern browsers, best compression (~30% smaller than WOFF)
+ * 2. WOFF  - Older browsers, wide compatibility
+ * 3. OTF   - Legacy fallback for browsers without web font support
  *
- * Available font families:
+ * Available Font Families:
  * - SF Pro: Primary system font for body text and headings
  * - SF Compact: Condensed variant for dense UI elements
  * - New York Small: Serif font for editorial content
  *
  * Performance: WOFF2 format reduces font file size by ~30% compared to WOFF,
  * improving page load times while maintaining full glyph quality.
+ *
+ * Browser Support:
+ * - WOFF2: Chrome 36+, Firefox 39+, Safari 10+, Edge 14+
+ * - WOFF: Chrome 5+, Firefox 3.6+, Safari 5.1+, Edge 12+, IE 9+
+ * - OTF: Universal fallback for legacy browsers
  *
  * © Apple Inc. All rights reserved.
  */
@@ -26,7 +33,10 @@
 
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Regular.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Regular.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Regular.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -34,7 +44,10 @@
 
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-RegularItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-RegularItalic.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-RegularItalic.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-RegularItalic.otf") format("opentype");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -42,7 +55,10 @@
 
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Medium.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Medium.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Medium.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-Medium.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -50,7 +66,10 @@
 
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-MediumItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-MediumItalic.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-MediumItalic.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-MediumItalic.otf") format("opentype");
   font-weight: 500;
   font-style: italic;
   font-display: swap;
@@ -58,7 +77,10 @@
 
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Semibold.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Semibold.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Semibold.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-Semibold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -66,7 +88,10 @@
 
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-SemiboldItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-SemiboldItalic.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-SemiboldItalic.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-SemiboldItalic.otf") format("opentype");
   font-weight: 600;
   font-style: italic;
   font-display: swap;
@@ -74,7 +99,10 @@
 
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Bold.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Bold.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Bold.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-Bold.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -82,7 +110,10 @@
 
 @font-face {
   font-family: "SF Pro";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-BoldItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-BoldItalic.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Pro-Text-BoldItalic.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Pro-Text-BoldItalic.otf") format("opentype");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
@@ -96,7 +127,10 @@
 
 @font-face {
   font-family: "SF Compact";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-Regular.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-Regular.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Compact-Text-Regular.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Compact-Text-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -104,8 +138,10 @@
 
 @font-face {
   font-family: "SF Compact";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-RegularItalic.woff2")
-    format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-RegularItalic.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Compact-Text-RegularItalic.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Compact-Text-RegularItalic.otf") format("opentype");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -113,7 +149,10 @@
 
 @font-face {
   font-family: "SF Compact";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-Medium.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-Medium.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Compact-Text-Medium.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Compact-Text-Medium.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -121,7 +160,10 @@
 
 @font-face {
   font-family: "SF Compact";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-MediumItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-MediumItalic.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Compact-Text-MediumItalic.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Compact-Text-MediumItalic.otf") format("opentype");
   font-weight: 500;
   font-style: italic;
   font-display: swap;
@@ -129,7 +171,10 @@
 
 @font-face {
   font-family: "SF Compact";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-Semibold.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-Semibold.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Compact-Text-Semibold.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Compact-Text-Semibold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -137,8 +182,10 @@
 
 @font-face {
   font-family: "SF Compact";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-SemiboldItalic.woff2")
-    format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-SemiboldItalic.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Compact-Text-SemiboldItalic.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Compact-Text-SemiboldItalic.otf") format("opentype");
   font-weight: 600;
   font-style: italic;
   font-display: swap;
@@ -146,7 +193,10 @@
 
 @font-face {
   font-family: "SF Compact";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-Bold.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-Bold.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Compact-Text-Bold.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Compact-Text-Bold.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -154,7 +204,10 @@
 
 @font-face {
   font-family: "SF Compact";
-  src: url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-BoldItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/san_francisco/WOFF2/SF-Compact-Text-BoldItalic.woff2") format("woff2"),
+    url("../assets/fonts/san_francisco/WOFF/SF-Compact-Text-BoldItalic.woff") format("woff"),
+    url("../assets/fonts/san_francisco/OTF/SF-Compact-Text-BoldItalic.otf") format("opentype");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
@@ -167,7 +220,10 @@
 
 @font-face {
   font-family: "New York Small";
-  src: url("../assets/fonts/new_york/WOFF2/NewYorkSmall-Regular.woff2") format("woff2");
+  src:
+    url("../assets/fonts/new_york/WOFF2/NewYorkSmall-Regular.woff2") format("woff2"),
+    url("../assets/fonts/new_york/WOFF/NewYorkSmall-Regular.woff") format("woff"),
+    url("../assets/fonts/new_york/OTF/NewYorkSmall-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -175,7 +231,10 @@
 
 @font-face {
   font-family: "New York Small";
-  src: url("../assets/fonts/new_york/WOFF2/NewYorkSmall-RegularItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/new_york/WOFF2/NewYorkSmall-RegularItalic.woff2") format("woff2"),
+    url("../assets/fonts/new_york/WOFF/NewYorkSmall-RegularItalic.woff") format("woff"),
+    url("../assets/fonts/new_york/OTF/NewYorkSmall-RegularItalic.otf") format("opentype");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -183,7 +242,10 @@
 
 @font-face {
   font-family: "New York Small";
-  src: url("../assets/fonts/new_york/WOFF2/NewYorkSmall-Medium.woff2") format("woff2");
+  src:
+    url("../assets/fonts/new_york/WOFF2/NewYorkSmall-Medium.woff2") format("woff2"),
+    url("../assets/fonts/new_york/WOFF/NewYorkSmall-Medium.woff") format("woff"),
+    url("../assets/fonts/new_york/OTF/NewYorkSmall-Medium.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -191,7 +253,10 @@
 
 @font-face {
   font-family: "New York Small";
-  src: url("../assets/fonts/new_york/WOFF2/NewYorkSmall-MediumItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/new_york/WOFF2/NewYorkSmall-MediumItalic.woff2") format("woff2"),
+    url("../assets/fonts/new_york/WOFF/NewYorkSmall-MediumItalic.woff") format("woff"),
+    url("../assets/fonts/new_york/OTF/NewYorkSmall-MediumItalic.otf") format("opentype");
   font-weight: 500;
   font-style: italic;
   font-display: swap;
@@ -199,7 +264,10 @@
 
 @font-face {
   font-family: "New York Small";
-  src: url("../assets/fonts/new_york/WOFF2/NewYorkSmall-Semibold.woff2") format("woff2");
+  src:
+    url("../assets/fonts/new_york/WOFF2/NewYorkSmall-Semibold.woff2") format("woff2"),
+    url("../assets/fonts/new_york/WOFF/NewYorkSmall-Semibold.woff") format("woff"),
+    url("../assets/fonts/new_york/OTF/NewYorkSmall-Semibold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -207,7 +275,10 @@
 
 @font-face {
   font-family: "New York Small";
-  src: url("../assets/fonts/new_york/WOFF2/NewYorkSmall-SemiboldItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/new_york/WOFF2/NewYorkSmall-SemiboldItalic.woff2") format("woff2"),
+    url("../assets/fonts/new_york/WOFF/NewYorkSmall-SemiboldItalic.woff") format("woff"),
+    url("../assets/fonts/new_york/OTF/NewYorkSmall-SemiboldItalic.otf") format("opentype");
   font-weight: 600;
   font-style: italic;
   font-display: swap;
@@ -215,7 +286,10 @@
 
 @font-face {
   font-family: "New York Small";
-  src: url("../assets/fonts/new_york/WOFF2/NewYorkSmall-Bold.woff2") format("woff2");
+  src:
+    url("../assets/fonts/new_york/WOFF2/NewYorkSmall-Bold.woff2") format("woff2"),
+    url("../assets/fonts/new_york/WOFF/NewYorkSmall-Bold.woff") format("woff"),
+    url("../assets/fonts/new_york/OTF/NewYorkSmall-Bold.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -223,7 +297,10 @@
 
 @font-face {
   font-family: "New York Small";
-  src: url("../assets/fonts/new_york/WOFF2/NewYorkSmall-BoldItalic.woff2") format("woff2");
+  src:
+    url("../assets/fonts/new_york/WOFF2/NewYorkSmall-BoldItalic.woff2") format("woff2"),
+    url("../assets/fonts/new_york/WOFF/NewYorkSmall-BoldItalic.woff") format("woff"),
+    url("../assets/fonts/new_york/OTF/NewYorkSmall-BoldItalic.otf") format("opentype");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
