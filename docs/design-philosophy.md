@@ -23,7 +23,7 @@ Light uses a professional design system focused on clarity, trustworthiness, and
 
 **Professional, refined, and familiar.**
 
-- **Typography:** San Francisco (SF Pro, SF Mono) and New York fonts
+- **Typography:** San Francisco (SF Pro) and New York fonts
 - **Color Palette:** Sophisticated ink grays with ambient light effects
 - **Depth System:** Layered shadows and diffused glows
 - **Layout:** Unitary surface with clear hierarchy
@@ -118,28 +118,26 @@ Light implements Apple's official system colors for both Light and Dark modes.
 
 ### Complete Apple Color Reference
 
-| Color    | Light Mode RGB    | Dark Mode RGB     |
-|----------|------------------|-------------------|
-| Red      | (255, 56, 60)    | (255, 66, 69)     |
-| Orange   | (255, 141, 40)   | (255, 146, 48)    |
-| Yellow   | (255, 204, 0)    | (255, 214, 0)     |
-| Green    | (52, 199, 89)    | (48, 209, 88)     |
-| Mint     | (0, 200, 179)    | (0, 218, 195)     |
-| Teal     | (0, 195, 208)    | (0, 210, 224)     |
-| Cyan     | (0, 192, 232)    | (60, 211, 254)    |
-| Blue     | (0, 136, 255)    | (0, 145, 255)     |
-| Indigo   | (97, 85, 245)    | (109, 124, 255)   |
-| Purple   | (203, 48, 224)   | (219, 52, 242)    |
-| Pink     | (255, 45, 85)    | (255, 55, 95)     |
-| Brown    | (172, 127, 94)   | (183, 138, 102)   |
-| Gray (1) | (142, 142, 147)  | (142, 142, 147)   |
-| Gray (2) | (174, 174, 178)  | (99, 99, 102)     |
-| Gray (3) | (199, 199, 204)  | (72, 72, 74)      |
-| Gray (4) | (209, 209, 214)  | (58, 58, 60)      |
-| Gray (5) | (229, 229, 234)  | (44, 44, 46)      |
-| Gray (6) | (242, 242, 247)  | (28, 28, 30)      |
-
----
+| Color | Light Mode RGB | Dark Mode RGB |
+| --- | --- | --- |
+| Red | (255, 56, 60) | (255, 66, 69) |
+| Orange | (255, 141, 40) | (255, 146, 48) |
+| Yellow | (255, 204, 0) | (255, 214, 0) |
+| Green | (52, 199, 89) | (48, 209, 88) |
+| Mint | (0, 200, 179) | (0, 218, 195) |
+| Teal | (0, 195, 208) | (0, 210, 224) |
+| Cyan | (0, 192, 232) | (60, 211, 254) |
+| Blue | (0, 136, 255) | (0, 145, 255) |
+| Indigo | (97, 85, 245) | (109, 124, 255) |
+| Purple | (203, 48, 224) | (219, 52, 242) |
+| Pink | (255, 45, 85) | (255, 55, 95) |
+| Brown | (172, 127, 94) | (183, 138, 102) |
+| Gray (1) | (142, 142, 147) | (142, 142, 147) |
+| Gray (2) | (174, 174, 178) | (99, 99, 102) |
+| Gray (3) | (199, 199, 204) | (72, 72, 74) |
+| Gray (4) | (209, 209, 214) | (58, 58, 60) |
+| Gray (5) | (229, 229, 234) | (44, 44, 46) |
+| Gray (6) | (242, 242, 247) | (28, 28, 30) |
 
 ## Typography
 
@@ -147,24 +145,9 @@ Light implements Apple's official system colors for both Light and Dark modes.
 
 Light implements Apple fonts with progressive loading for maximum browser compatibility.
 
-```css
-/* San Francisco Pro - Primary UI font */
---font-system: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-
-/* San Francisco Pro - All text sizes (Display variant removed) */
---font-display: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-
-/* Monospace - System fonts (SF Mono not included) */
---font-mono: ui-monospace, "SF Mono", Menlo, monospace;
-
-/* San Francisco Compact - Condensed UI elements */
---font-compact: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
---font-compact-display: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-
-/* New York Small - Serif headings and editorial content */
---font-serif: "New York Small", ui-serif, "Times New Roman", Times, serif;
-
-```
+- San Francisco Pro: Primary UI font
+- San Francisco Compact: Condensed UI elements
+- New York Small: Serif headings and editorial content
 
 **Available Fonts:**
 
@@ -221,7 +204,7 @@ Light implements Apple fonts with progressive loading for maximum browser compat
 
 #### New York Small
 
-**Purpose:** All serif applications—headings, hero titles, editorial content
+**Purpose:** All serif applications—headings, hero titles, editorial content. NOT for body text. NOT for UI elements.
 
 **Weight Distribution:**
 
@@ -240,25 +223,7 @@ Light implements Apple fonts with progressive loading for maximum browser compat
 
 #### Monospace Stack
 
-**Purpose:** Numeric data, tabular information
-
-**Font stack:** `ui-monospace, "SF Mono", Menlo, monospace`
-
-**Critical Usage:**
-
-- Currency values ($1,234.56)
-- Energy rates (12.5¢/kWh)
-- Usage amounts (1,234 kWh)
-- ZIP codes (75001)
-- Contract terms (12 months)
-- All table numeric cells
-- Metric values
-
-**Why monospace:**
-
-- Fixed-width characters ensure perfect alignment
-- Tabular numerals maintain consistent spacing
-- Superior legibility for financial data
+**Purpose:** DO NOT USE.
 
 ### Typography Pairing Rules
 
@@ -272,13 +237,11 @@ Subsection       → SF Pro (600, 18px)
 Body Text        → SF Pro (400, 16px)
 Caption          → SF Pro (400, 14px)
 Label            → SF Compact (600, 12px uppercase)
-Numeric Data     → System Monospace (500-700, varies)
 ```
 
 #### Contrast Pairing
 
 - **Serif + Sans:** New York Small headings with SF Pro body
-- **Mono + Sans:** System monospace numbers with SF Pro labels
 - **Compact + Regular:** SF Compact headers with SF Pro content
 
 ### Advanced Typography Features
@@ -292,7 +255,6 @@ font-variant-numeric: tabular-nums;
 /* Enable ligatures for SF Pro (default) */
 font-variant-ligatures: common-ligatures;
 
-/* Disable ligatures for monospace (preserve fixed-width integrity) */
 font-variant-ligatures: none;
 ```
 
@@ -301,7 +263,6 @@ font-variant-ligatures: none;
 - **Headings:** -0.02em to -0.03em (tighter)
 - **Body text:** 0 (default)
 - **Small caps/labels:** 0.03em to 0.05em (looser)
-- **Monospace:** 0 (preserve alignment)
 
 #### Line Height
 
@@ -606,7 +567,7 @@ When adding new UI components, verify:
 - [ ] All animations use spring-based cubic-bezier
 - [ ] All transitions use spring-based cubic-bezier
 - [ ] Colors from approved palette
-- [ ] Typography uses SF Pro, SF Mono, or New York
+- [ ] Typography uses SF Pro/SF Compact or New York
 - [ ] WCAG 2.1 AA contrast ratios met
 - [ ] Keyboard navigation supported
 - [ ] Semantic HTML with ARIA labels
@@ -654,5 +615,5 @@ For future interactive features:
 
 ---
 
-**Last Updated:** January 11, 2026
+**Last Updated:** January 18, 2026
 **Document Version:** 1.0.0

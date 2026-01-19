@@ -834,10 +834,17 @@ const UI = {
       this.elements.usageChart.innerHTML = monthlyUsage
         .map((usage, i) => {
           const height = max > 0 ? Math.round((usage / max) * 100) : 0;
+          let intensityClass = 'intensity-low';
+          if (height > 80) intensityClass = 'intensity-high';
+          else if (height > 60) intensityClass = 'intensity-medium-high';
+          else if (height > 40) intensityClass = 'intensity-medium';
+          else if (height > 20) intensityClass = 'intensity-low';
+          else intensityClass = 'intensity-very-low';
+
           return `
-            <div class="chart-bar-container">
-              <div class="chart-bar" style="height: ${height}%" title="${usage.toLocaleString()} kWh"></div>
-              <span class="chart-label">${monthNames[i]}</span>
+            <div class="bar-container" style="justify-content: flex-end; height: 100%;">
+              <div class="bar ${intensityClass}" style="height: ${height}%" title="${usage.toLocaleString()} kWh"></div>
+              <span class="bar-label">${monthNames[i]}</span>
             </div>
           `;
         })
@@ -877,7 +884,7 @@ const UI = {
             <td class="col-renewable">${plan.renewable_pct}%</td>
             <td class="col-etf">${this.formatETF(plan)}</td>
             <td class="col-actions">
-              <button class="btn-table-details" onclick="UI.showPlanModal('${plan.plan_id}')">Details</button>
+              <button class="btn-view" onclick="UI.showPlanModal('${plan.plan_id}')">Details</button>
             </td>
           </tr>
         `;
@@ -938,34 +945,50 @@ const UI = {
         : formatCurrency(plan.averageMonthlyCost);
 
       this.elements.modalBody.innerHTML = `
-        <div class="modal-header">
-          <h2 class="modal-plan-name">${this.escapeHtml(plan.plan_name)}</h2>
+        <div class="modal-header-group">
+          <h2 class="modal-title">${this.escapeHtml(plan.plan_name)}</h2>
           <p class="modal-provider">${this.escapeHtml(plan.rep_name)}</p>
         </div>
-        <div class="modal-cost-summary">
-          <div class="modal-cost-item">
-            <span class="modal-cost-label">Annual Cost</span>
-            <span class="modal-cost-value">${formatCurrency(plan.annualCost)}</span>
+        <div class="modal-grid">
+          <div class="modal-stat">
+            <span class="modal-stat-label">Annual Cost</span>
+            <span class="modal-stat-value">${formatCurrency(plan.annualCost)}</span>
           </div>
-          <div class="modal-cost-item">
-            <span class="modal-cost-label">Monthly (${plan.term_months} months)</span>
-            <span class="modal-cost-value">${monthlyCostText}</span>
+          <div class="modal-stat">
+            <span class="modal-stat-label">Monthly (${plan.term_months} mo)</span>
+            <span class="modal-stat-value">${monthlyCostText}</span>
           </div>
-          <div class="modal-cost-item">
-            <span class="modal-cost-label">Effective Rate</span>
-            <span class="modal-cost-value">${formatRate(plan.effectiveRate)}</span>
+          <div class="modal-stat">
+            <span class="modal-stat-label">Effective Rate</span>
+            <span class="modal-stat-value">${formatRate(plan.effectiveRate)}</span>
           </div>
         </div>
-        <div class="modal-details">
+        <div class="modal-section">
+          <h3 class="modal-section-title">Plan Details</h3>
           <p><strong>Rate Type:</strong> ${plan.rate_type}</p>
           <p><strong>Contract Term:</strong> ${plan.term_months} months</p>
           <p><strong>Renewable:</strong> ${plan.renewable_pct}%</p>
           <p><strong>Cancellation Fee:</strong> ${this.formatETF(plan)}</p>
-          ${plan.special_terms ? `<p><strong>Special Terms:</strong> ${this.escapeHtml(plan.special_terms)}</p>` : ''}
         </div>
+        ${plan.special_terms
+          ? `
+          <div class="modal-section">
+            <h3 class="modal-section-title">Special Terms</h3>
+            <div class="modal-terms-list">
+              ${plan.special_terms
+            .split('|')
+            .map((term) => term.trim())
+            .filter(Boolean)
+            .map((term) => `<p class="modal-subtext">${this.escapeHtml(term)}</p>`)
+            .join('')}
+            </div>
+          </div>
+        `
+          : ''
+        }
         <div class="modal-actions">
-          ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-modal-action">View EFL</a>` : ''}
-          ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="btn-modal-action btn-enroll">Enroll Now</a>` : ''}
+          ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn">View EFL</a>` : ''}
+          ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="modal-btn btn-enroll">Enroll Now</a>` : ''}
         </div>
       `;
     }

@@ -90,8 +90,8 @@ test.describe('Texas Electricity Calculator', () => {
     await expect(modal).toBeVisible();
 
     // Verify cost formatting in modal
-    // Modal shows structured layout with "Monthly (X months)" label and cost value
+    // Modal shows structured layout with "Monthly (X mo)" label and cost value
     const modalBody = page.locator('#modal-body');
-    await expect(modalBody).toContainText(/Monthly \(\d+ months\)/);
+    await expect(modalBody).toContainText(/Monthly \(\d+ mo\)/);
   });
 });

@@ -47,7 +47,7 @@ Comprehensive overview of technologies, formats, and dependencies used in the Li
   - Styles: Regular, Italic
   - Usage: Headings, hero titles, editorial content
 
-**Monospace**: System fonts (ui-monospace, SF Mono fallback, Menlo)
+**Monospace**: DO NOT USE
 
 - Usage: Numeric data, currency values, energy rates, tabular information
 
