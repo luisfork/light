@@ -106,6 +106,7 @@ export type ZipCodeRange = readonly [number, number];
 export interface TDURate {
   readonly code: string;
   readonly name: string;
+  readonly service_area: string;
   readonly monthly_base_charge: number;
   readonly per_kwh_rate: number;
   readonly effective_date: string;

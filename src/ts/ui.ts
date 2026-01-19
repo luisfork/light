@@ -605,7 +605,7 @@ const UI = {
       this.elements.tduRate.textContent = `${tdu.per_kwh_rate.toFixed(2)} cents/kWh`;
     }
     if (this.elements.tduArea !== null) {
-      this.elements.tduArea.textContent = tdu.code;
+      this.elements.tduArea.textContent = tdu.service_area;
     }
   },
 
@@ -805,6 +805,7 @@ const UI = {
   displayResults(plans: RankedPlanWithMetrics[], monthlyUsage: number[]): void {
     this.displayUsageProfile(monthlyUsage);
     this.displayTopPlans(plans);
+    this.displayComparisonTable(plans);
 
     if (this.elements.resultsCount !== null) {
       this.elements.resultsCount.textContent = String(plans.length);
@@ -826,6 +827,22 @@ const UI = {
     if (this.elements.profilePeak !== null) {
       this.elements.profilePeak.textContent = `${getMonthName(peakMonth)} (${Math.round(max).toLocaleString()} kWh)`;
     }
+
+    // Render usage chart bars
+    if (this.elements.usageChart !== null) {
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      this.elements.usageChart.innerHTML = monthlyUsage
+        .map((usage, i) => {
+          const height = max > 0 ? Math.round((usage / max) * 100) : 0;
+          return `
+            <div class="chart-bar-container">
+              <div class="chart-bar" style="height: ${height}%" title="${usage.toLocaleString()} kWh"></div>
+              <span class="chart-label">${monthNames[i]}</span>
+            </div>
+          `;
+        })
+        .join('');
+    }
   },
 
   displayTopPlans(plans: RankedPlanWithMetrics[]): void {
@@ -834,6 +851,37 @@ const UI = {
     const displayPlans = plans.slice(0, 5);
     this.elements.topPlans.innerHTML = displayPlans
       .map((plan, i) => this.renderPlanCard(plan, i))
+      .join('');
+  },
+
+  displayComparisonTable(plans: RankedPlanWithMetrics[]): void {
+    if (this.elements.comparisonBody === null) return;
+
+    this.elements.comparisonBody.innerHTML = plans
+      .map((plan) => {
+        const grade = this.getQualityGrade(plan.qualityScore);
+        const contractEnd = new Date();
+        contractEnd.setMonth(contractEnd.getMonth() + plan.term_months);
+        const contractEndStr = contractEnd.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+        return `
+          <tr>
+            <td class="col-grade"><span class="quality-grade ${grade.class}">${grade.letter}</span></td>
+            <td class="col-provider">${this.escapeHtml(plan.rep_name)}</td>
+            <td class="col-plan">${this.escapeHtml(plan.plan_name)}</td>
+            <td class="col-term">${plan.term_months} mo</td>
+            <td class="col-contract-end">${contractEndStr}</td>
+            <td class="col-annual">${formatCurrency(plan.annualCost)}</td>
+            <td class="col-monthly">${formatCurrency(plan.averageMonthlyCost)}</td>
+            <td class="col-rate">${formatRate(plan.effectiveRate)}</td>
+            <td class="col-renewable">${plan.renewable_pct}%</td>
+            <td class="col-etf">${this.formatETF(plan)}</td>
+            <td class="col-actions">
+              <button class="btn-table-details" onclick="UI.showPlanModal('${plan.plan_id}')">Details</button>
+            </td>
+          </tr>
+        `;
+      })
       .join('');
   },
 
@@ -885,13 +933,40 @@ const UI = {
     if (plan === undefined || this.elements.modalBackdrop === null) return;
 
     if (this.elements.modalBody !== null) {
+      const monthlyCostText = plan.monthlyCosts
+        ? `${formatCurrency(Math.min(...plan.monthlyCosts))} - ${formatCurrency(Math.max(...plan.monthlyCosts))}`
+        : formatCurrency(plan.averageMonthlyCost);
+
       this.elements.modalBody.innerHTML = `
-        <h2>${this.escapeHtml(plan.plan_name)}</h2>
-        <p><strong>Provider:</strong> ${this.escapeHtml(plan.rep_name)}</p>
-        <p><strong>Annual Cost:</strong> ${formatCurrency(plan.annualCost)}</p>
-        <p><strong>Term:</strong> ${plan.term_months} months</p>
-        <p><strong>Rate Type:</strong> ${plan.rate_type}</p>
-        ${plan.special_terms ? `<p><strong>Special Terms:</strong> ${this.escapeHtml(plan.special_terms)}</p>` : ''}
+        <div class="modal-header">
+          <h2 class="modal-plan-name">${this.escapeHtml(plan.plan_name)}</h2>
+          <p class="modal-provider">${this.escapeHtml(plan.rep_name)}</p>
+        </div>
+        <div class="modal-cost-summary">
+          <div class="modal-cost-item">
+            <span class="modal-cost-label">Annual Cost</span>
+            <span class="modal-cost-value">${formatCurrency(plan.annualCost)}</span>
+          </div>
+          <div class="modal-cost-item">
+            <span class="modal-cost-label">Monthly (${plan.term_months} months)</span>
+            <span class="modal-cost-value">${monthlyCostText}</span>
+          </div>
+          <div class="modal-cost-item">
+            <span class="modal-cost-label">Effective Rate</span>
+            <span class="modal-cost-value">${formatRate(plan.effectiveRate)}</span>
+          </div>
+        </div>
+        <div class="modal-details">
+          <p><strong>Rate Type:</strong> ${plan.rate_type}</p>
+          <p><strong>Contract Term:</strong> ${plan.term_months} months</p>
+          <p><strong>Renewable:</strong> ${plan.renewable_pct}%</p>
+          <p><strong>Cancellation Fee:</strong> ${this.formatETF(plan)}</p>
+          ${plan.special_terms ? `<p><strong>Special Terms:</strong> ${this.escapeHtml(plan.special_terms)}</p>` : ''}
+        </div>
+        <div class="modal-actions">
+          ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-modal-action">View EFL</a>` : ''}
+          ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="btn-modal-action btn-enroll">Enroll Now</a>` : ''}
+        </div>
       `;
     }
 

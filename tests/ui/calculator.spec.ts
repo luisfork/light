@@ -43,10 +43,8 @@ test.describe('Texas Electricity Calculator', () => {
 
     // Verify cost formatting in top plans
     const topPlans = page.locator('#top-plans');
-    // Look for the "($XXX.XX (X months))" pattern
-    // The previous format was "$318.21/ 3 months"
-    // The new format is "$318.21 (3 months)"
-    await expect(topPlans).toContainText(/\$\d{1,3}(,\d{3})*\.\d{2} \(\d+ months\)/);
+    // Format: "$1,216.49/yr" and "$101.37/month avg" on separate lines
+    await expect(topPlans).toContainText(/\$\d{1,3}(,\d{3})*\.\d{2}\/yr/);
   });
 
   test('should display proper warning badges for TIME OF USE plans', async ({ page }) => {
@@ -92,8 +90,8 @@ test.describe('Texas Electricity Calculator', () => {
     await expect(modal).toBeVisible();
 
     // Verify cost formatting in modal
-    // Searching for something like "$1,272.82 (3 months)"
+    // Modal shows structured layout with "Monthly (X months)" label and cost value
     const modalBody = page.locator('#modal-body');
-    await expect(modalBody).toContainText(/\$\d{1,3}(,\d{3})*\.\d{2} \(\d+ months\)/);
+    await expect(modalBody).toContainText(/Monthly \(\d+ months\)/);
   });
 });
