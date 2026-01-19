@@ -71,10 +71,10 @@ Many Texans overpay between **$816** and **$1,072** annually by selecting electr
 ### UI/UX Enhancements
 
 - **Improved Accessibility**: Enhanced text contrast for WCAG 2.1 AA compliance (5.74:1 and 4.54:1 ratios)
-- **Better Visualization**: Redesigned usage chart with 75% taller bars, month labels, and heat-map color coding (red=high, orange=medium-high, yellow=medium, blue=low)
-- **Polished Components**: Upgraded grade badges with gradients, enhanced dropdown styling, and improved warning badges (TIME OF USE, NEW CUSTOMERS ONLY, LOW RENEWABLE, MIN USAGE FEE)
+- **Better Visualization**: Redesigned usage chart with 75% taller bars, month labels, and heat-map color coding (`red=high, orange=medium-high, yellow=medium, blue=low`)
+- **Polished Components**: Upgraded grade badges with gradients, enhanced dropdown styling, and improved warning badges (`TIME OF USE, NEW CUSTOMERS ONLY, LOW RENEWABLE, MIN USAGE FEE`)
 - **Cleaner Layout**: Moved ZIP validation indicator horizontal, removed redundant "Plans Requiring Caution" section
-- **Fixed Precision**: Annual usage now displays exactly 12,000 kWh (was 11,999 kWh due to rounding)
+- **Fixed Precision**: Annual usage now exact
 
 ### Functional Improvements
 
