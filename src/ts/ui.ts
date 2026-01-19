@@ -10,6 +10,7 @@
 import type { ElectricityPlan, TDURate, TaxInfo, QualityGrade } from './types';
 import { API } from './api';
 import { PlanRanker } from './modules/plan-ranker';
+import { CostCalculator } from './modules/cost-calculator';
 import { formatCurrency, formatRate, getMonthName } from './modules/formatters';
 import { UsageEstimator } from './modules/usage-estimator';
 import { ETFCalculator } from './modules/etf-calculator';
@@ -603,6 +604,9 @@ const UI = {
     if (this.elements.tduRate !== null) {
       this.elements.tduRate.textContent = `${tdu.per_kwh_rate.toFixed(2)} cents/kWh`;
     }
+    if (this.elements.tduArea !== null) {
+      this.elements.tduArea.textContent = tdu.code;
+    }
   },
 
   enableUsageSection(): void {
@@ -757,7 +761,7 @@ const UI = {
         monthlyUsage,
         this.state.tdu,
         { localTaxRate: this.state.localTaxRate },
-        null
+        CostCalculator
       );
 
       this.state.rankedPlans = rankedPlans;
