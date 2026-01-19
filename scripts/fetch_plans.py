@@ -287,8 +287,8 @@ def extract_etf_from_text(text: str) -> dict[str, Any] | None:
     per_month_patterns = [
         r"\$(\d+(?:\.\d{2})?)\s*(?:per|/)\s*(?:each\s+)?(?:month|mo)\s*(?:remaining|left)",
         r"\$(\d+(?:\.\d{2})?)\s*(?:for\s+each)\s+(?:remaining\s+)?month",
-        r"\$(\d+(?:\.\d{2})?)\s*(?:multiplied\s+by|times|x|×)\s*(?:the\s+)?(?:number\s+of\s+)?months?\s*(?:remaining|left)",
-        r"\$(\d+(?:\.\d{2})?)\s*(?:multiplied\s+by|times|x|×)\s*(?:the\s+)?(?:number\s+of\s+)?months?\s*(?:remaining|left).*?term",
+        r"\$(\d+(?:\.\d{2})?)\s*(?:multiplied\s+by|times|x)\s*(?:the\s+)?(?:number\s+of\s+)?months?\s*(?:remaining|left)",
+        r"\$(\d+(?:\.\d{2})?)\s*(?:multiplied\s+by|times|x)\s*(?:the\s+)?(?:number\s+of\s+)?months?\s*(?:remaining|left).*?term",
         r"\$(\d+(?:\.\d{2})?)\s*(?:per|/)\s*(?:month|mo)\s*remaining",
     ]
 

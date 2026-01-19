@@ -117,9 +117,9 @@ jobs:
             echo "## Data Update Summary"
             echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')"
             if [ "${{ steps.check_changes.outputs.changes }}" == "true" ]; then
-              echo "**Status:** ✅ Data updated successfully"
+              echo "**Status:** Data updated successfully"
             else
-              echo "**Status:** ℹ️ No changes detected"
+              echo "**Status:** No changes detected"
             fi
 
             # Count plans in the file

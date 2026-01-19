@@ -82,7 +82,7 @@ jobs:
 
       - name: Minify HTML files
         run: |
-          find src -name "*.html" | while read file; do
+          find src -name "*.html" | while read -r file; do
             target="_site/${file#src/}"
             mkdir -p "$(dirname "$target")"
             html-minifier-terser \
@@ -100,7 +100,7 @@ jobs:
 
       - name: Minify CSS files
         run: |
-          find src/css -name "*.css" | while read file; do
+          find src/css -name "*.css" | while read -r file; do
             target="_site/css/${file#src/css/}"
             mkdir -p "$(dirname "$target")"
             csso "$file" --output "$target" --comments none
@@ -109,7 +109,7 @@ jobs:
 
       - name: Minify TypeScript files
         run: |
-          find src/js -name "*.js" | while read file; do
+          find src/js -name "*.js" | while read -r file; do
             target="_site/js/${file#src/js/}"
             mkdir -p "$(dirname "$target")"
             terser "$file" \
@@ -122,7 +122,7 @@ jobs:
 
       - name: Minify Python scripts
         run: |
-          find scripts -name "*.py" | while read file; do
+          find scripts -name "*.py" | while read -r file; do
             target="_site/scripts/${file#scripts/}"
             mkdir -p "$(dirname "$target")"
             pyminify \
@@ -168,12 +168,14 @@ jobs:
 
       - name: Generate build report
         run: |
-          echo "## Build Report" >> "$GITHUB_STEP_SUMMARY"
-          echo "### File Sizes" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
-          du -sh _site/* 2>/dev/null | sort -h >> "$GITHUB_STEP_SUMMARY"
-          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Total size:** $(du -sh _site | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Build Report"
+            echo "### File Sizes"
+            echo "\`\`\`"
+            du -sh _site/* 2>/dev/null | sort -h
+            echo "\`\`\`"
+            echo "**Total size:** $(du -sh _site | cut -f1)"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -196,7 +198,7 @@ jobs:
         run: |
           {
             echo "## Deployment Summary"
-            echo "**Status:** ✅ Successfully deployed to GitHub Pages"
+            echo "**Status:** Successfully deployed to GitHub Pages"
             echo "**URL:** ${{ steps.deployment.outputs.page_url }}"
             echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')"
             echo ""

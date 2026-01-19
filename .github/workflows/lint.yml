@@ -92,6 +92,6 @@ jobs:
             echo "✓ All linting checks passed"
             # Note: Biome warnings are informational only
             if [[ "${{ steps.biome.outcome }}" == "failure" ]]; then
-              echo "ℹ️ Biome reported style warnings (non-blocking)"
+              echo "Biome reported style warnings (non-blocking)"
             fi
           fi
