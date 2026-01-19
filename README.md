@@ -125,28 +125,28 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 *Light* calculates your true annual electricity cost using this algorithm:
 
-```typescript
-// For each month of the year:
+For each month of the year *(Note: Plan rates already include TDU delivery charges per EFL requirements)*:
+
 1. Interpolate energy rate based on your usage (500/1000/2000 kWh tiers)
-   Note: Plan rates already include TDU delivery charges per EFL requirements
 2. Add REP base charge
 3. Subtract bill credits (only if you qualify that month)
 4. Add local sales tax
 5. Sum all 12 months for annual cost
 
-// TDU charges are used for:
+TDU charges are used for:
+
 - ZIP code validation and service area detection
 - Geographic filtering (only show plans for your TDU)
 - User education (display your TDU rates before calculation)
 - Breakdown transparency (tracked separately but not added to totals)
 
-// Then calculate combined score (Multiplicative Value Model):
+Then calculate combined score (Multiplicative Value Model):
+
 - Cost score: 100 for lowest cost, scaled down for higher costs
 - Quality score: 0-100 based on volatility, renewal timing, fee structure
-- Combined score = Cost Score × (Quality Score / 100)
+  - $\text{Combined score} = \text{Cost Score} \times \frac{\text{Quality Score}}{100}$
 - This ensures that a plan must have BOTH a competitive price AND high quality to rank well.
 - Cheap but risky plans (bad renewal timing, volatile rates) are heavily discounted.
-```
 
 ### Seasonal Usage Estimation
 
@@ -172,13 +172,10 @@ Example: A 12-month contract starting in July expires in July (expensive). *Ligh
 
 Many plans charge $10-20 per month remaining instead of flat fees. *Light* prioritizes EFL-derived `etf_details` when present and falls back to conservative text parsing when not. If the EFL mentions a fee but does not disclose a rate, the UI shows “See EFL” instead of guessing.
 
-```typescript
-// Per-month-remaining ETF (common for 12-36 month contracts):
-Total ETF = Base Fee × Months Remaining
+Per-month-remaining ETF (common for 12-36 month contracts):
+$\text{Total ETF} = \text{Base Fee} \times \text{Months Remaining}$
 
-// Example: $15/month ETF with 18 months remaining = $270
-// (not $15 flat fee as it might appear)
-```
+Example: $15/month ETF with 18 months remaining = $270 *(not $15 flat fee as it might appear)*
 
 ### Provider Name Formatting
 
