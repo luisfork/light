@@ -5,26 +5,20 @@ __pycache__/
 *.so
 .Python
 build/
-develop-eggs/
 dist/
-downloads/
 eggs/
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
 *.egg
 
 # Virtual environments
+.venv/
 venv/
 ENV/
 env/
-.venv
+
+# UV
+.uv/
 
 # IDE
 .vscode/
@@ -32,26 +26,23 @@ env/
 *.swp
 *.swo
 *~
+
+# OS
 .DS_Store
-
-# UV
-.uv/
-
-# Logs
-*.log
+Thumbs.db
 
 # Testing
 .coverage
 htmlcov/
 .pytest_cache/
 
+# Logs
+*.log
+
 # Temporary files
 *.tmp
 *.bak
 .cache/
-
-# OS
-Thumbs.db
 
 # Node / JS
 node_modules/
@@ -61,15 +52,13 @@ yarn-error.log*
 .pnpm-debug.log*
 .npm/
 
+# Bun
+.bun/
+
 # Playwright
 playwright-report/
 test-results/
 .playwright/
 
-# Bun
-bun.lockb
-.bun/
-
-# Other
+# Project-specific
 .other/
-

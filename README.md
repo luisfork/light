@@ -310,7 +310,11 @@ This approach avoids double-counting while maintaining full transparency about d
 **CSV Columns:**
 
 ```bash
-plan_id, plan_name, rep_name, tdu_area, rate_type, term_months, price_kwh_500, price_kwh_1000, price_kwh_2000, base_charge_monthly, early_termination_fee, renewable_pct, is_prepaid, is_tou, special_terms, promotion_details, fees_credits, min_usage_fees, language, efl_url, enrollment_url, terms_url
+plan_id, plan_name, rep_name, tdu_area, rate_type,
+term_months, price_kwh_500, price_kwh_1000, price_kwh_2000,
+base_charge_monthly, early_termination_fee, renewable_pct,
+is_prepaid, is_tou, special_terms, promotion_details,
+fees_credits, min_usage_fees, language, efl_url, enrollment_url, terms_url
 ```
 
 **Accessing Historical Data:**
@@ -472,7 +476,7 @@ uv sync --all-extras
 
 ### Testing & Validation
 
-*Light* uses a comprehensive testing strategy covering TypeScript, Python, and UI logic.
+*Light* uses a comprehensive testing strategy covering `TypeScript`, `Python`, and UI logic.
 
 #### 1. TypeScript Validation
 
@@ -577,7 +581,7 @@ uv run python scripts/fetch_tdu_rates.py
 3. **Asset Optimization**
    - Fonts: Only WOFF2 format deployed (30% smaller than WOFF, 50% smaller than OTF)
    - Data: JSON files copied without modification (integrity preservation)
-   - Documentation: LICENSE and README included for transparency
+   - Documentation: `LICENSE` and `README.md` included for transparency
 
 4. **Deployment**
    - Publishes optimized `_site/` directory to GitHub Pages
@@ -702,7 +706,7 @@ The quality score (0-100) is calculated from multiple factors:
 
 **Automatic F Grade (Score = 0):**
 
-- Non-fixed rate plans (VARIABLE, INDEXED): Price can change unpredictably
+- Non-fixed rate plans (`VARIABLE`, `INDEXED`): Price can change unpredictably
 - Prepaid plans: Require upfront payment and credit monitoring
 - Time-of-use plans: Rates vary by time of day, impractical for most users
 
