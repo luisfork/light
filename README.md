@@ -29,7 +29,7 @@ Visit [**luisfork.github.io/light**](https://luisfork.github.io/light)
 
 <!-- The following is correctly formatted Markdown. Ignore warnings. -->
 
-Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage.[^3] This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms.[^4]
+Many Texans overpay between **$816** and **$1,072** annually by selecting electricity plans with deceptive structures—such as *"bill credits"* or *"free nights"*—that are engineered to appear cheapest at the 1,000 kWh benchmark while charging significantly higher rates for actual household usage.[^1][^2][^3] This financial burden is compounded by the *"summer renewal trap,"* where consumers inadvertently renew contracts during peak-price months; academic research indicates that nearly 45% of Texans now face monthly bills exceeding $200 during the summer due to market volatility and complex plan terms.[^4]
 
 <!-- The following is correctly formatted Markdown. Ignore warnings. -->
 
@@ -127,7 +127,7 @@ Many Texans overpay between **$816**[^1] and **$1,072**[^2] annually by selectin
 
 For each month of the year *(Note: Plan rates already include TDU delivery charges per EFL requirements)*:
 
-1. Interpolate energy rate based on your usage (500/1000/2000 kWh tiers)
+1. Interpolate energy rate based on your usage (500, 1000, 2000 kWh tiers)
 2. Add REP base charge
 3. Subtract bill credits (only if you qualify that month)
 4. Add local sales tax
@@ -144,7 +144,7 @@ Then calculate combined score (Multiplicative Value Model):
 
 - Cost score: 100 for lowest cost, scaled down for higher costs
 - Quality score: 0-100 based on volatility, renewal timing, fee structure
-  - $\text{Combined score} = \text{Cost Score} \times \frac{\text{Quality Score}}{100}$
+- `Combined score = Cost Score × (Quality Score / 100)`
 - This ensures that a plan must have BOTH a competitive price AND high quality to rank well.
 - Cheap but risky plans (bad renewal timing, volatile rates) are heavily discounted.
 
@@ -172,17 +172,20 @@ Example: A 12-month contract starting in July expires in July (expensive). *Ligh
 
 Many plans charge $10-20 per month remaining instead of flat fees. *Light* prioritizes EFL-derived `etf_details` when present and falls back to conservative text parsing when not. If the EFL mentions a fee but does not disclose a rate, the UI shows “See EFL” instead of guessing.
 
+```typescript
 Per-month-remaining ETF (common for 12-36 month contracts):
-$\text{Total ETF} = \text{Base Fee} \times \text{Months Remaining}$
+Total ETF = Base Fee × Months Remaining
 
-Example: $15/month ETF with 18 months remaining = $270 *(not $15 flat fee as it might appear)*
+Example: $15/month ETF with 18 months remaining = $270
+Note: Not $15 flat fee as it might appear
+```
 
 ### Provider Name Formatting
 
 All provider names are displayed in professional uppercase format with legal suffixes removed:
 
-- Original: "TXU Energy Retail Company LLC"
-- Displayed: "TXU ENERGY"
+- Original: "Example Energy Retail Company, LLC"
+- Displayed: "EXAMPLE ENERGY"
 
 This ensures consistent, professional presentation across all plans.
 
@@ -192,16 +195,16 @@ This ensures consistent, professional presentation across all plans.
 
 ### Electricity Plans
 
-- **Source:** Power to Choose (official PUCT platform)
+- **Source:** *Power to Choose* (official PUCT platform)
 - **API Endpoint:** `http://api.powertochoose.org/api/PowerToChoose/plans`
 - **Update Frequency:** Daily at 2 AM Central Time
 - **Coverage:** All deregulated Texas markets *(Oncor, CenterPoint, AEP Central, AEP North, TNMP, Lubbock P&L)*
 
-#### Power to Choose API Details
+#### *Power to Choose* API Details
 
-The official Public Utility Commission of Texas (PUCT) Power to Choose platform provides public API access:
+The official Public Utility Commission of Texas (PUCT) [*Power to Choose*](https://powertochoose.org/) platform provides public API access:
 
-**Base URL:** `http://api.powertochoose.org/`
+**Base URL:** `http://api.powertochoose.org`
 
 **Primary Endpoints:**
 
@@ -226,7 +229,7 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 - Plan ID, REP name, Product name
 - TDU service area
-- Pricing at 500/1000/2000 kWh (includes TDU charges)
+- Pricing at 500, 1000, 2000 kWh (includes TDU charges)
 - Contract term length
 - Rate type (Fixed, Variable, Indexed)
 - Renewable energy percentage
@@ -239,9 +242,9 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 **Important Notes:**
 
-- REPs directly submit plan information (PUCT does not independently verify)
+- REPs directly submit plan information *(PUCT does not independently verify)*
 - Each REP limited to 5 plans on platform
-- Prices shown include TDU delivery charges (all-inclusive per PUCT rules)
+- Prices shown include TDU delivery charges *(all-inclusive per PUCT rules)*
 - Data refreshed frequently; recommend daily fetching
 - No authentication required for public endpoints
 
@@ -261,12 +264,12 @@ CSV Export: http://www.powertochoose.org/en-us/Plan/ExportToCsv
 
 | TDU | Monthly Base | Per-kWh Rate | Effective Date |
 | --- | --- | --- | --- |
-| CenterPoint Energy | $4.90 | 6.0009¢ | Dec 7, 2025 |
-| Oncor Electric Delivery | $4.23 | 5.5833¢ | Sep 1, 2025 |
-| AEP Texas Central | $5.49 | 5.6954¢ | Sep 1, 2025 |
-| AEP Texas North | $5.49 | 5.2971¢ | Sep 1, 2025 |
-| Texas-New Mexico Power | $7.85 | 6.0509¢ | Sep 1, 2025 |
-| Lubbock Power & Light | $0.00 | 6.31¢ | Sep 1, 2025 |
+| CenterPoint Energy | $4.90 | 6.0009¢ | Jan 2026 |
+| Oncor Electric Delivery | $4.23 | 5.5833¢ | Jan 2026 |
+| AEP Texas Central | $3.24 | 6.0563¢ | Jan 2026 |
+| AEP Texas North | $3.24 | 5.9233¢ | Jan 2026 |
+| Texas-New Mexico Power | $7.85 | 7.237¢ | Jan 2026 |
+| Lubbock Power & Light | $0.00 | 6.312¢ | Jan 2026 |
 
 **Implementation:** TDU rates stored in `data/tdu-rates.json` and updated manually when PUCT approves rate changes.
 
@@ -380,9 +383,9 @@ light/
 
 ### Prerequisites
 
-- Python 3.11+
-- Bun (preferred) or Node.js 18+
-- `uv` package manager (or pip)
+- `Python 3.11+`
+- `Bun` (preferred) or `Node.js 18+`
+- `uv` package manager (or `pip`)
 
 ### Installation
 
@@ -442,8 +445,7 @@ light/
    ```
 
 > [!IMPORTANT]
-> Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions.
-> You must use a local HTTP server.
+> Opening `index.html` directly via `file://` **will not work** due to browser CORS restrictions. You must use a local HTTP server.
 
 ### TypeScript Build Process
 
@@ -488,7 +490,7 @@ bun run typecheck
 bun run build
 ```
 
-#### 2. Python Unit Tests (Pytest)
+#### 2. Python Unit Tests (`Pytest`)
 
 Validates data models, rate limiters, and utility functions using Pydantic schemas.
 
@@ -503,7 +505,7 @@ uv run pytest
 uv run pytest -v
 ```
 
-#### 3. Frontend Unit Tests (Bun)
+#### 3. Frontend Unit Tests (`Bun`)
 
 Tests core calculation logic, formatting, and ranking algorithms.
 
@@ -512,7 +514,7 @@ Tests core calculation logic, formatting, and ranking algorithms.
 bun test tests/unit
 ```
 
-#### 4. UI/E2E Tests (Playwright)
+#### 4. UI/E2E Tests (`Playwright`)
 
 Validates the full user journey against a real browser.
 
@@ -567,7 +569,7 @@ uv run python scripts/fetch_tdu_rates.py
 **Build Process:**
 
 1. **Environment Setup**
-   - Ubuntu runner with Node.js 20 and Python 3.11
+   - Ubuntu runner with `Node.js 20` and `Python 3.11`
    - Installs industry-standard minification tools
 
 2. **Source Code Optimization**
@@ -627,7 +629,7 @@ Based on research showing Texans often renew during expensive months, *Light* im
 
 - Calculates exact contract expiration date
 - Scores renewal month seasonality (0.0 = best, 1.0 = worst)
-- Identifies peak season expirations (July/August/January)
+- Identifies peak season expirations (July, August,January)
 - Suggests 2-3 alternative contract lengths for optimal timing
 - Warns users proactively about expensive renewal periods
 
@@ -723,14 +725,14 @@ The quality score (0-100) is calculated from multiple factors:
 
 **Table Features:**
 
-- Click any column header to sort (Grade, Provider, Plan, Term, Contract Ends, Annual Cost, Monthly Cost, Rate, Renewable %, Cancel Fee)
-- "Contract Ends" column shows expiration date and warns about high-risk renewal months (for July/August/January)
+- Click any column header to sort `(Grade, Provider, Plan, Term, Contract Ends, Annual Cost, Monthly Cost, Rate, Renewable %, Cancel Fee)`
+- "Contract Ends" column shows expiration date and warns about high-risk renewal months (for July, August, January)
 - Best values highlighted in green (lowest cost, lowest rate, best quality)
 - "Lowest" indicator badge on the most affordable plan
 - Tooltips on column headers explaining each metric
 
 > [!NOTE]
-> **Warning Badges:** Plans with non-fixed rates, prepaid requirements, time-of-use restrictions, or new-customer-only eligibility display warning badges (VARIABLE, PREPAID, TIME OF USE, NEW CUSTOMERS ONLY) and may receive quality penalties. Non-fixed, prepaid, and TOU plans automatically receive an F grade. New-customer-only detection is text-based and conservative, so false negatives are possible but false positives are avoided.
+> **Warning Badges:** Plans with non-fixed rates, prepaid requirements, time-of-use restrictions, or new-customer-only eligibility display warning badges `(VARIABLE, PREPAID, TIME OF USE, NEW CUSTOMERS ONLY)` and may receive quality penalties. Non-fixed, prepaid, and TOU plans automatically receive an F grade. New-customer-only detection is text-based and conservative, so false negatives are possible but false positives are avoided.
 
 ### 4. Simplified Duplicate Plan Detection
 
@@ -769,10 +771,10 @@ Analysis of 986 plans confirms that plans with identical numeric features (price
 
 **Simplification Benefits:**
 
-- ✓ **100+ lines removed**: Eliminated fragile text parsing and keyword matching
-- ✓ **Language-agnostic**: No bilingual dictionaries to maintain
-- ✓ **Robust**: Numbers don't change with marketing phrases or translations
-- ✓ **Same accuracy**: 100% duplicate detection maintained
+- **100+ lines removed**: Eliminated fragile text parsing and keyword matching
+- **Language-agnostic**: No bilingual dictionaries to maintain
+- **Robust**: Numbers don't change with marketing phrases or translations
+- **Same accuracy**: 100% duplicate detection maintained
 
 **Example from real data (1,854 total plans):**
 
@@ -812,7 +814,7 @@ formatProviderName(name):
   2. Remove trailing: LLC, INC, LP, & CO, (TX), (TEXAS), COMPANY, RETAIL, SERVICES
   3. Trim whitespace and punctuation
 
-Example: "Reliant Energy Retail Services, LLC" → "RELIANT ENERGY"
+Example: "Example Energy Retail Services, LLC" → "EXAMPLE ENERGY"
 ```
 
 ### 6. Historical Data Tracking
@@ -841,7 +843,6 @@ Unlike competitors, *Light* maintains unlimited historical archive:
   - **SF Pro**: Primary UI text and body copy (weights 400-700, regular/italic)
   - **SF Compact**: Table headers and dense UI layouts (weights 400-700, regular/italic)
   - **New York Small**: All serif applications—headings, hero titles, editorial content (weights 400-700, regular/italic)
-  - **System Monospace**: All numeric and tabular data for superior legibility and alignment
 - **Progressive Font Loading**: Modern browsers use WOFF2 (~30% smaller), older browsers fall back to WOFF or OTF
 - **Functional depth**: Rich calculations, transparent methodology
 
