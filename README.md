@@ -198,7 +198,7 @@ This ensures consistent, professional presentation across all plans.
 - **Source:** *Power to Choose* (official PUCT platform)
 - **API Endpoint:** `http://api.powertochoose.org/api/PowerToChoose/plans`
 - **Update Frequency:** Daily at 2 AM Central Time
-- **Coverage:** All deregulated Texas markets *(Oncor, CenterPoint, AEP Central, AEP North, TNMP, Lubbock P&L)*
+- **Coverage:** All deregulated Texas markets (`Oncor, CenterPoint, AEP Central, AEP North, TNMP, Lubbock P&L`)
 
 #### *Power to Choose* API Details
 
@@ -310,11 +310,7 @@ This approach avoids double-counting while maintaining full transparency about d
 **CSV Columns:**
 
 ```bash
-plan_id, plan_name, rep_name, tdu_area, rate_type,
-term_months, price_kwh_500, price_kwh_1000, price_kwh_2000,
-base_charge_monthly, early_termination_fee, renewable_pct,
-is_prepaid, is_tou, special_terms, promotion_details,
-fees_credits, min_usage_fees, language, efl_url, enrollment_url, terms_url
+plan_id, plan_name, rep_name, tdu_area, rate_type, term_months, price_kwh_500, price_kwh_1000, price_kwh_2000, base_charge_monthly, early_termination_fee, renewable_pct, is_prepaid, is_tou, special_terms, promotion_details, fees_credits, min_usage_fees, language, efl_url, enrollment_url, terms_url
 ```
 
 **Accessing Historical Data:**
