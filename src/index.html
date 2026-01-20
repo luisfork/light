@@ -13,7 +13,7 @@
   </head>
   <body>
     <!-- Skip to main content for keyboard users -->
-    <a href="#step-location" class="sr-only" id="skip-link">Skip to main content</a>
+    <a href="#main-content" class="sr-only" id="skip-link">Skip to main content</a>
     <div class="page-wrapper">
       <!-- Navigation -->
       <header class="site-header">
@@ -59,7 +59,7 @@
         </div>
       </section>
       <!-- Main Calculator -->
-      <main class="calculator-section">
+      <main class="calculator-section" id="main-content" role="main">
         <div class="calculator-container">
           <!-- Step 1: Location -->
           <section class="calc-step" id="step-location" data-reveal>
@@ -74,16 +74,17 @@
               <div class="field-group">
                 <label for="zip-code" class="field-label">Texas ZIP Code</label>
                 <div class="zip-input-container">
-                  <input type="text"
-                         id="zip-code"
-                         class="field-input field-input-zip"
-                         placeholder="75001"
-                         maxlength="5"
-                         pattern="[0-9]{5}"
-                         inputmode="numeric"
-                         autocomplete="postal-code"
-                         required>
-                  <div class="zip-status-container" id="zip-status" aria-live="polite"></div>
+                      <input type="text"
+                        id="zip-code"
+                        class="field-input field-input-zip"
+                        placeholder="75001"
+                        maxlength="5"
+                        pattern="[0-9]{5}"
+                        inputmode="numeric"
+                        autocomplete="postal-code"
+                        aria-describedby="zip-status"
+                        required>
+                      <div class="zip-status-container" id="zip-status" role="status" aria-live="polite" aria-atomic="true"></div>
                 </div>
               </div>
               <div class="tdu-display" id="tdu-display" hidden>
@@ -362,9 +363,9 @@
               </p>
             </div>
             <!-- Usage Profile Summary -->
-            <div class="usage-profile" id="usage-profile" data-reveal>
-              <h3 class="profile-title">Your Usage Profile</h3>
-              <div class="profile-chart" id="usage-chart"></div>
+            <div class="usage-profile" id="usage-profile" data-reveal role="region" aria-labelledby="usage-profile-title">
+              <h3 class="profile-title" id="usage-profile-title">Your Usage Profile</h3>
+              <div class="profile-chart" id="usage-chart" role="img" aria-label="Monthly electricity usage pattern"></div>
               <div class="profile-stats">
                 <div class="profile-stat">
                   <span class="stat-value" id="profile-annual">--</span>
@@ -381,9 +382,9 @@
               </div>
             </div>
             <!-- Top Recommendations -->
-            <div class="recommendations" id="recommendations" data-reveal>
+            <div class="recommendations" id="recommendations" data-reveal role="region" aria-labelledby="recommendations-title">
               <div class="section-header-enhanced">
-                <h3 class="section-heading">Lowest Cost Plans</h3>
+                <h3 class="section-heading" id="recommendations-title">Lowest Cost Plans</h3>
                 <div class="ranking-notes">
                   <p class="ranking-title">How plans are ranked</p>
                   <p>Each plan receives a combined score that balances cost performance with stability and transparency.</p>
@@ -402,7 +403,7 @@
                   </p>
                 </div>
               </div>
-              <div class="plan-list" id="top-plans"></div>
+              <div class="plan-list" id="top-plans" role="list"></div>
             </div>
             <!-- Full Comparison -->
             <div class="full-comparison" data-reveal>
@@ -626,12 +627,13 @@
       </footer>
     </div>
     <!-- Plan Details Modal -->
-    <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <div class="modal-backdrop" id="modal-backdrop" aria-hidden="true" hidden>
        <div class="modal-dialog"
          role="dialog"
          aria-modal="true"
          aria-labelledby="modal-title"
-         aria-describedby="modal-description">
+         aria-describedby="modal-description"
+         tabindex="-1">
         <button class="modal-close" id="modal-close" aria-label="Close">×</button>
         <div class="modal-body" id="modal-body"></div>
       </div>

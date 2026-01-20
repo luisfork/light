@@ -337,6 +337,8 @@
   border-radius: var(--radius-md);
   padding: var(--space-6);
   margin-bottom: var(--space-8);
+  display: grid;
+  gap: var(--space-6);
 }
 
 .profile-title {
@@ -349,6 +351,7 @@
 
 .profile-chart {
   height: 7.5rem; /* 120px */
+  min-height: 6rem;
   margin-bottom: var(--space-4);
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -356,6 +359,10 @@
   align-items: end;
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-keyline-light);
+}
+
+.profile-chart .empty-state {
+  grid-column: 1 / -1;
 }
 
 .bar-container {
@@ -372,7 +379,6 @@
   min-height: 4px;
   border-radius: var(--radius-sm);
   background: var(--color-data-neutral);
-  transition: height var(--duration-normal) var(--ease-out);
 }
 
 .bar-label {
@@ -405,6 +411,8 @@
 .profile-stats {
   display: flex;
   gap: var(--space-8);
+  flex-wrap: wrap;
+  row-gap: var(--space-4);
 }
 
 .profile-stat {
@@ -424,6 +432,15 @@
 .stat-label {
   font-size: var(--text-caption);
   color: var(--color-text-tertiary);
+}
+
+.empty-state {
+  padding: var(--space-4);
+  border: 1px solid var(--color-keyline-light);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-tertiary);
+  font-size: var(--text-body-reduced);
+  color: var(--color-text-secondary);
 }
 
 /* ==============================

@@ -58,6 +58,7 @@ interface UIState {
   lastCalculation: Date | null;
   localTaxRate: number;
   taxInfo: TaxInfo | null;
+  lastFocusedElement: HTMLElement | null;
   data?: {
     duplicate_count?: number;
     total_plans?: number;
@@ -115,6 +116,7 @@ interface UIElements {
   filterRenewable: HTMLSelectElement | null;
   // Modal
   modalBackdrop: HTMLElement | null;
+  modalDialog: HTMLElement | null;
   modalBody: HTMLElement | null;
   modalClose: HTMLButtonElement | null;
   // Status
@@ -279,7 +281,8 @@ const UI = {
     zipValidationTimer: null,
     lastCalculation: null,
     localTaxRate: 0,
-    taxInfo: null
+    taxInfo: null,
+    lastFocusedElement: null
   } as UIState,
 
   elements: {} as UIElements,
@@ -352,6 +355,7 @@ const UI = {
       filterRenewable: document.getElementById('filter-renewable') as HTMLSelectElement | null,
       // Modal
       modalBackdrop: document.getElementById('modal-backdrop'),
+      modalDialog: document.querySelector('.modal-dialog') as HTMLElement | null,
       modalBody: document.getElementById('modal-body'),
       modalClose: document.getElementById('modal-close') as HTMLButtonElement | null,
       // Status
@@ -832,6 +836,17 @@ const UI = {
     if (this.elements.resultsCount !== null) {
       this.elements.resultsCount.textContent = String(plans.length);
     }
+
+    this.revealResultsSection();
+  },
+
+  revealResultsSection(): void {
+    if (this.elements.resultsSection === null) return;
+
+    const revealTargets = this.elements.resultsSection.querySelectorAll<HTMLElement>('.reveal');
+    revealTargets.forEach((element) => {
+      element.classList.add('is-visible');
+    });
   },
 
   displayUsageProfile(monthlyUsage: number[]): void {
@@ -852,6 +867,11 @@ const UI = {
 
     // Render usage chart bars
     if (this.elements.usageChart !== null) {
+      this.elements.usageChart.setAttribute(
+        'aria-label',
+        `Monthly usage pattern. Annual total ${total.toLocaleString()} kWh. Average ${Math.round(avg).toLocaleString()} kWh.`
+      );
+
       const monthNames = [
         'Jan',
         'Feb',
@@ -866,6 +886,12 @@ const UI = {
         'Nov',
         'Dec'
       ];
+      if (max === 0) {
+        this.elements.usageChart.innerHTML =
+          '<div class="empty-state">No usage data available yet.</div>';
+        return;
+      }
+
       this.elements.usageChart.innerHTML = monthlyUsage
         .map((usage, i) => {
           const height = max > 0 ? Math.round((usage / max) * 100) : 0;
@@ -877,9 +903,9 @@ const UI = {
           else intensityClass = 'intensity-very-low';
 
           return `
-            <div class="bar-container" style="justify-content: flex-end; height: 100%;">
+            <div class="bar-container" style="justify-content: flex-end; height: 100%;" aria-hidden="true">
               <div class="bar ${intensityClass}" style="height: 0%" data-target="${height}" title="${usage.toLocaleString()} kWh"></div>
-              <span class="bar-label">${monthNames[i]}</span>
+              <span class="bar-label" aria-hidden="true">${monthNames[i]}</span>
             </div>
           `;
         })
@@ -898,6 +924,12 @@ const UI = {
     if (this.elements.topPlans === null) return;
 
     const displayPlans = plans.slice(0, 5);
+    if (displayPlans.length === 0) {
+      this.elements.topPlans.innerHTML =
+        '<div class="empty-state">No plans available for this service area.</div>';
+      return;
+    }
+
     this.elements.topPlans.innerHTML = displayPlans
       .map((plan, i) => this.renderPlanCard(plan, i))
       .join('');
@@ -905,6 +937,11 @@ const UI = {
     const items = this.elements.topPlans.querySelectorAll<HTMLElement>('.plan-item');
     applyStaggeredDelay(items);
     setupScrollReveal('.plan-item.reveal');
+    requestAnimationFrame(() => {
+      items.forEach((item) => {
+        item.classList.add('is-visible');
+      });
+    });
   },
 
   displayComparisonTable(plans: RankedPlanWithMetrics[]): void {
@@ -933,7 +970,7 @@ const UI = {
             <td class="col-renewable">${plan.renewable_pct}%</td>
             <td class="col-etf">${this.formatETF(plan)}</td>
             <td class="col-actions">
-              <button class="btn-view" onclick="UI.showPlanModal('${plan.plan_id}')">Details</button>
+              <button class="btn-view" type="button" aria-haspopup="dialog" aria-label="View details for ${this.escapeHtml(plan.plan_name)}" onclick="UI.showPlanModal('${plan.plan_id}')">Details</button>
             </td>
           </tr>
         `;
@@ -947,7 +984,7 @@ const UI = {
     const rankLabel = index === 0 ? 'Best Value' : index <= 2 ? 'Top 3' : 'Top 5';
 
     return `
-      <div class="plan-item reveal stagger-item">
+      <div class="plan-item reveal stagger-item" role="listitem">
         <div class="plan-item-rank">
           <span class="rank-badge ${rankBadge}">${rankLabel}</span>
         </div>
@@ -976,7 +1013,7 @@ const UI = {
           </span>
         </div>
         <div class="plan-item-actions">
-          <button class="btn-plan-action btn-plan-details" type="button" onclick="UI.showPlanModal('${plan.plan_id}')">View Details</button>
+          <button class="btn-plan-action btn-plan-details" type="button" aria-haspopup="dialog" aria-label="View details for ${this.escapeHtml(plan.plan_name)}" onclick="UI.showPlanModal('${plan.plan_id}')">View Details</button>
           ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-plan-action btn-plan-efl">View EFL</a>` : ''}
         </div>
       </div>
@@ -988,6 +1025,8 @@ const UI = {
       | RankedPlanWithMetrics
       | undefined;
     if (plan === undefined || this.elements.modalBackdrop === null) return;
+
+    this.state.lastFocusedElement = document.activeElement as HTMLElement | null;
 
     if (this.elements.modalBody !== null) {
       const monthlyCostText = plan.monthlyCosts
@@ -1059,11 +1098,28 @@ const UI = {
     }
 
     this.elements.modalBackdrop.hidden = false;
+    this.elements.modalBackdrop.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    if (this.elements.modalClose !== null) {
+      this.elements.modalClose.focus();
+    } else if (this.elements.modalDialog !== null) {
+      this.elements.modalDialog.focus();
+    }
   },
 
   closeModal(): void {
     if (this.elements.modalBackdrop !== null) {
       this.elements.modalBackdrop.hidden = true;
+      this.elements.modalBackdrop.setAttribute('aria-hidden', 'true');
+    }
+
+    document.body.style.overflow = '';
+
+    const lastFocused = this.state.lastFocusedElement;
+    if (lastFocused !== null) {
+      lastFocused.focus();
+      this.state.lastFocusedElement = null;
     }
   },
 
