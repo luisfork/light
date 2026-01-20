@@ -212,7 +212,7 @@ const Toast = {
       <button class="toast-close" aria-label="Dismiss notification">&times;</button>
       ${
         duration > 0
-          ? `<div class="toast-progress"><div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div></div>`
+          ? `<div class="toast-progress"><div class="toast-progress-bar" style="--toast-duration: ${duration}ms"></div></div>`
           : ''
       }
     `;
@@ -223,6 +223,9 @@ const Toast = {
     }
 
     this.container?.appendChild(toast);
+    requestAnimationFrame(() => {
+      toast.classList.add('visible');
+    });
 
     if (duration > 0) {
       setTimeout(() => this.dismiss(toast), duration);

@@ -76,7 +76,7 @@
   color: var(--color-text-tertiary);
   background: var(--color-bg-tertiary);
   border: 1px solid var(--color-border-secondary);
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
     color var(--transition-fast),
@@ -90,7 +90,7 @@
 
 .modal-close:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: var(--color-focus-offset);
 }
 
 /* Modal Body */
@@ -289,8 +289,8 @@
   align-items: center;
   justify-content: center;
   font-size: var(--text-body-reduced);
-  font-weight: 700;
-  border-radius: 50%;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
   color: var(--color-text-contrast);
 }
 
@@ -340,7 +340,7 @@
   color: var(--color-text-tertiary);
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
     color var(--transition-fast),
@@ -354,7 +354,7 @@
 
 .toast-close:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: var(--color-focus-offset);
 }
 
 /* Toast Progress Bar */
@@ -372,7 +372,7 @@
 .toast-progress-bar {
   height: 100%;
   background: var(--color-link);
-  animation: toast-progress-shrink var(--animation-duration, 5000ms) var(--ease-standard) forwards;
+  animation: toast-progress-shrink var(--toast-duration, 5000ms) var(--ease-standard) forwards;
 }
 
 @keyframes toast-progress-shrink {

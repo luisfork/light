@@ -146,13 +146,13 @@
 /* Focus states for navigation */
 .nav-item:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: var(--color-focus-offset);
   border-radius: var(--radius-sm);
 }
 
 .site-brand:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 4px;
+  outline-offset: var(--color-focus-offset-container);
   border-radius: var(--radius-sm);
 }
 

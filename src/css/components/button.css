@@ -13,8 +13,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgb(0, 113, 227);
-  color: rgb(255, 255, 255);
+  background: var(--color-accent);
+  color: var(--color-text-contrast);
   padding: var(--space-1) 11px;
   border-radius: var(--radius-pill);
   font-family: var(--font-primary);
@@ -29,17 +29,17 @@
 }
 
 .button-primary:hover {
-  background: rgb(0, 118, 223);
+  background: var(--color-accent-hover);
   text-decoration: none;
 }
 
 .button-primary:active {
-  background: rgb(0, 110, 219);
+  background: var(--color-accent-active);
 }
 
 .button-primary:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: var(--color-focus-offset);
 }
 
 /* ==============================
@@ -79,7 +79,7 @@
 
 .button-secondary:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: var(--color-focus-offset);
 }
 
 /* ==============================
@@ -110,7 +110,7 @@
 
 .button-ghost:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: var(--color-focus-offset);
 }
 
 /* ==============================
@@ -126,7 +126,7 @@
   background: var(--color-bg-secondary);
   color: var(--color-text-secondary);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
     background var(--transition-fast),
@@ -140,7 +140,7 @@
 
 .button-icon:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: var(--color-focus-offset);
 }
 
 /* ==============================
@@ -211,14 +211,14 @@
 
 .modal-btn-primary,
 .btn-enroll {
-  background: rgb(0, 113, 227);
+  background: var(--color-accent);
   color: var(--color-text-contrast);
   border-color: transparent;
 }
 
 .modal-btn-primary:hover,
 .btn-enroll:hover {
-  background: rgb(0, 118, 223);
+  background: var(--color-accent-hover);
 }
 
 @media (max-width: 734px) {

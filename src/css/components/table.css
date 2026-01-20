@@ -157,7 +157,7 @@
   font-family: var(--font-primary);
   font-size: var(--text-body-reduced);
   font-weight: 700;
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   color: var(--color-text-contrast);
 }
 
