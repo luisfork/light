@@ -16,9 +16,9 @@ import { UsageEstimator } from './modules/usage-estimator';
 import type { ElectricityPlan, QualityGrade, TaxInfo, TDURate } from './types';
 import Logger from './utils/logger';
 
-// ============================================================================
+// ==============================
 // Types
-// ============================================================================
+// ==============================
 
 /**
  * Toast notification type.
@@ -141,15 +141,15 @@ interface RankedPlanWithMetrics extends ElectricityPlan {
   contractEndTimestamp?: number;
 }
 
-// ============================================================================
+// ==============================
 // Logger
-// ============================================================================
+// ==============================
 
 const logger = Logger.withPrefix('UI');
 
-// ============================================================================
+// ==============================
 // Toast Notification System
-// ============================================================================
+// ==============================
 
 const Toast = {
   container: null as HTMLElement | null,
@@ -255,9 +255,9 @@ const Toast = {
   }
 };
 
-// ============================================================================
+// ==============================
 // Main UI Controller
-// ============================================================================
+// ==============================
 
 const UI = {
   state: {
@@ -633,7 +633,8 @@ const UI = {
   },
 
   handleMethodChange(option: HTMLElement): void {
-    const method = (option.dataset.method ?? 'estimate') as UsageMethod;
+    const dataset = option.dataset as DOMStringMap & { method?: string };
+    const method = (dataset.method ?? 'estimate') as UsageMethod;
     this.state.usageMethod = method;
 
     this.elements.methodOptions.forEach((opt) => {
@@ -1056,17 +1057,28 @@ export { UI, Toast };
 export type { UIState, UIElements, ToastType, UsageMethod, RankedPlanWithMetrics };
 
 // Browser compatibility
+declare global {
+  interface Window {
+    UI: typeof UI;
+    Toast: typeof Toast;
+  }
+}
+
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>).UI = UI;
-  (window as unknown as Record<string, unknown>).Toast = Toast;
+  window.UI = UI;
+  window.Toast = Toast;
 }
 
 // Initialize on DOM ready
 if (typeof document !== 'undefined') {
+  interface WindowWithInitFlag extends Window {
+    _uiInitialized?: boolean;
+  }
+
   const init = (): void => {
     // Prevent double init
-    if ((window as any)._uiInitialized) return;
-    (window as any)._uiInitialized = true;
+    if ((window as WindowWithInitFlag)._uiInitialized) return;
+    (window as WindowWithInitFlag)._uiInitialized = true;
     UI.init();
   };
 

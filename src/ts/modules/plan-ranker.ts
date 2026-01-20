@@ -20,9 +20,9 @@
 import type { ElectricityPlan, QualityGrade, QualityGradeLetter, TDURate } from '../types';
 import { ETFCalculator } from './etf-calculator';
 
-// ============================================================================
+// ==============================
 // Types
-// ============================================================================
+// ==============================
 
 /**
  * Risk level for various scoring factors.
@@ -125,9 +125,9 @@ interface CostCalculatorLike {
   ): AnnualCostResult;
 }
 
-// ============================================================================
+// ==============================
 // Constants
-// ============================================================================
+// ==============================
 
 const MONTH_NAMES = [
   'January',
@@ -171,9 +171,9 @@ const NON_FIXED_WARNINGS: Record<string, string> = {
     'Fixed-rate plans provide more budget certainty.'
 };
 
-// ============================================================================
+// ==============================
 // Helper Functions
-// ============================================================================
+// ==============================
 
 /**
  * Safe regex match with capture group extraction.
@@ -211,9 +211,9 @@ function calculateBillCredits(usageKwh: number, plan: ElectricityPlan): number {
   return 0;
 }
 
-// ============================================================================
+// ==============================
 // Plan Ranker Module
-// ============================================================================
+// ==============================
 
 const PlanRanker = {
   /**

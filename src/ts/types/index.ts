@@ -5,9 +5,9 @@
  * These types mirror the JSON schema in data/plans.json and data/tdu-rates.json.
  */
 
-// ============================================================================
+// ==============================
 // Early Termination Fee Types
-// ============================================================================
+// ==============================
 
 /**
  * Structure indicating how the ETF is calculated.
@@ -35,9 +35,9 @@ export interface ETFDetails {
   readonly source: ETFSource;
 }
 
-// ============================================================================
+// ==============================
 // Electricity Plan Types
-// ============================================================================
+// ==============================
 
 /**
  * Valid rate types for electricity plans.
@@ -90,9 +90,9 @@ export interface PlansData {
   readonly disclaimer: string;
 }
 
-// ============================================================================
+// ==============================
 // TDU (Transmission and Distribution Utility) Types
-// ============================================================================
+// ==============================
 
 /**
  * ZIP code range for TDU service area mapping.
@@ -164,9 +164,9 @@ export interface LocalTaxesData {
   readonly major_cities: Record<string, CityTaxData>;
 }
 
-// ============================================================================
+// ==============================
 // Cost Calculation Types
-// ============================================================================
+// ==============================
 
 /**
  * Breakdown of monthly electricity cost components.
@@ -218,9 +218,9 @@ export type MonthlyUsagePattern = readonly [
   number
 ];
 
-// ============================================================================
+// ==============================
 // Quality Scoring Types
-// ============================================================================
+// ==============================
 
 /**
  * Letter grades for plan quality.
@@ -266,9 +266,9 @@ export interface RankedPlan extends ElectricityPlan {
   readonly effectiveRate: number;
 }
 
-// ============================================================================
+// ==============================
 // Contract Expiration Types
-// ============================================================================
+// ==============================
 
 /**
  * Contract expiration analysis result.
@@ -293,9 +293,9 @@ export interface ContractRecommendation {
   readonly improvement: string;
 }
 
-// ============================================================================
+// ==============================
 // ETF Calculation Types
-// ============================================================================
+// ==============================
 
 /**
  * Result of ETF calculation.
@@ -310,9 +310,9 @@ export interface ETFCalculationResult {
   readonly tooltip: string;
 }
 
-// ============================================================================
+// ==============================
 // UI State Types
-// ============================================================================
+// ==============================
 
 /**
  * Usage input method selection.
@@ -352,9 +352,9 @@ export interface UIElements {
   readonly comparisonBody: HTMLTableSectionElement | null;
 }
 
-// ============================================================================
+// ==============================
 // Cache Types
-// ============================================================================
+// ==============================
 
 /**
  * Generic cache entry with timestamp.
@@ -378,9 +378,9 @@ export interface CacheConfig {
   readonly retryDelay: number;
 }
 
-// ============================================================================
+// ==============================
 // Logging Types
-// ============================================================================
+// ==============================
 
 /**
  * Log severity levels.
@@ -397,9 +397,9 @@ export interface LogEntry {
   readonly context?: Record<string, unknown>;
 }
 
-// ============================================================================
+// ==============================
 // Deduplication Types
-// ============================================================================
+// ==============================
 
 /**
  * Result of plan deduplication process.

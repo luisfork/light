@@ -20,9 +20,9 @@ import type {
 } from './types';
 import Logger from './utils/logger';
 
-// ============================================================================
+// ==============================
 // Types
-// ============================================================================
+// ==============================
 
 /**
  * Cache key type.
@@ -89,15 +89,15 @@ interface DeregulationStatus {
   readonly reason: string | null;
 }
 
-// ============================================================================
+// ==============================
 // Logger
-// ============================================================================
+// ==============================
 
 const logger = Logger.withPrefix('API');
 
-// ============================================================================
+// ==============================
 // Constants
-// ============================================================================
+// ==============================
 
 const LEGAL_SUFFIXES = [
   ', LLC',
@@ -115,9 +115,9 @@ const LEGAL_SUFFIXES = [
   ' RETAIL'
 ] as const;
 
-// ============================================================================
+// ==============================
 // API Module
-// ============================================================================
+// ==============================
 
 const API = {
   /**
@@ -209,7 +209,11 @@ const API = {
    */
   async loadPlans(forceRefresh: boolean = false): Promise<PlansData> {
     if (!forceRefresh && this.isCacheValid('plans')) {
-      return this.cache.plans.data!;
+      const cachedData = this.cache.plans.data;
+      if (cachedData === null) {
+        throw new Error('Cache validation error: data should not be null');
+      }
+      return cachedData;
     }
 
     if (this.loadingPromises.plans !== null) {
@@ -266,7 +270,11 @@ const API = {
    */
   async loadTDURates(forceRefresh: boolean = false): Promise<TDURatesData> {
     if (!forceRefresh && this.isCacheValid('tduRates')) {
-      return this.cache.tduRates.data!;
+      const cachedData = this.cache.tduRates.data;
+      if (cachedData === null) {
+        throw new Error('Cache validation error: data should not be null');
+      }
+      return cachedData;
     }
 
     if (this.loadingPromises.tduRates !== null) {
@@ -304,7 +312,11 @@ const API = {
    */
   async loadLocalTaxes(forceRefresh: boolean = false): Promise<LocalTaxesData> {
     if (!forceRefresh && this.isCacheValid('localTaxes')) {
-      return this.cache.localTaxes.data!;
+      const cachedData = this.cache.localTaxes.data;
+      if (cachedData === null) {
+        throw new Error('Cache validation error: data should not be null');
+      }
+      return cachedData;
     }
 
     if (this.loadingPromises.localTaxes !== null) {
@@ -579,11 +591,10 @@ const API = {
         });
       } else {
         duplicateCount++;
-        const existing = fingerprintMap.get(fingerprint)!;
-        const currentPreference = this.calculatePlanPreference(plan);
-
-        existing.hasLanguagePair = true;
-
+        const existing = fingerprintMap.get(fingerprint);
+        if (existing === undefined) {
+          throw new Error('Fingerprint map consistency error');
+        }
         if (currentPreference > existing.preference) {
           fingerprintMap.set(fingerprint, {
             plan,

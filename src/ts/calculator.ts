@@ -9,9 +9,9 @@
  * All actual logic is in the /modules subdirectory.
  */
 
-// ============================================================================
+// ==============================
 // Re-exports from TypeScript modules
-// ============================================================================
+// ==============================
 
 // Cache management
 export { CacheManager } from './modules/cache';
@@ -52,9 +52,9 @@ export { formatProviderName, ProviderFormatter } from './modules/provider-format
 // Usage estimation
 export { estimateUsagePattern, UsageEstimator } from './modules/usage-estimator';
 
-// ============================================================================
+// ==============================
 // Types re-exports
-// ============================================================================
+// ==============================
 
 export type {
   AnnualCostResult,
@@ -73,9 +73,9 @@ export type {
   TDURatesData
 } from './types';
 
-// ============================================================================
+// ==============================
 // Default export for backwards compatibility
-// ============================================================================
+// ==============================
 
 import { ContractAnalyzer } from './modules/contract-analyzer';
 import { CostCalculator } from './modules/cost-calculator';
