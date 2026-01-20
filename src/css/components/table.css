@@ -40,7 +40,7 @@
 
 /* Table Header */
 .comparison-table th {
-  font-family: var(--font-compact);
+  font-family: var(--font-primary);
   font-size: var(--text-caption);
   font-weight: 600;
   text-transform: uppercase;
@@ -160,15 +160,15 @@
 }
 
 .grade-b {
-  background: #84cc16;
+  background: var(--color-data-neutral);
 }
 
 .grade-c {
-  background: #f59e0b;
+  background: var(--color-warning);
 }
 
 .grade-d {
-  background: #f97316;
+  background: var(--color-error);
 }
 
 .grade-f {
@@ -195,7 +195,7 @@
 }
 
 .grade-legend-title {
-  font-family: var(--font-compact);
+  font-family: var(--font-primary);
   font-size: var(--text-caption);
   font-weight: 600;
   text-transform: uppercase;

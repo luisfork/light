@@ -102,7 +102,7 @@
 }
 
 .brand-mark {
-  font-family: var(--font-headline);
+  font-family: var(--font-primary);
   font-size: var(--text-eyebrow);
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -218,6 +218,12 @@
 
   .nav-item {
     font-size: var(--text-caption);
+  }
+}
+
+@media (max-width: 734px) {
+  .tabnav-item {
+    min-height: 44px;
   }
 }
 

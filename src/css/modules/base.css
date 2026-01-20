@@ -65,30 +65,6 @@
   --color-data-negative: rgb(255, 59, 48);
   --color-data-muted: rgba(0, 0, 0, 0.2);
 
-  /* Legacy token mappings for backwards compatibility */
-  --color-ink: var(--color-text-primary);
-  --color-ink-secondary: var(--color-text-secondary);
-  --color-ink-tertiary: var(--color-text-tertiary);
-  --color-ink-muted: var(--color-text-tertiary);
-  --color-surface: var(--color-bg-primary);
-  --color-surface-raised: var(--color-bg-secondary);
-  --color-surface-sunken: #e5e5ea;
-  --color-surface-overlay: var(--color-scrim-light);
-  --color-border-subtle: var(--color-keyline-light);
-  --color-border-medium: var(--color-border-primary);
-  --color-accent: var(--color-link);
-  --color-accent-hover: var(--color-link-hover);
-  --color-accent-muted: rgba(0, 102, 204, 0.08);
-  --color-positive: var(--color-success);
-  --color-positive-muted: rgba(40, 167, 69, 0.08);
-  --color-positive-ink: #1f7a3a;
-  --color-caution: var(--color-warning);
-  --color-caution-muted: rgba(255, 149, 0, 0.08);
-  --color-caution-ink: #b45309;
-  --color-negative: var(--color-error);
-  --color-negative-muted: rgba(255, 59, 48, 0.08);
-  --color-negative-ink: #b42318;
-
   /* ==============================
      TYPOGRAPHY
      ============================== */
@@ -97,13 +73,6 @@
   --font-primary: "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-headline: "New York Small", ui-serif, "Times New Roman", Times, serif;
   --font-mono: "SF Compact", ui-monospace, "SF Mono", Menlo, monospace;
-
-  /* Legacy font mappings */
-  --font-system: var(--font-primary);
-  --font-display: var(--font-primary);
-  --font-serif: var(--font-headline);
-  --font-compact: "SF Compact", var(--font-primary);
-  --font-compact-display: "SF Compact", var(--font-primary);
 
   /* Type Scale — Desktop (Default) */
   --text-headline-super: 80px;
@@ -114,16 +83,6 @@
   --text-body: 17px;
   --text-body-reduced: 14px;
   --text-caption: 12px;
-
-  /* Legacy size tokens (rem-based for compatibility) */
-  --text-xs: 0.75rem;   /* 12px */
-  --text-sm: 0.875rem;  /* 14px */
-  --text-base: 1.0625rem; /* 17px */
-  --text-lg: 1.3125rem; /* 21px - eyebrow */
-  --text-xl: 1.5rem;    /* 24px */
-  --text-2xl: 2rem;     /* 32px */
-  --text-3xl: 2.5rem;   /* 40px - headline-reduced */
-  --text-4xl: 3rem;     /* 48px - headline */
 
   /* Line Heights */
   --leading-headline-super: 1.05;
@@ -173,10 +132,6 @@
   --content-padding: 22px;
   --content-padding-mobile: 16px;
 
-  /* Legacy layout tokens */
-  --max-width-content: var(--content-max-width);
-  --max-width-wide: 1200px;
-
   /* ==============================
      BORDER RADIUS — Conservative, Functional
      ============================== */
@@ -186,9 +141,6 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-pill: 980px;
-
-  /* Legacy radius tokens */
-  --radius-xl: var(--radius-lg);
 
   /* ==============================
      MOTION & ANIMATION — Spring Physics
@@ -212,41 +164,6 @@
   --transition-fast: var(--duration-fast) var(--ease-standard);
   --transition-base: var(--duration-standard) var(--ease-standard);
   --transition-slow: var(--duration-slow) var(--ease-out);
-
-  /* ==============================
-     SHADOWS & DEPTH — Functional Only
-     ============================== */
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  /* Glow effects (layered for depth) */
-  --glow-subtle: 0 0 0 1px var(--color-border-primary), 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
-  --glow-medium: 0 0 0 1px var(--color-border-primary), 0 2px 6px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.05);
-  --glow-strong: 0 0 0 1px var(--color-border-primary), 0 4px 12px rgba(0, 0, 0, 0.04), 0 16px 48px rgba(0, 0, 0, 0.06);
-  --glow-accent: 0 0 0 1px rgba(0, 102, 204, 0.15), 0 4px 16px rgba(0, 102, 204, 0.08), 0 12px 32px rgba(0, 102, 204, 0.04);
-
-  /* ==============================
-     DATA VISUALIZATION — Usage Profile Charts
-     ============================== */
-
-  --usage-high-start: #ff383c;
-  --usage-high-end: #d81f28;
-  --usage-medium-high-start: #ff8d28;
-  --usage-medium-high-end: #d56e1a;
-  --usage-medium-start: #ffcc00;
-  --usage-medium-end: #d9a900;
-  --usage-low-start: #34c759;
-  --usage-low-end: #248a3d;
-  --usage-very-low-start: #0088ff;
-  --usage-very-low-end: #0066cc;
-  --usage-chart-bg-start: rgba(0, 0, 0, 0.02);
-  --usage-chart-bg-end: rgba(0, 0, 0, 0);
-  --usage-chart-grid: rgba(0, 0, 0, 0.05);
-  --usage-bar-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --usage-bar-shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.12);
 
   /* ==============================
      VIEWPORT TRIGGERS — Scroll Animation
@@ -285,19 +202,6 @@
   /* Scrims & Overlays */
   --color-scrim-dark: rgba(22, 22, 23, 0.88);
   --color-scrim-dark-blur: rgba(22, 22, 23, 0.8);
-
-  /* Legacy mappings for dark */
-  --color-ink: var(--color-text-primary);
-  --color-ink-secondary: var(--color-text-secondary);
-  --color-ink-tertiary: var(--color-text-tertiary);
-  --color-surface: var(--color-bg-primary);
-  --color-surface-raised: var(--color-bg-secondary);
-  --color-surface-sunken: var(--color-bg-tertiary);
-  --color-surface-overlay: var(--color-scrim-dark);
-  --color-border-subtle: var(--color-keyline-dark);
-  --color-border-medium: var(--color-border-primary);
-  --color-accent: var(--color-link);
-  --color-accent-hover: var(--color-link-hover);
 }
 
 /* ==============================
@@ -406,12 +310,18 @@ body {
 
 /* Headlines — New York Small (use sparingly) */
 h1,
-h2,
+h2 {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* UI and supporting headings use the primary system font */
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-headline);
+  font-family: var(--font-primary);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -632,7 +542,7 @@ textarea:focus-visible,
   color: var(--color-link);
   font-weight: 600;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border-primary);
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }

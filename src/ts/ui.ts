@@ -15,6 +15,12 @@ import { PlanRanker } from './modules/plan-ranker';
 import { UsageEstimator } from './modules/usage-estimator';
 import type { ElectricityPlan, QualityGrade, TaxInfo, TDURate } from './types';
 import Logger from './utils/logger';
+import {
+  animateSpring,
+  applyStaggeredDelay,
+  SpringPresets,
+  setupScrollReveal
+} from './utils/motion';
 
 // ==============================
 // Types
@@ -287,6 +293,7 @@ const UI = {
     this.cacheElements();
     Toast.init();
     this.attachEventListeners();
+    this.setupMotion();
 
     try {
       const { plans } = await API.preloadAll();
@@ -353,6 +360,13 @@ const UI = {
       statusLoading: document.getElementById('status-loading'),
       statusReady: document.getElementById('status-ready')
     };
+  },
+
+  setupMotion(): void {
+    document.querySelectorAll('[data-reveal]').forEach((element) => {
+      element.classList.add('reveal');
+    });
+    setupScrollReveal('.reveal');
   },
 
   attachEventListeners(): void {
@@ -640,15 +654,18 @@ const UI = {
     this.elements.methodOptions.forEach((opt) => {
       opt.classList.remove('active');
       opt.setAttribute('aria-selected', 'false');
+      opt.setAttribute('tabindex', '-1');
     });
     option.classList.add('active');
     option.setAttribute('aria-selected', 'true');
+    option.setAttribute('tabindex', '0');
 
     ['estimate', 'average', 'detailed'].forEach((m) => {
       const panel = document.getElementById(`panel-${m}`);
       if (panel !== null) {
         panel.hidden = m !== method;
         panel.classList.toggle('active', m === method);
+        panel.setAttribute('aria-hidden', String(m !== method));
       }
     });
   },
@@ -861,12 +878,19 @@ const UI = {
 
           return `
             <div class="bar-container" style="justify-content: flex-end; height: 100%;">
-              <div class="bar ${intensityClass}" style="height: ${height}%" title="${usage.toLocaleString()} kWh"></div>
+              <div class="bar ${intensityClass}" style="height: 0%" data-target="${height}" title="${usage.toLocaleString()} kWh"></div>
               <span class="bar-label">${monthNames[i]}</span>
             </div>
           `;
         })
         .join('');
+
+      const bars = this.elements.usageChart.querySelectorAll<HTMLElement>('.bar');
+      bars.forEach((bar) => {
+        const dataset = bar.dataset as { target?: string };
+        const target = Number(dataset.target ?? '0');
+        void animateSpring(bar, 'height', 0, target, SpringPresets.gentle, '%');
+      });
     }
   },
 
@@ -877,6 +901,10 @@ const UI = {
     this.elements.topPlans.innerHTML = displayPlans
       .map((plan, i) => this.renderPlanCard(plan, i))
       .join('');
+
+    const items = this.elements.topPlans.querySelectorAll<HTMLElement>('.plan-item');
+    applyStaggeredDelay(items);
+    setupScrollReveal('.plan-item.reveal');
   },
 
   displayComparisonTable(plans: RankedPlanWithMetrics[]): void {
@@ -919,7 +947,7 @@ const UI = {
     const rankLabel = index === 0 ? 'Best Value' : index <= 2 ? 'Top 3' : 'Top 5';
 
     return `
-      <div class="plan-item">
+      <div class="plan-item reveal stagger-item">
         <div class="plan-item-rank">
           <span class="rank-badge ${rankBadge}">${rankLabel}</span>
         </div>
@@ -948,7 +976,7 @@ const UI = {
           </span>
         </div>
         <div class="plan-item-actions">
-          <button class="btn-plan-action btn-plan-details" onclick="UI.showPlanModal('${plan.plan_id}')">View Details</button>
+          <button class="btn-plan-action btn-plan-details" type="button" onclick="UI.showPlanModal('${plan.plan_id}')">View Details</button>
           ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="btn-plan-action btn-plan-efl">View EFL</a>` : ''}
         </div>
       </div>
@@ -968,8 +996,8 @@ const UI = {
 
       this.elements.modalBody.innerHTML = `
         <div class="modal-header-group">
-          <h2 class="modal-title">${this.escapeHtml(plan.plan_name)}</h2>
-          <p class="modal-provider">${this.escapeHtml(plan.rep_name)}</p>
+          <h2 class="modal-title" id="modal-title">${this.escapeHtml(plan.plan_name)}</h2>
+          <p class="modal-provider" id="modal-description">${this.escapeHtml(plan.rep_name)}</p>
         </div>
         <div class="modal-grid">
           <div class="modal-stat">
@@ -987,10 +1015,24 @@ const UI = {
         </div>
         <div class="modal-section">
           <h3 class="modal-section-title">Plan Details</h3>
-          <p><strong>Rate Type:</strong> ${plan.rate_type}</p>
-          <p><strong>Contract Term:</strong> ${plan.term_months} months</p>
-          <p><strong>Renewable:</strong> ${plan.renewable_pct}%</p>
-          <p><strong>Cancellation Fee:</strong> ${this.formatETF(plan)}</p>
+          <dl class="modal-kv">
+            <div class="modal-kv-row">
+              <dt>Rate Type</dt>
+              <dd>${this.escapeHtml(plan.rate_type)}</dd>
+            </div>
+            <div class="modal-kv-row">
+              <dt>Contract Term</dt>
+              <dd>${plan.term_months} months</dd>
+            </div>
+            <div class="modal-kv-row">
+              <dt>Renewable</dt>
+              <dd>${plan.renewable_pct}%</dd>
+            </div>
+            <div class="modal-kv-row">
+              <dt>Cancellation Fee</dt>
+              <dd>${this.formatETF(plan)}</dd>
+            </div>
+          </dl>
         </div>
         ${
           plan.special_terms
@@ -1011,7 +1053,7 @@ const UI = {
         }
         <div class="modal-actions">
           ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn">View EFL</a>` : ''}
-          ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="modal-btn btn-enroll">Enroll Now</a>` : ''}
+          ${plan.enrollment_url ? `<a href="${this.escapeHtml(plan.enrollment_url)}" target="_blank" rel="noopener" class="modal-btn modal-btn-primary btn-enroll">Enroll Now</a>` : ''}
         </div>
       `;
     }

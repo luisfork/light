@@ -1,5 +1,5 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { CostCalculator } from '../../src/ts/modules/cost-calculator';
 import type { ElectricityPlan, TDURate } from '../../src/ts/types';
 

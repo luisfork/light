@@ -43,18 +43,17 @@
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-sm);
   transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+    border-color var(--transition-fast);
 }
 
 .field-input:hover {
   border-color: var(--color-border-secondary);
 }
 
-.field-input:focus {
-  outline: none;
+.field-input:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--color-focus-offset);
   border-color: var(--color-focus);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
 }
 
 .field-input::placeholder {
@@ -73,14 +72,13 @@
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-sm);
   transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+    border-color var(--transition-fast);
 }
 
-.field-input-compact:focus {
-  outline: none;
+.field-input-compact:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--color-focus-offset);
   border-color: var(--color-focus);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
 }
 
 /* ==============================
@@ -104,18 +102,17 @@
   appearance: none;
   -webkit-appearance: none;
   transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+    border-color var(--transition-fast);
 }
 
 .field-select:hover {
   border-color: var(--color-border-secondary);
 }
 
-.field-select:focus {
-  outline: none;
+.field-select:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--color-focus-offset);
   border-color: var(--color-focus);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
 }
 
 /* Filter select (smaller variant) */
@@ -155,30 +152,52 @@
 
 .zip-input-container {
   position: relative;
-  max-width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  max-width: 240px;
+  width: 100%;
 }
 
 .field-input-zip {
   font-family: var(--font-mono);
-  font-size: var(--text-2xl);
+  font-size: var(--text-headline-reduced);
+  line-height: var(--leading-headline-reduced);
   font-weight: 600;
   text-align: center;
   letter-spacing: 0.1em;
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  min-height: 52px;
   font-variant-numeric: tabular-nums;
 }
 
 .zip-status-container {
-  position: absolute;
-  right: calc(100% + var(--space-3));
-  top: 50%;
-  transform: translateY(-50%);
+  position: static;
+  transform: none;
   display: flex;
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-body-reduced);
   font-weight: 500;
+  color: var(--color-text-secondary);
   white-space: nowrap;
+}
+
+.zip-status-valid {
+  color: var(--color-success);
+}
+
+.zip-status-checking {
+  color: var(--color-text-secondary);
+}
+
+.zip-status-partial {
+  color: var(--color-warning);
+}
+
+.zip-status-unknown {
+  color: var(--color-error);
 }
 
 /* ==============================
@@ -207,7 +226,8 @@
   cursor: pointer;
   transition:
     background var(--transition-fast),
-    box-shadow var(--transition-fast);
+    border-color var(--transition-fast);
+  border: 1px solid transparent;
 }
 
 .method-option:hover {
@@ -221,7 +241,7 @@
 
 .method-option.active {
   background: var(--color-bg-primary);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border-secondary);
 }
 
 .method-name {
@@ -254,12 +274,20 @@
 }
 
 .month-field label {
-  font-family: var(--font-compact);
+  font-family: var(--font-primary);
   font-size: var(--text-caption);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--color-text-tertiary);
+}
+
+@media (max-width: 734px) {
+  .field-input,
+  .field-input-compact,
+  .field-select {
+    min-height: 44px;
+  }
 }
 
 /* Responsive grid */
@@ -295,10 +323,8 @@
    ============================== */
 
 @media (max-width: 734px) {
-  .zip-status-container {
-    position: static;
-    transform: none;
-    margin-top: var(--space-2);
+  .zip-input-container {
+    max-width: 100%;
   }
 
   /* Stack method selector on mobile */

@@ -1,5 +1,5 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { ETFCalculator } from '../../src/ts/modules/etf-calculator';
 import type { ElectricityPlan, ETFDetails } from '../../src/ts/types';
 

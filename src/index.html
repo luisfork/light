@@ -33,7 +33,7 @@
         </div>
       </header>
       <!-- Hero -->
-      <section class="hero">
+      <section class="hero" data-reveal>
         <div class="hero-inner">
           <div class="hero-content">
             <h1 class="hero-title">
@@ -62,7 +62,7 @@
       <main class="calculator-section">
         <div class="calculator-container">
           <!-- Step 1: Location -->
-          <section class="calc-step" id="step-location">
+          <section class="calc-step" id="step-location" data-reveal>
             <div class="step-header">
               <span class="step-indicator">1</span>
               <div class="step-title-group">
@@ -83,7 +83,7 @@
                          inputmode="numeric"
                          autocomplete="postal-code"
                          required>
-                  <div class="zip-status-container" id="zip-status"></div>
+                  <div class="zip-status-container" id="zip-status" aria-live="polite"></div>
                 </div>
               </div>
               <div class="tdu-display" id="tdu-display" hidden>
@@ -109,7 +109,7 @@
             </div>
           </section>
           <!-- Step 2: Usage -->
-          <section class="calc-step calc-step-disabled" id="step-usage">
+          <section class="calc-step calc-step-disabled" id="step-usage" data-reveal>
             <div class="step-header">
               <span class="step-indicator">2</span>
               <div class="step-title-group">
@@ -123,35 +123,42 @@
                    role="tablist"
                    aria-label="Usage input method">
                 <button class="method-option active"
-                        role="tab"
-                        aria-selected="true"
-                        data-method="estimate"
-                        id="tab-estimate">
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="panel-estimate"
+                  tabindex="0"
+                  data-method="estimate"
+                  id="tab-estimate">
                   <span class="method-name">Quick Estimate</span>
                   <span class="method-desc">Based on home size</span>
                 </button>
                 <button class="method-option"
-                        role="tab"
-                        aria-selected="false"
-                        data-method="average"
-                        id="tab-average">
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-average"
+                  tabindex="-1"
+                  data-method="average"
+                  id="tab-average">
                   <span class="method-name">Monthly Average</span>
                   <span class="method-desc">Single value input</span>
                 </button>
                 <button class="method-option"
-                        role="tab"
-                        aria-selected="false"
-                        data-method="detailed"
-                        id="tab-detailed">
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-detailed"
+                  tabindex="-1"
+                  data-method="detailed"
+                  id="tab-detailed">
                   <span class="method-name">Detailed Usage</span>
                   <span class="method-desc">12-month breakdown</span>
                 </button>
               </div>
               <!-- Estimate Panel -->
-              <div class="usage-panel active"
-                   id="panel-estimate"
-                   role="tabpanel"
-                   aria-labelledby="tab-estimate">
+                  <div class="usage-panel active"
+                    id="panel-estimate"
+                    role="tabpanel"
+                    aria-labelledby="tab-estimate"
+                    aria-hidden="false">
                 <div class="field-group">
                   <label for="home-size" class="field-label">Home Size / Typical Usage</label>
                   <select id="home-size" class="field-select">
@@ -169,11 +176,12 @@
                 </div>
               </div>
               <!-- Average Panel -->
-              <div class="usage-panel"
-                   id="panel-average"
-                   role="tabpanel"
-                   aria-labelledby="tab-average"
-                   hidden>
+                  <div class="usage-panel"
+                    id="panel-average"
+                    role="tabpanel"
+                    aria-labelledby="tab-average"
+                    aria-hidden="true"
+                    hidden>
                 <div class="field-group">
                   <label for="avg-kwh" class="field-label">Average Monthly Usage (kWh)</label>
                   <div class="input-with-unit">
@@ -190,11 +198,12 @@
                 </div>
               </div>
               <!-- Detailed Panel -->
-              <div class="usage-panel"
-                   id="panel-detailed"
-                   role="tabpanel"
-                   aria-labelledby="tab-detailed"
-                   hidden>
+                  <div class="usage-panel"
+                    id="panel-detailed"
+                    role="tabpanel"
+                    aria-labelledby="tab-detailed"
+                    aria-hidden="true"
+                    hidden>
                 <p class="panel-intro">
                   Enter your actual monthly usage for the most accurate calculation.
                   You can find this data on Smart Meter Texas or your past utility bills.
@@ -339,7 +348,7 @@
             </div>
           </section>
           <!-- Results Section -->
-          <section class="results-section" id="results-section" hidden>
+          <section class="results-section" id="results-section" data-reveal hidden>
             <div class="results-header">
               <div class="step-header step-header-results">
                 <span class="step-indicator">3</span>
@@ -353,7 +362,7 @@
               </p>
             </div>
             <!-- Usage Profile Summary -->
-            <div class="usage-profile" id="usage-profile">
+            <div class="usage-profile" id="usage-profile" data-reveal>
               <h3 class="profile-title">Your Usage Profile</h3>
               <div class="profile-chart" id="usage-chart"></div>
               <div class="profile-stats">
@@ -372,7 +381,7 @@
               </div>
             </div>
             <!-- Top Recommendations -->
-            <div class="recommendations" id="recommendations">
+            <div class="recommendations" id="recommendations" data-reveal>
               <div class="section-header-enhanced">
                 <h3 class="section-heading">Lowest Cost Plans</h3>
                 <div class="ranking-notes">
@@ -396,7 +405,7 @@
               <div class="plan-list" id="top-plans"></div>
             </div>
             <!-- Full Comparison -->
-            <div class="full-comparison">
+            <div class="full-comparison" data-reveal>
               <div class="comparison-header-enhanced">
                 <div class="comparison-title-section">
                   <h3 class="section-heading">Complete Plan Comparison</h3>
@@ -523,7 +532,7 @@
         </div>
       </main>
       <!-- Methodology Section -->
-      <section class="methodology-section" id="methodology">
+      <section class="methodology-section" id="methodology" data-reveal>
         <div class="methodology-inner">
           <h2 class="methodology-title">Calculation Methodology</h2>
           <p class="methodology-intro">
@@ -618,11 +627,12 @@
     </div>
     <!-- Plan Details Modal -->
     <div class="modal-backdrop" id="modal-backdrop" hidden>
-      <div class="modal-dialog"
-           role="dialog"
-           aria-modal="true"
-           aria-labelledby="modal-title">
-        <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+       <div class="modal-dialog"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modal-title"
+         aria-describedby="modal-description">
+        <button class="modal-close" id="modal-close" aria-label="Close">×</button>
         <div class="modal-body" id="modal-body"></div>
       </div>
     </div>

@@ -172,6 +172,74 @@
 }
 
 /* ==============================
+   Contextual Buttons (Table/Plan/Modal)
+   ============================== */
+
+.btn-view,
+.btn-plan-action,
+.modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-body-reduced);
+  font-weight: 400;
+  border: 1px solid var(--color-border-primary);
+  color: var(--color-link);
+  background: transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-view:hover,
+.btn-plan-action:hover,
+.modal-btn:hover {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border-secondary);
+  text-decoration: none;
+}
+
+.btn-plan-details {
+  border-color: var(--color-border-secondary);
+}
+
+.btn-plan-efl {
+  color: var(--color-link);
+}
+
+.modal-btn-primary,
+.btn-enroll {
+  background: rgb(0, 113, 227);
+  color: var(--color-text-contrast);
+  border-color: transparent;
+}
+
+.modal-btn-primary:hover,
+.btn-enroll:hover {
+  background: rgb(0, 118, 223);
+}
+
+@media (max-width: 734px) {
+  .button-primary,
+  .button-secondary,
+  .button-ghost {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .button-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .button-sm {
+    min-height: 44px;
+  }
+}
+
+/* ==============================
    Link Styles
    ============================== */
 
