@@ -15,7 +15,7 @@
    ========================================================================== */
 
 @font-face {
-  font-family: 'SF Pro';
+  font-family: 'SF Pro Text';
   src:
     url('../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Regular.woff2') format('woff2'),
     url('../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Regular.woff') format('woff');
@@ -25,7 +25,7 @@
 }
 
 @font-face {
-  font-family: 'SF Pro';
+  font-family: 'SF Pro Text';
   src:
     url('../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-RegularItalic.woff2') format('woff2'),
     url('../assets/fonts/san_francisco/WOFF/SF-Pro-Text-RegularItalic.woff') format('woff');
@@ -35,7 +35,7 @@
 }
 
 @font-face {
-  font-family: 'SF Pro';
+  font-family: 'SF Pro Text';
   src:
     url('../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Medium.woff2') format('woff2'),
     url('../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Medium.woff') format('woff');
@@ -45,7 +45,7 @@
 }
 
 @font-face {
-  font-family: 'SF Pro';
+  font-family: 'SF Pro Text';
   src:
     url('../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-MediumItalic.woff2') format('woff2'),
     url('../assets/fonts/san_francisco/WOFF/SF-Pro-Text-MediumItalic.woff') format('woff');
@@ -55,7 +55,7 @@
 }
 
 @font-face {
-  font-family: 'SF Pro';
+  font-family: 'SF Pro Text';
   src:
     url('../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Semibold.woff2') format('woff2'),
     url('../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Semibold.woff') format('woff');
@@ -65,7 +65,7 @@
 }
 
 @font-face {
-  font-family: 'SF Pro';
+  font-family: 'SF Pro Text';
   src:
     url('../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-SemiboldItalic.woff2') format('woff2'),
     url('../assets/fonts/san_francisco/WOFF/SF-Pro-Text-SemiboldItalic.woff') format('woff');
@@ -75,7 +75,7 @@
 }
 
 @font-face {
-  font-family: 'SF Pro';
+  font-family: 'SF Pro Text';
   src:
     url('../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-Bold.woff2') format('woff2'),
     url('../assets/fonts/san_francisco/WOFF/SF-Pro-Text-Bold.woff') format('woff');
@@ -85,7 +85,7 @@
 }
 
 @font-face {
-  font-family: 'SF Pro';
+  font-family: 'SF Pro Text';
   src:
     url('../assets/fonts/san_francisco/WOFF2/SF-Pro-Text-BoldItalic.woff2') format('woff2'),
     url('../assets/fonts/san_francisco/WOFF/SF-Pro-Text-BoldItalic.woff') format('woff');

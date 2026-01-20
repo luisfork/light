@@ -40,34 +40,34 @@ The following are explicitly forbidden in this design system:
 ### Font Stack
 
 ```css
-/* Primary — New York Small (headlines) */
-font-family: "New York Small", serif, sans-serif;
-/* light/src/assets/fonts/new_york/WOFF2/ */
-
-/* Secondary — SF Pro Text (body, UI) */
+/* Primary — SF Pro Text (body, UI) */
 font-family: "SF Pro Text", sans-serif;
 /* light/src/assets/fonts/san_francisco/WOFF2/ */
 
-/* Monospace — for data/code (use sparingly) */
+/* Major Headlines — New York Small */
+/* USE VERY SPARINGLY — DO NOT USE FOR UI */
+font-family: "New York Small", serif, sans-serif;
+/* light/src/assets/fonts/new_york/WOFF2/ */
+
+/* Monospace — for data/code (USE VERY SPARINGLY) */
 font-family: "SF Compact", monospace;
 /* light/src/assets/fonts/san_francisco/WOFF2/ */
 ```
 
-### Type Scale
+### Type Scale (Responsive)
 
-| Token | Size | Weight | Line Height | Letter Spacing | Usage |
-| --- | --- | --- | --- | --- | --- |
-| `headline-super` | 96px | 700 | 1.0 | -0.015em | Hero statements |
-| `headline-elevated` | 64px | 600 | 1.05 | -0.009em | Section headers |
-| `headline` | 48px | 600 | 1.08 | -0.003em | Subsection headers |
-| `headline-reduced` | 40px | 600 | 1.1 | 0em | Tertiary headers |
-| `eyebrow-super` | 28px | 600 | 1.14 | 0.007em | Large labels/stats |
-| `eyebrow-elevated` | 24px | 600 | 1.17 | 0.009em | Stat labels |
-| `eyebrow` | 21px | 600 | 1.19 | 0.011em | Section eyebrows |
-| `eyebrow-reduced` | 19px | 400 | 1.21 | 0.012em | Body elevated |
-| `body` | 17px | 400 | 1.47 | -0.022em | Body copy |
-| `body-reduced` | 14px | 400 | 1.43 | -0.016em | Secondary body |
-| `caption` | 12px | 400 | 1.33 | -0.01em | Captions, footnotes |
+Values derived from `macbook-pro` overview page.
+
+| Token | Desktop (Default) | Tablet (<1068px) | Mobile (<734px) | Weight | Line Height | Tracking | Usage |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `headline-super` | **80px** | 64px | 48px | 600 | 1.05 | -0.015em | Hero statements |
+| `headline-elevated` | **64px** | 48px | 40px | 600 | 1.06 | -0.009em | Major Sections |
+| `headline` | **48px** | 40px | 32px | 600 | 1.08 | -0.003em | Subsection |
+| `headline-reduced` | **40px** | 32px | 28px | 600 | 1.1 | 0em | Tertiary |
+| `eyebrow` | **21px** | 19px | 17px | 600 | 1.19 | 0.011em | Section Labels |
+| `body` | **17px** | 17px | 17px | 400 | 1.47 | -0.022em | Body copy |
+| `body-reduced` | **14px** | 14px | 14px | 400 | 1.42 | -0.016em | Secondary |
+| `caption` | **12px** | 12px | 12px | 400 | 1.33 | 0em | Footnotes |
 
 ### Typography Rules
 
@@ -86,36 +86,36 @@ font-family: "SF Compact", monospace;
 ```css
 :root {
   /* Backgrounds */
-  --color-bg-primary: rgb(255, 255, 255);
-  --color-bg-secondary: rgb(245, 245, 247);       /* #f5f5f7 */
-  --color-bg-tertiary: rgb(250, 250, 252);        /* #fafafc */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f5f5f7;  /* Section backgrounds (e.g. gray sections) */
+  --color-bg-tertiary: #fafafc;   /* Subtle variations */
 
   /* Text */
-  --color-text-primary: rgba(0, 0, 0, 0.88);
-  --color-text-secondary: rgba(0, 0, 0, 0.56);
-  --color-text-tertiary: rgba(0, 0, 0, 0.48);
-  --color-text-contrast: rgba(0, 0, 0, 0.72);
+  --color-text-primary: #1d1d1f;  /* Standard Apple Text Black (~88% black) */
+  --color-text-secondary: #86868b; /* Subtitles, Eyebrows */
+  --color-text-tertiary: #a1a1a6; /* Footers, disclaimers */
+  --color-text-contrast: #ffffff;
 
   /* Interactive */
-  --color-link: rgb(0, 102, 204);                 /* #0066cc */
-  --color-link-hover: rgb(0, 113, 227);           /* #0071e3 */
-  --color-focus: rgb(0, 113, 227);                /* #0071e3 */
+  --color-link: #0066cc;          /* Standard Apple Link Blue */
+  --color-link-hover: #004499;
+  --color-focus: #0071e3;
   --color-focus-offset: 1px;
   --color-focus-offset-container: 3px;
 
   /* Borders */
   --color-border-primary: rgba(0, 0, 0, 0.16);
-  --color-border-secondary: rgba(0, 0, 0, 0.1);
+  --color-border-secondary: #d2d2d7;
   --color-keyline-light: rgba(0, 0, 0, 0.16);
 
   /* Scrims & overlays */
-  --color-scrim-light: rgba(250, 250, 252, 0.92);
-  --color-scrim-light-blur: rgba(250, 250, 252, 0.8);
+  --color-scrim-light: rgba(255, 255, 255, 0.92);
+  --color-scrim-light-blur: rgba(255, 255, 255, 0.8);
 
   /* Semantic */
-  --color-success: rgb(40, 167, 69);
-  --color-warning: rgb(255, 149, 0);
-  --color-error: rgb(255, 59, 48);
+  --color-success: #28a745;
+  --color-warning: #ff9500;
+  --color-error: #ff3b30;
 }
 ```
 
@@ -124,26 +124,24 @@ font-family: "SF Compact", monospace;
 ```css
 .theme-dark {
   /* Backgrounds */
-  --color-bg-primary: rgb(0, 0, 0);
-  --color-bg-secondary: rgb(29, 29, 31);          /* #1d1d1f */
-  --color-bg-tertiary: rgb(22, 22, 23);           /* #161617 */
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #161617; /* Common dark mode gray */
+  --color-bg-tertiary: #1d1d1f;
 
   /* Text */
-  --color-text-primary: rgba(255, 255, 255, 0.92);
-  --color-text-secondary: rgba(255, 255, 255, 0.56);
-  --color-text-tertiary: rgba(255, 255, 255, 0.4);
-  --color-text-contrast: rgba(255, 255, 255, 0.8);
+  --color-text-primary: #f5f5f7;
+  --color-text-secondary: #86868b;
+  --color-text-tertiary: #6e6e73;
+  --color-text-contrast: #000000;
 
   /* Interactive */
-  --color-link: rgb(41, 151, 255);                /* #2997ff */
-  --color-link-hover: rgb(64, 169, 255);
-  --color-focus: rgb(0, 113, 227);
-  --color-focus-offset: 1px;
-  --color-focus-offset-container: 3px;
+  --color-link: #2997ff;
+  --color-link-hover: #40a9ff;
+  --color-focus: #0071e3;
 
   /* Borders */
   --color-border-primary: rgba(255, 255, 255, 0.24);
-  --color-border-secondary: rgba(255, 255, 255, 0.16);
+  --color-border-secondary: #424245;
   --color-keyline-dark: rgba(255, 255, 255, 0.24);
 
   /* Scrims & overlays */
@@ -165,7 +163,8 @@ font-family: "SF Compact", monospace;
 
 ### Base Unit: 4px
 
-All spacing is derived from a 4px base unit, with a constrained scale:
+All spacing is derived from a 4px base unit, with a constrained scale.
+**Note:** Major vertical section padding follows a responsive scale (`--global-section-aap-padding`).
 
 | Token | Value | Usage |
 | --- | --- | --- |
@@ -183,6 +182,15 @@ All spacing is derived from a 4px base unit, with a constrained scale:
 | `--space-16` | 64px | Page section separation |
 | `--space-20` | 80px | Hero spacing |
 | `--space-24` | 96px | Major visual breaks |
+| `section-padding` | **100/120/160px** | Global vertical padding (Responsive) |
+
+### Global Section Padding
+
+| Device | Token Variable | Value |
+| --- | --- | --- |
+| Desktop | `--global-section-aap-padding` | **160px** |
+| Tablet | `--global-section-aap-padding` | **120px** |
+| Mobile | `--global-section-aap-padding` | **100px** |
 
 ### Content Width
 
@@ -190,7 +198,7 @@ All spacing is derived from a 4px base unit, with a constrained scale:
 --content-max-width: 980px;      /* Primary content container */
 --content-nav-max-width: 1024px; /* Global nav container */
 --content-padding: 22px;         /* Desktop edge padding */
---content-padding-mobile: 16px;  /* Mobile edge padding */
+--content-padding-mobile: 16px;  /* Mobile edge padding (up to 20px in some cases) */
 ```
 
 ### Viewport-Relative Spacing
@@ -336,6 +344,37 @@ Conservative, functional radius values:
 }
 ```
 
+### Navigation (Tab Nav)
+
+Used for switching content views (e.g., Year/Month or Plan types).
+
+```css
+.tabnav {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--color-border-secondary);
+  background: var(--color-bg-primary);
+}
+
+.tabnav-item {
+  color: var(--color-text-secondary);
+  font-size: 14px; /* body-reduced */
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.tabnav-item:hover {
+  color: var(--color-text-primary);
+}
+
+.tabnav-item.is-active {
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-text-primary); /* Uses text color (black) for active line */
+}
+```
+
 ### Buttons
 
 ```css
@@ -414,8 +453,8 @@ Conservative, functional radius values:
 
 ```css
 .section {
-  padding-top: var(--space-16);
-  padding-bottom: var(--space-16);
+  padding-top: var(--global-section-aap-padding, 100px);
+  padding-bottom: var(--global-section-aap-padding, 100px);
 }
 
 .section.no-pad-top { padding-top: 0; }

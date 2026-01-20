@@ -1,68 +1,237 @@
 /**
- * Texas Electricity Calculator
- * Professional, functionally deep interface design
- * No bento grids, no card borders, diffused ambient light
+ * Light — Design System Foundation
  *
- * Design Philosophy (Developer Notes)
- * - Unitary surface: avoid card/bento layouts; use section dividers and spacing hierarchy.
- * - ZERO decorative elements: no icons/emojis/illustrations; every pixel conveys data.
- * - No badges/pills/marketing chrome; prefer text-first hierarchy and subtle separators.
- * - Apple-inspired typography: New York for headings, SF Pro for body, SF Mono for numbers.
- * - Spring-only motion: use the --transition-* variables; avoid ease/linear timing.
- * - Ambient light depth: prefer soft glows and gradients over heavy shadows.
- * - Mobile-first, data-dense layouts; preserve readability and scanning.
+ * Philosophy: Every pixel serves the truth. Data over Decoration.
+ * This design system represents a utility-focused, data-centric aesthetic
+ * that prioritizes clarity over embellishment.
  *
- * Typography: San Francisco and New York font families
+ * Forbidden Patterns:
+ * - Emojis in UI
+ * - Bento Grids/Cards/Masonry
+ * - Shadcn/ui aesthetics
+ * - Marketing Chrome (gradients, glows, decorative illustrations)
+ * - Linear-style animations
+ * - Rounded corners > 8px (except pills)
+ * - Drop shadows for decoration
+ *
+ * Typography: SF Pro Text, New York Small (Apple fonts)
  * © Apple Inc. All rights reserved.
  */
 
-/* Font declarations are bundled from fonts.css by build-css.ts */
-
-/* CSS Variables & Design Tokens */
+/* ==========================================================================
+   CSS Custom Properties — Design Tokens
+   ========================================================================== */
 
 :root {
-  /* Color System - Apple Developer Color Specifications (Light Mode) */
-  --color-ink: #1a1a1a;
-  --color-ink-secondary: #666666;
-  /* Gray - Enhanced contrast (WCAG AA compliant: 5.74:1) */
-  --color-ink-tertiary: #757575;
-  /* Gray - Enhanced contrast (WCAG AA compliant: 4.54:1) */
-  --color-ink-muted: #757575;
-  /* Gray - Enhanced contrast (WCAG AA compliant: 4.54:1) */
+  /* ========================================================================
+     COLOR SYSTEM — Light Theme (Default)
+     ======================================================================== */
 
-  --color-surface: #ffffff;
-  --color-surface-raised: #f2f2f7;
-  /* Gray (6) */
+  /* Backgrounds */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f5f5f7;
+  --color-bg-tertiary: #fafafc;
+
+  /* Text */
+  --color-text-primary: #1d1d1f;
+  --color-text-secondary: #86868b;
+  --color-text-tertiary: #a1a1a6;
+  --color-text-contrast: #ffffff;
+
+  /* Interactive */
+  --color-link: #0066cc;
+  --color-link-hover: #004499;
+  --color-focus: #0071e3;
+  --color-focus-offset: 1px;
+  --color-focus-offset-container: 3px;
+
+  /* Borders */
+  --color-border-primary: rgba(0, 0, 0, 0.16);
+  --color-border-secondary: #d2d2d7;
+  --color-keyline-light: rgba(0, 0, 0, 0.16);
+
+  /* Scrims & Overlays */
+  --color-scrim-light: rgba(255, 255, 255, 0.92);
+  --color-scrim-light-blur: rgba(255, 255, 255, 0.8);
+
+  /* Semantic Colors */
+  --color-success: #28a745;
+  --color-warning: #ff9500;
+  --color-error: #ff3b30;
+
+  /* Data Visualization */
+  --color-data-positive: rgb(40, 167, 69);
+  --color-data-neutral: rgb(0, 102, 204);
+  --color-data-negative: rgb(255, 59, 48);
+  --color-data-muted: rgba(0, 0, 0, 0.2);
+
+  /* Legacy token mappings for backwards compatibility */
+  --color-ink: var(--color-text-primary);
+  --color-ink-secondary: var(--color-text-secondary);
+  --color-ink-tertiary: var(--color-text-tertiary);
+  --color-ink-muted: var(--color-text-tertiary);
+  --color-surface: var(--color-bg-primary);
+  --color-surface-raised: var(--color-bg-secondary);
   --color-surface-sunken: #e5e5ea;
-  /* Gray (5) */
-  --color-surface-overlay: rgba(255, 255, 255, 0.95);
-
-  --color-border-subtle: rgba(0, 0, 0, 0.06);
-  --color-border-medium: rgba(0, 0, 0, 0.12);
-
-  /* Accent colors - Apple System Colors (Light Mode) */
-  --color-accent: #0088ff;
-  /* Blue: rgb(0, 136, 255) */
-  --color-accent-hover: #0077e6;
-  --color-accent-muted: rgba(0, 136, 255, 0.08);
-
-  --color-positive: #34c759;
-  /* Green: rgb(52, 199, 89) */
-  --color-positive-muted: rgba(52, 199, 89, 0.08);
-
+  --color-surface-overlay: var(--color-scrim-light);
+  --color-border-subtle: var(--color-keyline-light);
+  --color-border-medium: var(--color-border-primary);
+  --color-accent: var(--color-link);
+  --color-accent-hover: var(--color-link-hover);
+  --color-accent-muted: rgba(0, 102, 204, 0.08);
+  --color-positive: var(--color-success);
+  --color-positive-muted: rgba(40, 167, 69, 0.08);
   --color-positive-ink: #1f7a3a;
+  --color-caution: var(--color-warning);
+  --color-caution-muted: rgba(255, 149, 0, 0.08);
   --color-caution-ink: #b45309;
+  --color-negative: var(--color-error);
+  --color-negative-muted: rgba(255, 59, 48, 0.08);
   --color-negative-ink: #b42318;
 
-  --color-caution: #ff8d28;
-  /* Orange: rgb(255, 141, 40) */
-  --color-caution-muted: rgba(255, 141, 40, 0.08);
+  /* ========================================================================
+     TYPOGRAPHY
+     ======================================================================== */
 
-  --color-negative: #ff383c;
-  /* Red: rgb(255, 56, 60) */
-  --color-negative-muted: rgba(255, 56, 60, 0.08);
+  /* Font Stacks */
+  --font-primary: "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-headline: "New York Small", ui-serif, "Times New Roman", Times, serif;
+  --font-mono: "SF Compact", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Usage Profile Chart Colors (Blue → Green → Yellow → Orange → Red) */
+  /* Legacy font mappings */
+  --font-system: var(--font-primary);
+  --font-display: var(--font-primary);
+  --font-serif: var(--font-headline);
+  --font-compact: "SF Compact", var(--font-primary);
+  --font-compact-display: "SF Compact", var(--font-primary);
+
+  /* Type Scale — Desktop (Default) */
+  --text-headline-super: 80px;
+  --text-headline-elevated: 64px;
+  --text-headline: 48px;
+  --text-headline-reduced: 40px;
+  --text-eyebrow: 21px;
+  --text-body: 17px;
+  --text-body-reduced: 14px;
+  --text-caption: 12px;
+
+  /* Legacy size tokens (rem-based for compatibility) */
+  --text-xs: 0.75rem;   /* 12px */
+  --text-sm: 0.875rem;  /* 14px */
+  --text-base: 1.0625rem; /* 17px */
+  --text-lg: 1.3125rem; /* 21px - eyebrow */
+  --text-xl: 1.5rem;    /* 24px */
+  --text-2xl: 2rem;     /* 32px */
+  --text-3xl: 2.5rem;   /* 40px - headline-reduced */
+  --text-4xl: 3rem;     /* 48px - headline */
+
+  /* Line Heights */
+  --leading-headline-super: 1.05;
+  --leading-headline-elevated: 1.06;
+  --leading-headline: 1.08;
+  --leading-headline-reduced: 1.1;
+  --leading-eyebrow: 1.19;
+  --leading-body: 1.47;
+  --leading-body-reduced: 1.42;
+  --leading-caption: 1.33;
+
+  /* Letter Spacing (Tracking) */
+  --tracking-headline-super: -0.015em;
+  --tracking-headline-elevated: -0.009em;
+  --tracking-headline: -0.003em;
+  --tracking-headline-reduced: 0em;
+  --tracking-eyebrow: 0.011em;
+  --tracking-body: -0.022em;
+  --tracking-body-reduced: -0.016em;
+  --tracking-caption: 0em;
+
+  /* ========================================================================
+     SPACING SYSTEM — Base Unit: 4px
+     ======================================================================== */
+
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Global Section Padding — Desktop */
+  --global-section-aap-padding: 160px;
+
+  /* Content Width */
+  --content-max-width: 980px;
+  --content-nav-max-width: 1024px;
+  --content-padding: 22px;
+  --content-padding-mobile: 16px;
+
+  /* Legacy layout tokens */
+  --max-width-content: var(--content-max-width);
+  --max-width-wide: 1200px;
+
+  /* ========================================================================
+     BORDER RADIUS — Conservative, Functional
+     ======================================================================== */
+
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 980px;
+
+  /* Legacy radius tokens */
+  --radius-xl: var(--radius-lg);
+
+  /* ========================================================================
+     MOTION & ANIMATION — Spring Physics
+     ======================================================================== */
+
+  /* Timing Functions (Cubic-Bezier Curves) */
+  --ease-standard: cubic-bezier(0.28, 0.11, 0.32, 1);
+  --ease-in: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-utility: cubic-bezier(0.25, 0.1, 0.3, 1);
+
+  /* Duration Scale */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-standard: 240ms;
+  --duration-normal: 320ms;
+  --duration-slow: 500ms;
+  --duration-glacial: 1000ms;
+
+  /* Composite Transition Tokens */
+  --transition-fast: var(--duration-fast) var(--ease-standard);
+  --transition-base: var(--duration-standard) var(--ease-standard);
+  --transition-slow: var(--duration-slow) var(--ease-out);
+
+  /* ========================================================================
+     SHADOWS & DEPTH — Functional Only
+     ======================================================================== */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  /* Glow effects (layered for depth) */
+  --glow-subtle: 0 0 0 1px var(--color-border-primary), 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --glow-medium: 0 0 0 1px var(--color-border-primary), 0 2px 6px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.05);
+  --glow-strong: 0 0 0 1px var(--color-border-primary), 0 4px 12px rgba(0, 0, 0, 0.04), 0 16px 48px rgba(0, 0, 0, 0.06);
+  --glow-accent: 0 0 0 1px rgba(0, 102, 204, 0.15), 0 4px 16px rgba(0, 102, 204, 0.08), 0 12px 32px rgba(0, 102, 204, 0.04);
+
+  /* ========================================================================
+     DATA VISUALIZATION — Usage Profile Charts
+     ======================================================================== */
+
   --usage-high-start: #ff383c;
   --usage-high-end: #d81f28;
   --usage-medium-high-start: #ff8d28;
@@ -79,69 +248,92 @@
   --usage-bar-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   --usage-bar-shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.12);
 
-  /* Typography - SF Pro, SF Compact, New York Small (Apple fonts)
-     Font stack priority: Custom fonts → Apple system → System fallbacks
-     Note: Only WOFF2 format used for optimal performance (~30% smaller than WOFF) */
-  --font-system: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-display: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
-  --font-compact: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-compact-display: "SF Compact", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
-  --font-serif: "New York Small", ui-serif, "Times New Roman", Times, serif;
+  /* ========================================================================
+     VIEWPORT TRIGGERS — Scroll Animation
+     ======================================================================== */
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 2rem;
-  --text-4xl: 2.5rem;
-
-  /* Spacing */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
-
-  /* Layout */
-  --max-width-content: 960px;
-  --max-width-wide: 1200px;
-
-  /* Transitions - Spring Physics (cubic-bezier) */
-  --transition-fast: 0.15s cubic-bezier(0.21, 1.02, 0.73, 1);
-  --transition-base: 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  --transition-slow: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-  /* Ambient light effects (layered gradients instead of box-shadow) */
-  --glow-subtle: 0 0 0 1px var(--color-border-subtle), 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
-  --glow-medium: 0 0 0 1px var(--color-border-subtle), 0 2px 6px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.05);
-  --glow-strong: 0 0 0 1px var(--color-border-subtle), 0 4px 12px rgba(0, 0, 0, 0.04), 0 16px 48px rgba(0, 0, 0, 0.06);
-  --glow-accent: 0 0 0 1px rgba(0, 136, 255, 0.15), 0 4px 16px rgba(0, 136, 255, 0.08), 0 12px 32px rgba(0, 136, 255, 0.04);
-
-  /* Shadow system for depth hierarchy */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  /* Border radius */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --viewport-trigger-start: calc(100vh - 200px);
+  --viewport-trigger-end: calc(100vh - 100px);
 }
 
-/* Reset & Base */
+/* ==========================================================================
+   DARK THEME
+   ========================================================================== */
+
+.theme-dark {
+  /* Backgrounds */
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #161617;
+  --color-bg-tertiary: #1d1d1f;
+
+  /* Text */
+  --color-text-primary: #f5f5f7;
+  --color-text-secondary: #86868b;
+  --color-text-tertiary: #6e6e73;
+  --color-text-contrast: #000000;
+
+  /* Interactive */
+  --color-link: #2997ff;
+  --color-link-hover: #40a9ff;
+  --color-focus: #0071e3;
+
+  /* Borders */
+  --color-border-primary: rgba(255, 255, 255, 0.24);
+  --color-border-secondary: #424245;
+  --color-keyline-dark: rgba(255, 255, 255, 0.24);
+
+  /* Scrims & Overlays */
+  --color-scrim-dark: rgba(22, 22, 23, 0.88);
+  --color-scrim-dark-blur: rgba(22, 22, 23, 0.8);
+
+  /* Legacy mappings for dark */
+  --color-ink: var(--color-text-primary);
+  --color-ink-secondary: var(--color-text-secondary);
+  --color-ink-tertiary: var(--color-text-tertiary);
+  --color-surface: var(--color-bg-primary);
+  --color-surface-raised: var(--color-bg-secondary);
+  --color-surface-sunken: var(--color-bg-tertiary);
+  --color-surface-overlay: var(--color-scrim-dark);
+  --color-border-subtle: var(--color-keyline-dark);
+  --color-border-medium: var(--color-border-primary);
+  --color-accent: var(--color-link);
+  --color-accent-hover: var(--color-link-hover);
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS — Typography & Spacing
+   ========================================================================== */
+
+/* Tablet: 735px - 1068px */
+@media (max-width: 1068px) {
+  :root {
+    --text-headline-super: 64px;
+    --text-headline-elevated: 48px;
+    --text-headline: 40px;
+    --text-headline-reduced: 32px;
+    --text-eyebrow: 19px;
+
+    --global-section-aap-padding: 120px;
+  }
+}
+
+/* Mobile: 0 - 734px */
+@media (max-width: 734px) {
+  :root {
+    --text-headline-super: 48px;
+    --text-headline-elevated: 40px;
+    --text-headline: 32px;
+    --text-headline-reduced: 28px;
+    --text-eyebrow: 17px;
+
+    --global-section-aap-padding: 100px;
+    --content-padding: var(--content-padding-mobile);
+  }
+}
+
+/* ==========================================================================
+   CSS RESET — Strict Box-Sizing & Browser Defaults
+   ========================================================================== */
 
 *,
 *::before,
@@ -151,62 +343,302 @@
   padding: 0;
 }
 
+/* Remove default list styles */
+ul,
+ol {
+  list-style: none;
+}
+
+/* Remove default button styles */
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+/* Remove default input styles */
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Remove default anchor underlines */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Remove default table spacing */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* ==========================================================================
+   BASE STYLES — HTML & Body
+   ========================================================================== */
+
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: var(--font-system);
-  font-size: var(--text-base);
-  line-height: 1.6;
-  color: var(--color-ink);
-  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-sunken) 100%);
+  font-family: var(--font-primary);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
   min-height: 100vh;
 }
 
-.page-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
+/* ==========================================================================
+   TYPOGRAPHY — Base Elements
+   ========================================================================== */
 
-/* Typography */
-
+/* Headlines — New York Small (use sparingly) */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-serif);
+  font-family: var(--font-headline);
   font-weight: 600;
-  line-height: 1.25;
-  color: var(--color-ink);
-  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
 }
 
+h1 {
+  font-size: var(--text-headline);
+  line-height: var(--leading-headline);
+  letter-spacing: var(--tracking-headline);
+}
+
+h2 {
+  font-size: var(--text-headline-reduced);
+  line-height: var(--leading-headline-reduced);
+  letter-spacing: var(--tracking-headline-reduced);
+}
+
+h3 {
+  font-size: var(--text-eyebrow);
+  line-height: var(--leading-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  font-weight: 600;
+}
+
+h4,
+h5,
+h6 {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  font-weight: 600;
+}
+
+/* Body Text */
 p {
-  color: var(--color-ink-secondary);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
 }
 
+/* Links */
 a {
-  color: var(--color-accent);
-  text-decoration: none;
+  color: var(--color-link);
   transition: color var(--transition-fast);
 }
 
 a:hover {
-  color: var(--color-accent-hover);
+  color: var(--color-link-hover);
+  text-decoration: underline;
 }
 
-/* ... existing code ... */
-
-.copyright {
+/* Code/Monospace — Use sparingly */
+code,
+pre,
+kbd,
+samp {
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  margin-top: var(--space-2);
-  opacity: 0.8;
+  font-size: var(--text-body-reduced);
+}
+
+/* Small/Caption Text */
+small {
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  letter-spacing: var(--tracking-caption);
+}
+
+/* ==========================================================================
+   LAYOUT PATTERNS
+   ========================================================================== */
+
+/* Page Wrapper */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Viewport Content Container */
+.viewport-content {
+  margin: 0 auto;
+  max-width: var(--content-max-width);
+  padding: 0 var(--content-padding);
+  padding-inline-start: max(var(--content-padding), env(safe-area-inset-left));
+  padding-inline-end: max(var(--content-padding), env(safe-area-inset-right));
+}
+
+/* Section Structure */
+.section {
+  padding-top: var(--global-section-aap-padding);
+  padding-bottom: var(--global-section-aap-padding);
+}
+
+.section.no-pad-top {
+  padding-top: 0;
+}
+
+.section.no-pad-bottom {
+  padding-bottom: 0;
+}
+
+/* ==========================================================================
+   FOCUS STATES — Accessibility
+   ========================================================================== */
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--color-focus-offset);
+}
+
+.focus-container :focus-visible {
+  outline-offset: var(--color-focus-offset-container);
+}
+
+/* Remove default focus outline when using :focus-visible */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY — Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY — High Contrast
+   ========================================================================== */
+
+@media (prefers-contrast: more) {
+  a:link {
+    text-decoration: underline;
+  }
+
+  :focus-visible {
+    outline-width: 3px;
+  }
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+/* Hidden but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Hidden from everyone */
+[hidden] {
+  display: none !important;
+}
+
+/* ==========================================================================
+   SCROLL ANIMATION PATTERNS — Base Classes
+   ========================================================================== */
+
+/* Standard scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered list items */
+.stagger-item {
+  --item-index: 0;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition-delay: calc(var(--item-index) * 20ms + 260ms);
+  transition-duration: var(--duration-normal);
+  transition-timing-function: var(--ease-in);
+  transition-property: opacity, transform;
+}
+
+.stagger-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stagger-item:nth-child(1) { --item-index: 0; }
+.stagger-item:nth-child(2) { --item-index: 1; }
+.stagger-item:nth-child(3) { --item-index: 2; }
+.stagger-item:nth-child(4) { --item-index: 3; }
+.stagger-item:nth-child(5) { --item-index: 4; }
+.stagger-item:nth-child(6) { --item-index: 5; }
+.stagger-item:nth-child(7) { --item-index: 6; }
+.stagger-item:nth-child(8) { --item-index: 7; }
+.stagger-item:nth-child(9) { --item-index: 8; }
+.stagger-item:nth-child(10) { --item-index: 9; }
+
+/* ==========================================================================
+   PRINT STYLES
+   ========================================================================== */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .site-header,
+  .site-footer,
+  .modal-backdrop,
+  .toast-container {
+    display: none !important;
+  }
 }

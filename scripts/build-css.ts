@@ -4,6 +4,7 @@ import path from 'node:path';
 const projectRoot = path.resolve(__dirname, '..');
 const cssDir = path.join(projectRoot, 'src', 'css');
 const modulesDir = path.join(cssDir, 'modules');
+const componentsDir = path.join(cssDir, 'components');
 
 const hasModules = fs.existsSync(modulesDir);
 const moduleFiles = hasModules
@@ -14,10 +15,22 @@ const moduleFiles = hasModules
     .map((file: string) => path.join(modulesDir, file))
   : [];
 
-const sources =
-  hasModules && moduleFiles.length > 0
-    ? [path.join(cssDir, 'fonts.css'), ...moduleFiles, path.join(cssDir, 'styles.css')]
-    : [path.join(cssDir, 'fonts.css'), path.join(cssDir, 'styles.css')];
+const hasComponents = fs.existsSync(componentsDir);
+const componentFiles = hasComponents
+  ? fs
+    .readdirSync(componentsDir)
+    .filter((file: string) => file.endsWith('.css'))
+    .sort()
+    .map((file: string) => path.join(componentsDir, file))
+  : [];
+
+// Build order: fonts → modules (base) → components → page styles
+const sources = [
+  path.join(cssDir, 'fonts.css'),
+  ...moduleFiles,
+  ...componentFiles,
+  path.join(cssDir, 'styles.css'),
+];
 
 const concatenated = sources.map((filePath) => fs.readFileSync(filePath, 'utf8')).join('\n');
 

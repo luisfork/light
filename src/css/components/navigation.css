@@ -1,0 +1,214 @@
+/**
+ * Light — Navigation Components
+ *
+ * Design System Reference: Global Nav, Local Nav, Tab Nav
+ * Implements backdrop-filter materials and Apple-inspired navigation patterns.
+ */
+
+/* ==========================================================================
+   Global Navigation (Top Bar)
+   ========================================================================== */
+
+.globalnav {
+  height: 44px;
+  color: rgba(0, 0, 0, 0.8);
+  background: none;
+}
+
+.globalnav-scrim {
+  background: var(--color-scrim-light);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.theme-dark .globalnav {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.theme-dark .globalnav-scrim {
+  background: var(--color-scrim-dark);
+}
+
+/* ==========================================================================
+   Local Navigation (Section Navigation)
+   ========================================================================== */
+
+.localnav {
+  height: 52px;
+  background: var(--color-scrim-light-blur);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--color-keyline-light);
+}
+
+.localnav-stacked {
+  height: 66px;
+}
+
+.theme-dark .localnav {
+  background: var(--color-scrim-dark-blur);
+  border-bottom-color: var(--color-keyline-dark);
+}
+
+/* ==========================================================================
+   Site Header (Implementation)
+   ========================================================================== */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 52px;
+  background: var(--color-scrim-light-blur);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--color-keyline-light);
+}
+
+.theme-dark .site-header {
+  background: var(--color-scrim-dark-blur);
+  border-bottom-color: var(--color-keyline-dark);
+}
+
+.header-inner {
+  max-width: var(--content-nav-max-width);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 var(--content-padding);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+/* ==========================================================================
+   Site Brand
+   ========================================================================== */
+
+.site-brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.site-brand:hover {
+  opacity: 0.7;
+  text-decoration: none;
+}
+
+.brand-mark {
+  font-family: var(--font-headline);
+  font-size: var(--text-eyebrow);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.brand-descriptor {
+  font-family: var(--font-primary);
+  font-size: var(--text-body-reduced);
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   Main Navigation
+   ========================================================================== */
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.nav-item {
+  font-family: var(--font-primary);
+  font-size: var(--text-body-reduced);
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.nav-item:hover {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.nav-item.active {
+  color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   Tab Navigation
+   ========================================================================== */
+
+.tabnav {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--color-border-secondary);
+  background: var(--color-bg-primary);
+}
+
+.tabnav-item {
+  color: var(--color-text-secondary);
+  font-family: var(--font-primary);
+  font-size: var(--text-body-reduced);
+  font-weight: 400;
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  transition:
+    color var(--duration-normal) var(--ease-standard),
+    border-color var(--duration-normal) var(--ease-standard);
+}
+
+.tabnav-item:hover {
+  color: var(--color-text-primary);
+}
+
+.tabnav-item.is-active {
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   Responsive Navigation
+   ========================================================================== */
+
+/* Mobile nav collapses at 833px */
+@media (max-width: 833px) {
+  .header-inner {
+    padding: 0 var(--content-padding-mobile);
+  }
+
+  .brand-descriptor {
+    display: none;
+  }
+
+  .main-nav {
+    gap: var(--space-4);
+  }
+
+  .nav-item {
+    font-size: var(--text-caption);
+  }
+}
+
+/* Medium adjustments at 1023px */
+@media (max-width: 1023px) {
+  .main-nav {
+    gap: var(--space-5);
+  }
+}
+
+/* Mobile: 0 - 734px */
+@media (max-width: 734px) {
+  .site-header {
+    height: 48px;
+  }
+}

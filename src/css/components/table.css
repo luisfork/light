@@ -1,0 +1,249 @@
+/**
+ * Light — Table Component
+ *
+ * Design System Reference: Data Tables
+ * Clean, data-dense table styling with proper alignment.
+ * Tables use radius-none for a precise, utility aesthetic.
+ */
+
+/* ==========================================================================
+   Table Wrapper (Horizontal Scroll)
+   ========================================================================== */
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 calc(-1 * var(--content-padding));
+  padding: 0 var(--content-padding);
+}
+
+/* ==========================================================================
+   Comparison Table
+   ========================================================================== */
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-body-reduced);
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--color-keyline-light);
+  vertical-align: middle;
+}
+
+/* Table Header */
+.comparison-table th {
+  font-family: var(--font-compact);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-secondary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Sortable Headers */
+.comparison-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--transition-fast);
+}
+
+.comparison-table th.sortable:hover {
+  color: var(--color-text-primary);
+}
+
+.comparison-table th.sorted-asc::after,
+.comparison-table th.sorted-desc::after {
+  content: "";
+  display: inline-block;
+  margin-left: var(--space-1);
+  border: 4px solid transparent;
+}
+
+.comparison-table th.sorted-asc::after {
+  border-bottom-color: currentColor;
+  transform: translateY(-2px);
+}
+
+.comparison-table th.sorted-desc::after {
+  border-top-color: currentColor;
+  transform: translateY(2px);
+}
+
+/* Table Body Rows */
+.comparison-table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.comparison-table tbody tr:hover {
+  background: var(--color-bg-tertiary);
+}
+
+/* ==========================================================================
+   Column-Specific Styling
+   ========================================================================== */
+
+.col-grade {
+  width: 60px;
+  text-align: center;
+}
+
+.col-provider {
+  min-width: 120px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: var(--text-caption);
+}
+
+.col-plan {
+  min-width: 180px;
+}
+
+.col-term,
+.col-contract-end,
+.col-renewable {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.col-annual,
+.col-monthly,
+.col-rate,
+.col-etf {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.col-actions {
+  width: 80px;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Quality Grade Badges
+   ========================================================================== */
+
+.quality-grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-family: var(--font-primary);
+  font-size: var(--text-body-reduced);
+  font-weight: 700;
+  border-radius: 50%;
+  color: var(--color-text-contrast);
+}
+
+.grade-a {
+  background: var(--color-data-positive);
+}
+
+.grade-b {
+  background: #84cc16;
+}
+
+.grade-c {
+  background: #f59e0b;
+}
+
+.grade-d {
+  background: #f97316;
+}
+
+.grade-f {
+  background: var(--color-data-negative);
+}
+
+/* ==========================================================================
+   Grade Legend
+   ========================================================================== */
+
+.grade-legend-enhanced {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+}
+
+.grade-legend-header {
+  margin-right: var(--space-2);
+}
+
+.grade-legend-title {
+  font-family: var(--font-compact);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+}
+
+.grade-legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.grade-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.grade-legend-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.grade-name {
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+   Table Info Bar
+   ========================================================================== */
+
+.table-info-bar {
+  margin-bottom: var(--space-3);
+}
+
+.table-tip {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+}
+
+/* ==========================================================================
+   ETF Disclaimer
+   ========================================================================== */
+
+.etf-disclaimer {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  font-size: var(--text-body-reduced);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  line-height: var(--leading-body);
+}
+
+.etf-disclaimer strong {
+  color: var(--color-text-primary);
+}
