@@ -9,13 +9,13 @@
  */
 
 import type {
+  CityTaxData,
   ElectricityPlan,
-  TDURate,
-  TDURatesData,
   LocalTaxesData,
   PlansData,
   TaxInfo,
-  CityTaxData,
+  TDURate,
+  TDURatesData,
   ZipCodeRangeData
 } from './types';
 import Logger from './utils/logger';
@@ -658,7 +658,7 @@ export type {
 
 // Browser compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['API'] = API;
+  (window as unknown as Record<string, unknown>).API = API;
 }
 
 // CommonJS compatibility

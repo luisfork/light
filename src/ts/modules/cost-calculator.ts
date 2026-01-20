@@ -282,7 +282,7 @@ export { CostCalculator };
 
 // Browser environment: attach to window for compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['CostCalculator'] = CostCalculator;
+  (window as unknown as Record<string, unknown>).CostCalculator = CostCalculator;
 }
 
 // CommonJS export for Node.js compatibility (tests)

@@ -242,7 +242,7 @@ export { CacheManager };
 
 // Browser environment: attach to window for compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['CacheManager'] = CacheManager;
+  (window as unknown as Record<string, unknown>).CacheManager = CacheManager;
 }
 
 // CommonJS export for Node.js compatibility (tests)

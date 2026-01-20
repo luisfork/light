@@ -22,7 +22,7 @@ export const Easing = {
   /** Ease out — elements exiting/disappearing */
   out: 'cubic-bezier(0.4, 0, 0.2, 1)',
   /** Badge/utility easing */
-  utility: 'cubic-bezier(0.25, 0.1, 0.3, 1)',
+  utility: 'cubic-bezier(0.25, 0.1, 0.3, 1)'
 } as const;
 
 /**
@@ -40,7 +40,7 @@ export const Duration = {
   /** Page-level transitions */
   slow: 500,
   /** Complex orchestrated animations */
-  glacial: 1000,
+  glacial: 1000
 } as const;
 
 /**
@@ -64,7 +64,7 @@ export const defaultSpringConfig: SpringConfig = {
   stiffness: 100,
   damping: 10,
   mass: 1,
-  velocity: 0,
+  velocity: 0
 };
 
 /**
@@ -78,7 +78,7 @@ export const SpringPresets = {
   /** Bouncy motion with overshoot */
   bouncy: { stiffness: 180, damping: 12, mass: 1, velocity: 0 },
   /** Slow, deliberate motion for page transitions */
-  slow: { stiffness: 80, damping: 20, mass: 1, velocity: 0 },
+  slow: { stiffness: 80, damping: 20, mass: 1, velocity: 0 }
 } as const;
 
 /**
@@ -106,7 +106,7 @@ export function springPosition(
 ): number {
   const { stiffness, damping, mass, velocity } = {
     ...defaultSpringConfig,
-    ...config,
+    ...config
   };
 
   const displacement = from - to;
@@ -149,11 +149,7 @@ export function springPosition(
  * @param threshold - Settlement threshold (default: 0.01)
  * @returns Whether the animation has settled
  */
-export function isSpringSettled(
-  current: number,
-  target: number,
-  threshold = 0.01
-): boolean {
+export function isSpringSettled(current: number, target: number, threshold = 0.01): boolean {
   return Math.abs(current - target) < threshold;
 }
 
@@ -260,7 +256,7 @@ export function setupScrollReveal(
     root: null,
     rootMargin: '0px 0px -100px 0px',
     threshold: 0.1,
-    ...options,
+    ...options
   };
 
   const observer = new IntersectionObserver((entries) => {

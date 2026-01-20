@@ -399,7 +399,7 @@ export type { ETFCalcResult, ETFDisplayInfo, NormalizedETFDetails, ExtendedETFSt
 
 // Browser compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['ETFCalculator'] = ETFCalculator;
+  (window as unknown as Record<string, unknown>).ETFCalculator = ETFCalculator;
 }
 
 // CommonJS compatibility

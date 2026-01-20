@@ -279,7 +279,7 @@ export type { ContractExpirationResult, AlternativeTerm, RiskLevel };
 
 // Browser compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['ContractAnalyzer'] = ContractAnalyzer;
+  (window as unknown as Record<string, unknown>).ContractAnalyzer = ContractAnalyzer;
 }
 
 // CommonJS compatibility

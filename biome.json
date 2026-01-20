@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "include": [
+    "includes": [
       "src/ts/**/*.ts",
       "src/js/**/*.js",
       "tests/**/*.ts",

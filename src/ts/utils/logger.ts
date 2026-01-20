@@ -188,5 +188,5 @@ export { Logger };
 // Browser environment: attach to window for global access
 // VULNERABILITY FIXED: Safe window check for non-browser environments
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['Logger'] = Logger;
+  (window as unknown as Record<string, unknown>).Logger = Logger;
 }

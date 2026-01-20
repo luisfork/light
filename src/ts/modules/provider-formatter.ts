@@ -84,7 +84,7 @@ export { ProviderFormatter, LEGAL_SUFFIXES };
 
 // Browser environment: attach to window for compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['ProviderFormatter'] = ProviderFormatter;
+  (window as unknown as Record<string, unknown>).ProviderFormatter = ProviderFormatter;
 }
 
 // CommonJS export for Node.js compatibility (tests)

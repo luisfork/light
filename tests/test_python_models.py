@@ -42,7 +42,7 @@ class TestTDURateModel:
             "effective_date": "2024-03-01",
             "zip_codes": [],
         }
-        with pytest.raises(Exception):  # ValidationError
+        with pytest.raises(ValueError):
             TDURateModel(**data)
 
     def test_invalid_rate_type(self) -> None:
@@ -55,7 +55,7 @@ class TestTDURateModel:
             "effective_date": "2024-03-01",
             "zip_codes": [],
         }
-        with pytest.raises(Exception):  # ValidationError
+        with pytest.raises(ValueError):
             TDURateModel(**data)
 
     def test_negative_rate_raises_error(self) -> None:
@@ -68,7 +68,7 @@ class TestTDURateModel:
             "effective_date": "2024-01-01",
             "zip_codes": [],
         }
-        with pytest.raises(Exception):  # ValidationError
+        with pytest.raises(ValueError):
             TDURateModel(**data)
 
 

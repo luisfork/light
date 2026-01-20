@@ -7,13 +7,13 @@
  * VULNERABILITY FIXED: Null-safe element access throughout
  */
 
-import type { ElectricityPlan, TDURate, TaxInfo, QualityGrade } from './types';
 import { API } from './api';
-import { PlanRanker } from './modules/plan-ranker';
 import { CostCalculator } from './modules/cost-calculator';
-import { formatCurrency, formatRate, getMonthName } from './modules/formatters';
-import { UsageEstimator } from './modules/usage-estimator';
 import { ETFCalculator } from './modules/etf-calculator';
+import { formatCurrency, formatRate, getMonthName } from './modules/formatters';
+import { PlanRanker } from './modules/plan-ranker';
+import { UsageEstimator } from './modules/usage-estimator';
+import type { ElectricityPlan, QualityGrade, TaxInfo, TDURate } from './types';
 import Logger from './utils/logger';
 
 // ============================================================================
@@ -180,7 +180,12 @@ const Toast = {
     }
   },
 
-  show(message: string, type: ToastType = 'info', duration: number = 5000, title?: string): HTMLElement {
+  show(
+    message: string,
+    type: ToastType = 'info',
+    duration: number = 5000,
+    title?: string
+  ): HTMLElement {
     if (this.container === null) this.init();
 
     const toast = document.createElement('div');
@@ -196,9 +201,10 @@ const Toast = {
         <div class="toast-message">${this.escapeHtml(message)}</div>
       </div>
       <button class="toast-close" aria-label="Dismiss notification">&times;</button>
-      ${duration > 0
-        ? `<div class="toast-progress"><div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div></div>`
-        : ''
+      ${
+        duration > 0
+          ? `<div class="toast-progress"><div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div></div>`
+          : ''
       }
     `;
 
@@ -352,9 +358,7 @@ const UI = {
   attachEventListeners(): void {
     // ZIP code input
     if (this.elements.zipInput !== null) {
-      this.elements.zipInput.addEventListener('input', (e) =>
-        this.handleZipInput(e as InputEvent)
-      );
+      this.elements.zipInput.addEventListener('input', (e) => this.handleZipInput(e as InputEvent));
       this.elements.zipInput.addEventListener('blur', () => this.handleZipBlur());
       this.elements.zipInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -459,7 +463,8 @@ const UI = {
 
     if (value.length === 5) {
       if (this.elements.zipStatus !== null) {
-        this.elements.zipStatus.innerHTML = '<span class="zip-status-checking">Validating...</span>';
+        this.elements.zipStatus.innerHTML =
+          '<span class="zip-status-checking">Validating...</span>';
       }
       this.state.zipValidationTimer = setTimeout(() => {
         this.validateZipCode(value);
@@ -628,7 +633,7 @@ const UI = {
   },
 
   handleMethodChange(option: HTMLElement): void {
-    const method = (option.dataset['method'] ?? 'estimate') as UsageMethod;
+    const method = (option.dataset.method ?? 'estimate') as UsageMethod;
     this.state.usageMethod = method;
 
     this.elements.methodOptions.forEach((opt) => {
@@ -717,8 +722,7 @@ const UI = {
         break;
       }
       case 'average': {
-        const avgKwh =
-          Number.parseFloat(this.elements.avgKwh?.value ?? '') ?? this.state.avgUsage;
+        const avgKwh = Number.parseFloat(this.elements.avgKwh?.value ?? '') ?? this.state.avgUsage;
         if (!avgKwh) {
           Toast.warning('Enter your average monthly kWh usage.', 5000, 'Usage Required');
           return;
@@ -830,7 +834,20 @@ const UI = {
 
     // Render usage chart bars
     if (this.elements.usageChart !== null) {
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
       this.elements.usageChart.innerHTML = monthlyUsage
         .map((usage, i) => {
           const height = max > 0 ? Math.round((usage / max) * 100) : 0;
@@ -869,7 +886,10 @@ const UI = {
         const grade = this.getQualityGrade(plan.qualityScore);
         const contractEnd = new Date();
         contractEnd.setMonth(contractEnd.getMonth() + plan.term_months);
-        const contractEndStr = contractEnd.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        const contractEndStr = contractEnd.toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric'
+        });
 
         return `
           <tr>
@@ -893,7 +913,8 @@ const UI = {
   },
 
   renderPlanCard(plan: RankedPlanWithMetrics, index: number): string {
-    const rankBadge = index === 0 ? 'rank-badge-first' : index <= 2 ? 'rank-badge-top3' : 'rank-badge-top5';
+    const rankBadge =
+      index === 0 ? 'rank-badge-first' : index <= 2 ? 'rank-badge-top3' : 'rank-badge-top5';
     const rankLabel = index === 0 ? 'Best Value' : index <= 2 ? 'Top 3' : 'Top 5';
 
     return `
@@ -970,21 +991,22 @@ const UI = {
           <p><strong>Renewable:</strong> ${plan.renewable_pct}%</p>
           <p><strong>Cancellation Fee:</strong> ${this.formatETF(plan)}</p>
         </div>
-        ${plan.special_terms
-          ? `
+        ${
+          plan.special_terms
+            ? `
           <div class="modal-section">
             <h3 class="modal-section-title">Special Terms</h3>
             <div class="modal-terms-list">
               ${plan.special_terms
-            .split('|')
-            .map((term) => term.trim())
-            .filter(Boolean)
-            .map((term) => `<p class="modal-subtext">${this.escapeHtml(term)}</p>`)
-            .join('')}
+                .split('|')
+                .map((term) => term.trim())
+                .filter(Boolean)
+                .map((term) => `<p class="modal-subtext">${this.escapeHtml(term)}</p>`)
+                .join('')}
             </div>
           </div>
         `
-          : ''
+            : ''
         }
         <div class="modal-actions">
           ${plan.efl_url ? `<a href="${this.escapeHtml(plan.efl_url)}" target="_blank" rel="noopener" class="modal-btn">View EFL</a>` : ''}
@@ -1035,11 +1057,9 @@ export type { UIState, UIElements, ToastType, UsageMethod, RankedPlanWithMetrics
 
 // Browser compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['UI'] = UI;
-  (window as unknown as Record<string, unknown>)['Toast'] = Toast;
+  (window as unknown as Record<string, unknown>).UI = UI;
+  (window as unknown as Record<string, unknown>).Toast = Toast;
 }
-
-
 
 // Initialize on DOM ready
 if (typeof document !== 'undefined') {

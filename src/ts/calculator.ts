@@ -13,79 +13,76 @@
 // Re-exports from TypeScript modules
 // ============================================================================
 
-// Cost calculation
-export { CostCalculator, calculateMonthlyCost, calculateAnnualCost } from './modules/cost-calculator';
-
-// ETF calculation
-export {
-  ETFCalculator,
-  calculateEarlyTerminationFee,
-  getETFDisplayInfo
-} from './modules/etf-calculator';
-
+// Cache management
+export { CacheManager } from './modules/cache';
 // Contract expiration analysis
 export {
   ContractAnalyzer,
   calculateContractExpiration,
   getContractExpirationForPlan
 } from './modules/contract-analyzer';
-
-// Plan ranking
+// Cost calculation
 export {
-  PlanRanker,
-  rankPlans,
-  getQualityGrade,
-  getScoreExplanation,
-  comparePlans,
-  getRankDescription
-} from './modules/plan-ranker';
-
-// Usage estimation
-export { UsageEstimator, estimateUsagePattern } from './modules/usage-estimator';
+  CostCalculator,
+  calculateAnnualCost,
+  calculateMonthlyCost
+} from './modules/cost-calculator';
+// Data loading
+export { DataLoader } from './modules/data-loader';
+// ETF calculation
+export {
+  calculateEarlyTerminationFee,
+  ETFCalculator,
+  getETFDisplayInfo
+} from './modules/etf-calculator';
 
 // Formatting utilities
 export { formatCurrency, formatRate, getMonthName, MONTH_NAMES } from './modules/formatters';
-
-// Cache management
-export { CacheManager } from './modules/cache';
-
-// Data loading
-export { DataLoader } from './modules/data-loader';
-
+// Plan ranking
+export {
+  comparePlans,
+  getQualityGrade,
+  getRankDescription,
+  getScoreExplanation,
+  PlanRanker,
+  rankPlans
+} from './modules/plan-ranker';
 // Provider name formatting
-export { ProviderFormatter, formatProviderName } from './modules/provider-formatter';
+export { formatProviderName, ProviderFormatter } from './modules/provider-formatter';
+// Usage estimation
+export { estimateUsagePattern, UsageEstimator } from './modules/usage-estimator';
 
 // ============================================================================
 // Types re-exports
 // ============================================================================
 
 export type {
+  AnnualCostResult,
+  ContractExpiration,
+  ContractRecommendation,
   ElectricityPlan,
-  TDURate,
-  TDURatesData,
-  PlansData,
+  ETFCalculationResult,
   MonthlyCostBreakdown,
   MonthlyCostResult,
-  AnnualCostResult,
   MonthlyUsagePattern,
+  PlansData,
   QualityGrade,
   QualityGradeLetter,
   RankedPlan,
-  ContractExpiration,
-  ContractRecommendation,
-  ETFCalculationResult
+  TDURate,
+  TDURatesData
 } from './types';
 
 // ============================================================================
 // Default export for backwards compatibility
 // ============================================================================
 
+import { ContractAnalyzer } from './modules/contract-analyzer';
 import { CostCalculator } from './modules/cost-calculator';
 import { ETFCalculator } from './modules/etf-calculator';
-import { ContractAnalyzer } from './modules/contract-analyzer';
+import * as Formatters from './modules/formatters';
 import { PlanRanker } from './modules/plan-ranker';
 import { UsageEstimator } from './modules/usage-estimator';
-import * as Formatters from './modules/formatters';
 
 /**
  * Unified Calculator object for backwards compatibility.
@@ -102,8 +99,7 @@ const Calculator = {
   getETFDisplayInfo: ETFCalculator.getETFDisplayInfo.bind(ETFCalculator),
 
   // Contract expiration
-  calculateContractExpiration:
-    ContractAnalyzer.calculateContractExpiration.bind(ContractAnalyzer),
+  calculateContractExpiration: ContractAnalyzer.calculateContractExpiration.bind(ContractAnalyzer),
   getContractExpirationForPlan:
     ContractAnalyzer.getContractExpirationForPlan.bind(ContractAnalyzer),
 
@@ -129,11 +125,11 @@ export default Calculator;
 // Browser compatibility
 if (typeof window !== 'undefined') {
   const w = window as unknown as Record<string, unknown>;
-  w['Calculator'] = Calculator;
-  w['CostCalculator'] = CostCalculator;
-  w['ETFCalculator'] = ETFCalculator;
-  w['ContractAnalyzer'] = ContractAnalyzer;
-  w['PlanRanker'] = PlanRanker;
+  w.Calculator = Calculator;
+  w.CostCalculator = CostCalculator;
+  w.ETFCalculator = ETFCalculator;
+  w.ContractAnalyzer = ContractAnalyzer;
+  w.PlanRanker = PlanRanker;
 }
 
 // CommonJS compatibility

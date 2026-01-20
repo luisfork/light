@@ -183,7 +183,7 @@ export { UsageEstimator, SEASONAL_MULTIPLIERS, HOME_SIZE_USAGE };
 
 // Browser environment: attach to window for compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['UsageEstimator'] = UsageEstimator;
+  (window as unknown as Record<string, unknown>).UsageEstimator = UsageEstimator;
 }
 
 // CommonJS export for Node.js compatibility (tests)

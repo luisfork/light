@@ -138,7 +138,7 @@ export { DataLoader, FetchError };
 
 // Browser environment: attach to window for compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['DataLoader'] = DataLoader;
+  (window as unknown as Record<string, unknown>).DataLoader = DataLoader;
 }
 
 // CommonJS export for Node.js compatibility (tests)

@@ -249,7 +249,7 @@ const PlanRanker = {
    * Get warning message for non-fixed rate plans.
    */
   getNonFixedWarning(rateType: string): string {
-    return NON_FIXED_WARNINGS[rateType] ?? NON_FIXED_WARNINGS['default'] ?? '';
+    return NON_FIXED_WARNINGS[rateType] ?? NON_FIXED_WARNINGS.default ?? '';
   },
 
   /**
@@ -267,7 +267,7 @@ const PlanRanker = {
     // Get calculator (fallback to global if available)
     const windowCalc =
       typeof window !== 'undefined'
-        ? (window as unknown as Record<string, CostCalculatorLike | undefined>)['CostCalculator']
+        ? (window as unknown as Record<string, CostCalculatorLike | undefined>).CostCalculator
         : undefined;
     const calculator: CostCalculatorLike | null = CostCalc ?? windowCalc ?? null;
 
@@ -731,7 +731,7 @@ export type { RankedPlan, ScoreBreakdown, RankingOptions, ComparisonSummary, Ran
 
 // Browser compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['PlanRanker'] = PlanRanker;
+  (window as unknown as Record<string, unknown>).PlanRanker = PlanRanker;
 }
 
 // CommonJS compatibility

@@ -184,7 +184,7 @@ export type { TaxDataFile, CityTaxData, RangeTaxData, ExtendedTaxInfo, Deregulat
 
 // Browser environment: attach to window for compatibility
 if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>)['TaxLookup'] = TaxLookup;
+  (window as unknown as Record<string, unknown>).TaxLookup = TaxLookup;
 }
 
 // CommonJS export for Node.js compatibility (tests)
