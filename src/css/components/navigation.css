@@ -63,6 +63,8 @@
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--color-keyline-light);
+  /* Performance: isolate to prevent repainting child elements */
+  isolation: isolate;
 }
 
 .theme-dark .site-header {
@@ -141,6 +143,19 @@
   color: var(--color-text-primary);
 }
 
+/* Focus states for navigation */
+.nav-item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.site-brand:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
 /* ==============================
    Tab Navigation
    ============================== */
@@ -174,6 +189,13 @@
 .tabnav-item.is-active {
   color: var(--color-text-primary);
   border-bottom-color: var(--color-text-primary);
+}
+
+/* Tab navigation focus state */
+.tabnav-item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 /* ==============================

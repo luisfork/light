@@ -25,6 +25,8 @@
   transition:
     opacity var(--duration-normal) var(--ease-standard),
     visibility var(--duration-normal) var(--ease-standard);
+  /* Performance: isolate backdrop for compositing */
+  isolation: isolate;
 }
 
 .modal-backdrop:not([hidden]) {
@@ -39,14 +41,16 @@
 .modal-dialog {
   position: relative;
   width: 100%;
-  max-width: 560px;
+  max-width: 35rem; /* 560px */
   max-height: calc(100vh - var(--space-12));
   overflow-y: auto;
   background: var(--color-bg-primary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
-  transform: translateY(20px) scale(0.95);
+  transform: translateY(1.25rem) scale(0.95);
   transition: transform var(--duration-normal) var(--ease-standard);
+  /* Performance: promote to compositor layer during animation */
+  will-change: transform;
 }
 
 .modal-backdrop:not([hidden]) .modal-dialog {
@@ -58,12 +62,12 @@
   position: absolute;
   top: var(--space-4);
   right: var(--space-4);
-  width: 32px;
-  height: 32px;
+  width: 2rem; /* 32px */
+  height: 2rem; /* 32px */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 1.25rem; /* 20px */
   line-height: 1;
   color: var(--color-text-tertiary);
   background: var(--color-bg-secondary);
@@ -122,8 +126,8 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
-  min-width: 280px;
-  max-width: 420px;
+  min-width: 17.5rem; /* 280px */
+  max-width: 26.25rem; /* 420px */
   padding: var(--space-4);
   background: var(--color-bg-primary);
   border-radius: var(--radius-md);
@@ -134,6 +138,8 @@
   transition:
     transform var(--duration-normal) var(--ease-standard),
     opacity var(--duration-normal) var(--ease-standard);
+  /* Performance: promote to compositor layer during animation */
+  will-change: transform, opacity;
 }
 
 .toast.visible {
@@ -149,8 +155,8 @@
 /* Toast Icon */
 .toast-icon {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 1.5rem; /* 24px */
+  height: 1.5rem; /* 24px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -197,8 +203,8 @@
 /* Toast Close */
 .toast-close {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 1.25rem; /* 20px */
+  height: 1.25rem; /* 20px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,13 +224,18 @@
   background: var(--color-bg-secondary);
 }
 
+.toast-close:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 /* Toast Progress Bar */
 .toast-progress {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 0.1875rem; /* 3px */
   background: var(--color-border-secondary);
   border-radius: 0 0 var(--radius-md) var(--radius-md);
   overflow: hidden;

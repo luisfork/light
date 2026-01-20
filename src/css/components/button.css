@@ -77,6 +77,11 @@
   background: var(--color-bg-tertiary);
 }
 
+.button-secondary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 /* ==============================
    Ghost/Text Button
    ============================== */
@@ -103,6 +108,11 @@
   text-decoration: underline;
 }
 
+.button-ghost:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 /* ==============================
    Icon Button
    ============================== */
@@ -111,8 +121,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 2rem; /* 32px */
+  height: 2rem; /* 32px */
   background: var(--color-bg-secondary);
   color: var(--color-text-secondary);
   border: none;
@@ -128,20 +138,25 @@
   color: var(--color-text-primary);
 }
 
+.button-icon:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 /* ==============================
    Button Sizes
    ============================== */
 
 .button-sm {
-  padding: 2px 8px;
-  font-size: 11px;
-  min-width: 36px;
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.6875rem; /* 11px */
+  min-width: 2.25rem; /* 36px */
 }
 
 .button-lg {
   padding: var(--space-2) var(--space-5);
   font-size: var(--text-body-reduced);
-  min-width: 80px;
+  min-width: 5rem; /* 80px */
 }
 
 /* ==============================

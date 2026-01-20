@@ -199,7 +199,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-1);
   padding: var(--space-3) var(--space-4);
   background: transparent;
   border: none;
@@ -212,6 +212,11 @@
 
 .method-option:hover {
   background: var(--color-bg-primary);
+}
+
+.method-option:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .method-option.active {
@@ -294,5 +299,23 @@
     position: static;
     transform: none;
     margin-top: var(--space-2);
+  }
+
+  /* Stack method selector on mobile */
+  .method-selector {
+    flex-direction: column;
+  }
+
+  .method-option {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    text-align: left;
+  }
+
+  .method-name,
+  .method-desc {
+    text-align: left;
   }
 }

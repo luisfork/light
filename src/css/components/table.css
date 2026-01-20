@@ -13,8 +13,11 @@
 .table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin: 0 calc(-1 * var(--content-padding));
-  padding: 0 var(--content-padding);
+  /* Fix: Use inline margins to prevent horizontal scrollbar on mobile */
+  margin-inline: calc(-1 * var(--content-padding));
+  padding-inline: var(--content-padding);
+  /* Performance: promote to compositor layer for smooth scrolling */
+  will-change: scroll-position;
 }
 
 /* ==============================
@@ -58,6 +61,11 @@
 
 .comparison-table th.sortable:hover {
   color: var(--color-text-primary);
+}
+
+.comparison-table th.sortable:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
 }
 
 .comparison-table th.sorted-asc::after,
@@ -138,8 +146,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem; /* 28px */
+  height: 1.75rem; /* 28px */
   font-family: var(--font-primary);
   font-size: var(--text-body-reduced);
   font-weight: 700;
@@ -246,4 +254,48 @@
 
 .etf-disclaimer strong {
   color: var(--color-text-primary);
+}
+
+/* ==============================
+   Mobile Responsive Table
+   ============================== */
+
+@media (max-width: 734px) {
+  .comparison-table th,
+  .comparison-table td {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-caption);
+  }
+
+  .col-provider {
+    min-width: 100px;
+  }
+
+  .col-plan {
+    min-width: 140px;
+  }
+
+  /* Hide less critical columns on mobile */
+  .col-contract-end,
+  .col-renewable {
+    display: none;
+  }
+
+  .grade-legend-enhanced {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .grade-legend-items {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Further simplify on very small screens */
+  .col-etf {
+    display: none;
+  }
 }

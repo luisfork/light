@@ -515,18 +515,34 @@ small {
    FOCUS STATES — Accessibility
    ============================== */
 
+/* High-visibility focus ring using design system accent color */
 :focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: var(--color-focus-offset);
+  border-radius: var(--radius-sm);
 }
 
+/* Container focus offset for grouped elements */
 .focus-container :focus-visible {
   outline-offset: var(--color-focus-offset-container);
 }
 
-/* Remove default focus outline when using :focus-visible */
+/* Remove focus outline for mouse/touch unless focus-visible */
 :focus:not(:focus-visible) {
   outline: none;
+}
+
+/* Ensure buttons and interactive elements have visible focus */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 /* ==============================
@@ -542,6 +558,15 @@ small {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Disable backdrop-filter animations for performance */
+  .site-header,
+  .modal-backdrop,
+  .globalnav-scrim,
+  .localnav {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 /* ==============================
@@ -549,12 +574,27 @@ small {
    ============================== */
 
 @media (prefers-contrast: more) {
+  :root {
+    --color-text-secondary: #4a4a4d;
+    --color-text-tertiary: #636366;
+    --color-border-primary: rgba(0, 0, 0, 0.4);
+  }
+
   a:link {
     text-decoration: underline;
   }
 
   :focus-visible {
     outline-width: 3px;
+    outline-offset: 3px;
+  }
+
+  /* Ensure sufficient contrast on translucent backgrounds */
+  .site-header,
+  .modal-backdrop {
+    background: var(--color-bg-primary);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
 
@@ -573,6 +613,28 @@ small {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Skip link becomes visible on focus for keyboard navigation */
+#skip-link:focus {
+  position: fixed;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: 9999;
+  width: auto;
+  height: auto;
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  background: var(--color-bg-primary);
+  color: var(--color-link);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 /* Hidden from everyone */
