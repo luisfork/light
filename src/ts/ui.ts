@@ -59,6 +59,7 @@ interface UIState {
   localTaxRate: number;
   taxInfo: TaxInfo | null;
   lastFocusedElement: HTMLElement | null;
+  modalKeydownHandler: ((event: KeyboardEvent) => void) | null;
   data?: {
     duplicate_count?: number;
     total_plans?: number;
@@ -282,7 +283,8 @@ const UI = {
     lastCalculation: null,
     localTaxRate: 0,
     taxInfo: null,
-    lastFocusedElement: null
+    lastFocusedElement: null,
+    modalKeydownHandler: null
   } as UIState,
 
   elements: {} as UIElements,
@@ -389,6 +391,7 @@ const UI = {
     // Usage method tabs
     this.elements.methodOptions.forEach((option) => {
       option.addEventListener('click', () => this.handleMethodChange(option));
+      option.addEventListener('keydown', (event) => this.handleMethodKeydown(event, option));
     });
 
     // Home size select
@@ -423,6 +426,22 @@ const UI = {
     if (this.elements.filterRenewable !== null) {
       this.elements.filterRenewable.addEventListener('change', () => this.applyFilters());
     }
+
+    // Sorting headers
+    const sortableHeaders = document.querySelectorAll<HTMLTableCellElement>(
+      '.comparison-table th.sortable'
+    );
+    sortableHeaders.forEach((header) => {
+      header.tabIndex = 0;
+      header.setAttribute('aria-sort', 'none');
+      header.addEventListener('click', () => this.handleSort(header));
+      header.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          this.handleSort(header);
+        }
+      });
+    });
 
     // Modal
     if (this.elements.modalBackdrop !== null) {
@@ -672,6 +691,43 @@ const UI = {
         panel.setAttribute('aria-hidden', String(m !== method));
       }
     });
+
+    this.triggerAutoCalculate();
+  },
+
+  handleMethodKeydown(event: KeyboardEvent, option: HTMLElement): void {
+    const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (!keys.includes(event.key)) return;
+
+    event.preventDefault();
+    const options = Array.from(this.elements.methodOptions);
+    if (options.length === 0) return;
+
+    const currentIndex = options.indexOf(option);
+    if (currentIndex === -1) return;
+
+    let nextIndex = currentIndex;
+    switch (event.key) {
+      case 'ArrowRight':
+        nextIndex = (currentIndex + 1) % options.length;
+        break;
+      case 'ArrowLeft':
+        nextIndex = (currentIndex - 1 + options.length) % options.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = options.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    const nextOption = options[nextIndex];
+    if (nextOption === undefined) return;
+    nextOption.focus();
+    this.handleMethodChange(nextOption);
   },
 
   handleMonthlyInput(): void {
@@ -791,7 +847,10 @@ const UI = {
       );
 
       this.state.rankedPlans = rankedPlans;
-      this.displayResults(rankedPlans as unknown as RankedPlanWithMetrics[], monthlyUsage);
+      this.sortState.column = null;
+      this.sortState.direction = 'desc';
+      this.updateSortIndicators();
+      this.displayResults(monthlyUsage);
 
       if (this.elements.resultsSection !== null) {
         this.elements.resultsSection.hidden = false;
@@ -828,14 +887,9 @@ const UI = {
     if (this.elements.statusReady !== null) this.elements.statusReady.hidden = false;
   },
 
-  displayResults(plans: RankedPlanWithMetrics[], monthlyUsage: number[]): void {
+  displayResults(monthlyUsage: number[]): void {
     this.displayUsageProfile(monthlyUsage);
-    this.displayTopPlans(plans);
-    this.displayComparisonTable(plans);
-
-    if (this.elements.resultsCount !== null) {
-      this.elements.resultsCount.textContent = String(plans.length);
-    }
+    this.applyFilters();
 
     this.revealResultsSection();
   },
@@ -946,6 +1000,12 @@ const UI = {
 
   displayComparisonTable(plans: RankedPlanWithMetrics[]): void {
     if (this.elements.comparisonBody === null) return;
+
+    if (plans.length === 0) {
+      this.elements.comparisonBody.innerHTML =
+        '<tr><td class="table-empty" colspan="11">No plans match your current filters.</td></tr>';
+      return;
+    }
 
     this.elements.comparisonBody.innerHTML = plans
       .map((plan) => {
@@ -1100,12 +1160,52 @@ const UI = {
     this.elements.modalBackdrop.hidden = false;
     this.elements.modalBackdrop.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    this.setupModalFocusTrap();
 
     if (this.elements.modalClose !== null) {
       this.elements.modalClose.focus();
     } else if (this.elements.modalDialog !== null) {
       this.elements.modalDialog.focus();
     }
+  },
+
+  setupModalFocusTrap(): void {
+    const modalBackdrop = this.elements.modalBackdrop;
+    if (modalBackdrop === null) return;
+
+    const focusableSelector =
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
+    const getFocusableElements = (): HTMLElement[] =>
+      Array.from(modalBackdrop.querySelectorAll<HTMLElement>(focusableSelector));
+
+    const handler = (event: KeyboardEvent): void => {
+      if (event.key !== 'Tab') return;
+
+      const focusable = getFocusableElements();
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (first === undefined || last === undefined) return;
+
+      if (event.shiftKey) {
+        if (document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else if (document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    if (this.state.modalKeydownHandler !== null) {
+      document.removeEventListener('keydown', this.state.modalKeydownHandler);
+    }
+
+    this.state.modalKeydownHandler = handler;
+    document.addEventListener('keydown', handler);
   },
 
   closeModal(): void {
@@ -1116,6 +1216,11 @@ const UI = {
 
     document.body.style.overflow = '';
 
+    if (this.state.modalKeydownHandler !== null) {
+      document.removeEventListener('keydown', this.state.modalKeydownHandler);
+      this.state.modalKeydownHandler = null;
+    }
+
     const lastFocused = this.state.lastFocusedElement;
     if (lastFocused !== null) {
       lastFocused.focus();
@@ -1123,8 +1228,161 @@ const UI = {
     }
   },
 
+  getFilteredPlans(): RankedPlanWithMetrics[] {
+    const plans = (this.state.rankedPlans ?? []) as RankedPlanWithMetrics[];
+    let filtered = plans.slice();
+
+    const termFilter = this.elements.filterTerm?.value ?? 'all';
+    if (termFilter !== 'all') {
+      filtered = filtered.filter((plan) => {
+        if (termFilter === 'short') return plan.term_months >= 3 && plan.term_months <= 6;
+        if (termFilter === 'medium') return plan.term_months === 12;
+        if (termFilter === 'long') return plan.term_months >= 24;
+        return true;
+      });
+    }
+
+    const renewableFilter = this.elements.filterRenewable?.value ?? 'all';
+    if (renewableFilter !== 'all') {
+      const threshold = Number.parseInt(renewableFilter, 10);
+      if (Number.isFinite(threshold)) {
+        filtered = filtered.filter((plan) => plan.renewable_pct >= threshold);
+      }
+    }
+
+    return filtered;
+  },
+
+  getContractEndTimestamp(plan: RankedPlanWithMetrics): number {
+    const contractEnd = new Date();
+    contractEnd.setMonth(contractEnd.getMonth() + plan.term_months);
+    return contractEnd.getTime();
+  },
+
+  getSortValue(column: string, plan: RankedPlanWithMetrics): number | string {
+    switch (column) {
+      case 'quality':
+        return plan.qualityScore;
+      case 'provider':
+        return plan.rep_name;
+      case 'plan':
+        return plan.plan_name;
+      case 'term':
+        return plan.term_months;
+      case 'contractEnd':
+        return this.getContractEndTimestamp(plan);
+      case 'annual':
+        return plan.annualCost;
+      case 'monthly':
+        return plan.averageMonthlyCost;
+      case 'rate':
+        return plan.effectiveRate;
+      case 'renewable':
+        return plan.renewable_pct;
+      case 'cancelFee':
+        return ETFCalculator.calculateEarlyTerminationFee(plan, plan.term_months).total;
+      default:
+        return 0;
+    }
+  },
+
+  getSortedPlans(plans: RankedPlanWithMetrics[]): RankedPlanWithMetrics[] {
+    if (this.sortState.column === null) return plans;
+
+    const column = this.sortState.column;
+    const direction = this.sortState.direction === 'asc' ? 1 : -1;
+
+    return [...plans].sort((a, b) => {
+      const aValue = this.getSortValue(column, a);
+      const bValue = this.getSortValue(column, b);
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return direction * aValue.localeCompare(bValue, 'en', { sensitivity: 'base' });
+      }
+
+      const aNumber = typeof aValue === 'number' ? aValue : Number.parseFloat(aValue);
+      const bNumber = typeof bValue === 'number' ? bValue : Number.parseFloat(bValue);
+
+      if (!Number.isFinite(aNumber) || !Number.isFinite(bNumber)) return 0;
+      return direction * (aNumber - bNumber);
+    });
+  },
+
+  getDefaultSortDirection(column: string): SortDirection {
+    switch (column) {
+      case 'quality':
+      case 'renewable':
+        return 'desc';
+      case 'annual':
+      case 'monthly':
+      case 'rate':
+      case 'cancelFee':
+      case 'term':
+      case 'contractEnd':
+        return 'asc';
+      case 'provider':
+      case 'plan':
+        return 'asc';
+      default:
+        return 'desc';
+    }
+  },
+
+  updateSortIndicators(): void {
+    const headers = document.querySelectorAll<HTMLTableCellElement>(
+      '.comparison-table th.sortable'
+    );
+
+    headers.forEach((header) => {
+      header.classList.remove('sorted-asc', 'sorted-desc');
+      header.setAttribute('aria-sort', 'none');
+    });
+
+    if (this.sortState.column === null) return;
+
+    const activeHeader = Array.from(headers).find((header) => {
+      const dataset = header.dataset as DOMStringMap & { sort?: string };
+      return dataset.sort === this.sortState.column;
+    });
+
+    if (activeHeader !== undefined) {
+      const sortClass = this.sortState.direction === 'asc' ? 'sorted-asc' : 'sorted-desc';
+      activeHeader.classList.add(sortClass);
+      activeHeader.setAttribute(
+        'aria-sort',
+        this.sortState.direction === 'asc' ? 'ascending' : 'descending'
+      );
+    }
+  },
+
+  handleSort(header: HTMLTableCellElement): void {
+    const dataset = header.dataset as DOMStringMap & { sort?: string };
+    const column = dataset.sort ?? null;
+    if (column === null) return;
+
+    if (this.sortState.column === column) {
+      this.sortState.direction = this.sortState.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortState.column = column;
+      this.sortState.direction = this.getDefaultSortDirection(column);
+    }
+
+    this.updateSortIndicators();
+    this.applyFilters();
+  },
+
   applyFilters(): void {
-    // Filter implementation placeholder
+    if (this.state.rankedPlans === null) return;
+
+    const filtered = this.getFilteredPlans();
+    const sorted = this.getSortedPlans(filtered);
+
+    this.displayTopPlans(sorted);
+    this.displayComparisonTable(sorted);
+
+    if (this.elements.resultsCount !== null) {
+      this.elements.resultsCount.textContent = String(sorted.length);
+    }
   },
 
   escapeHtml(text: string | null | undefined): string {

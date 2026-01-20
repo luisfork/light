@@ -74,17 +74,21 @@
               <div class="field-group">
                 <label for="zip-code" class="field-label">Texas ZIP Code</label>
                 <div class="zip-input-container">
-                      <input type="text"
-                        id="zip-code"
-                        class="field-input field-input-zip"
-                        placeholder="75001"
-                        maxlength="5"
-                        pattern="[0-9]{5}"
-                        inputmode="numeric"
-                        autocomplete="postal-code"
-                        aria-describedby="zip-status"
-                        required>
-                      <div class="zip-status-container" id="zip-status" role="status" aria-live="polite" aria-atomic="true"></div>
+                  <input type="text"
+                         id="zip-code"
+                         class="field-input field-input-zip"
+                         placeholder="75001"
+                         maxlength="5"
+                         pattern="[0-9]{5}"
+                         inputmode="numeric"
+                         autocomplete="postal-code"
+                         aria-describedby="zip-status"
+                         required>
+                  <div class="zip-status-container"
+                       id="zip-status"
+                       role="status"
+                       aria-live="polite"
+                       aria-atomic="true"></div>
                 </div>
               </div>
               <div class="tdu-display" id="tdu-display" hidden>
@@ -124,42 +128,42 @@
                    role="tablist"
                    aria-label="Usage input method">
                 <button class="method-option active"
-                  role="tab"
-                  aria-selected="true"
-                  aria-controls="panel-estimate"
-                  tabindex="0"
-                  data-method="estimate"
-                  id="tab-estimate">
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="panel-estimate"
+                        tabindex="0"
+                        data-method="estimate"
+                        id="tab-estimate">
                   <span class="method-name">Quick Estimate</span>
                   <span class="method-desc">Based on home size</span>
                 </button>
                 <button class="method-option"
-                  role="tab"
-                  aria-selected="false"
-                  aria-controls="panel-average"
-                  tabindex="-1"
-                  data-method="average"
-                  id="tab-average">
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-average"
+                        tabindex="-1"
+                        data-method="average"
+                        id="tab-average">
                   <span class="method-name">Monthly Average</span>
                   <span class="method-desc">Single value input</span>
                 </button>
                 <button class="method-option"
-                  role="tab"
-                  aria-selected="false"
-                  aria-controls="panel-detailed"
-                  tabindex="-1"
-                  data-method="detailed"
-                  id="tab-detailed">
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-detailed"
+                        tabindex="-1"
+                        data-method="detailed"
+                        id="tab-detailed">
                   <span class="method-name">Detailed Usage</span>
                   <span class="method-desc">12-month breakdown</span>
                 </button>
               </div>
               <!-- Estimate Panel -->
-                  <div class="usage-panel active"
-                    id="panel-estimate"
-                    role="tabpanel"
-                    aria-labelledby="tab-estimate"
-                    aria-hidden="false">
+              <div class="usage-panel active"
+                   id="panel-estimate"
+                   role="tabpanel"
+                   aria-labelledby="tab-estimate"
+                   aria-hidden="false">
                 <div class="field-group">
                   <label for="home-size" class="field-label">Home Size / Typical Usage</label>
                   <select id="home-size" class="field-select">
@@ -177,12 +181,12 @@
                 </div>
               </div>
               <!-- Average Panel -->
-                  <div class="usage-panel"
-                    id="panel-average"
-                    role="tabpanel"
-                    aria-labelledby="tab-average"
-                    aria-hidden="true"
-                    hidden>
+              <div class="usage-panel"
+                   id="panel-average"
+                   role="tabpanel"
+                   aria-labelledby="tab-average"
+                   aria-hidden="true"
+                   hidden>
                 <div class="field-group">
                   <label for="avg-kwh" class="field-label">Average Monthly Usage (kWh)</label>
                   <div class="input-with-unit">
@@ -199,12 +203,12 @@
                 </div>
               </div>
               <!-- Detailed Panel -->
-                  <div class="usage-panel"
-                    id="panel-detailed"
-                    role="tabpanel"
-                    aria-labelledby="tab-detailed"
-                    aria-hidden="true"
-                    hidden>
+              <div class="usage-panel"
+                   id="panel-detailed"
+                   role="tabpanel"
+                   aria-labelledby="tab-detailed"
+                   aria-hidden="true"
+                   hidden>
                 <p class="panel-intro">
                   Enter your actual monthly usage for the most accurate calculation.
                   You can find this data on Smart Meter Texas or your past utility bills.
@@ -338,6 +342,10 @@
                     <span class="spinner-sm"></span>
                     Analyzing plans...
                   </span>
+                  <span class="status-ready" id="status-ready" hidden>
+                    <span class="status-dot"></span>
+                    Results ready. Scroll to plan results below.
+                  </span>
                 </div>
               </div>
               <!-- Hidden calculate button for compatibility -->
@@ -363,9 +371,16 @@
               </p>
             </div>
             <!-- Usage Profile Summary -->
-            <div class="usage-profile" id="usage-profile" data-reveal role="region" aria-labelledby="usage-profile-title">
+            <div class="usage-profile"
+                 id="usage-profile"
+                 data-reveal
+                 role="region"
+                 aria-labelledby="usage-profile-title">
               <h3 class="profile-title" id="usage-profile-title">Your Usage Profile</h3>
-              <div class="profile-chart" id="usage-chart" role="img" aria-label="Monthly electricity usage pattern"></div>
+              <div class="profile-chart"
+                   id="usage-chart"
+                   role="img"
+                   aria-label="Monthly electricity usage pattern"></div>
               <div class="profile-stats">
                 <div class="profile-stat">
                   <span class="stat-value" id="profile-annual">--</span>
@@ -382,7 +397,11 @@
               </div>
             </div>
             <!-- Top Recommendations -->
-            <div class="recommendations" id="recommendations" data-reveal role="region" aria-labelledby="recommendations-title">
+            <div class="recommendations"
+                 id="recommendations"
+                 data-reveal
+                 role="region"
+                 aria-labelledby="recommendations-title">
               <div class="section-header-enhanced">
                 <h3 class="section-heading" id="recommendations-title">Lowest Cost Plans</h3>
                 <div class="ranking-notes">
@@ -628,12 +647,12 @@
     </div>
     <!-- Plan Details Modal -->
     <div class="modal-backdrop" id="modal-backdrop" aria-hidden="true" hidden>
-       <div class="modal-dialog"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="modal-title"
-         aria-describedby="modal-description"
-         tabindex="-1">
+      <div class="modal-dialog"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="modal-title"
+           aria-describedby="modal-description"
+           tabindex="-1">
         <button class="modal-close" id="modal-close" aria-label="Close">×</button>
         <div class="modal-body" id="modal-body"></div>
       </div>

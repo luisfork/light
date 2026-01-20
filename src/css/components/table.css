@@ -95,6 +95,12 @@
   background: var(--color-bg-tertiary);
 }
 
+.table-empty {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--color-text-tertiary);
+}
+
 /* ==============================
    Column-Specific Styling
    ============================== */

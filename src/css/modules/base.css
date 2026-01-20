@@ -360,6 +360,11 @@ p {
   line-height: var(--leading-body);
 }
 
+strong {
+  font-weight: 400;
+  color: var(--color-text-primary);
+}
+
 /* Links */
 a {
   color: var(--color-link);
